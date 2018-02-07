@@ -121,6 +121,7 @@ class ZAlert {
     
     static func ShowError(_ text:String, error:Error) {
         ZAlert.Say(text, subText:error.GetMessage())
+        ZDebug.Print("Show Error:\n", text)
     }
 }
 

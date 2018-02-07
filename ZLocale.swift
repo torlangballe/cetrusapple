@@ -70,7 +70,7 @@ struct ZLocale {
         return (lang, ccode)
     }
     
-    static func Pluralize(word:String, count:Int, langCode:String? = nil, pluralWord:String? = nil) -> String {
+    static func Pluralize(word:String, count:Double, langCode:String? = nil, pluralWord:String? = nil) -> String {
         var lang = GetDeviceLanguageCode()
         if langCode != nil {
             lang = langCode!
@@ -116,6 +116,10 @@ struct ZLocale {
             return ZTS("hours") // generic name for hours plural
         }
         return ZTS("hour")    // generic name for hour singular
+    }
+    
+    static func GetToday() -> String {
+        return ZTS("Today") // generic name for today
     }
 
     // these three functions insert day/month/year symbol after date in picker, only needed for ja so far.
@@ -348,6 +352,35 @@ struct ZLocale {
         return distance + " " + word
     }
     
+    static func MemorySizeAsString(_ b:Int, langCode:String = "") -> String {
+        let kiloByte  = 1024.0
+        let megaByte  = kiloByte * 1024
+        let gigaByte  = megaByte * 1024
+        let terraByte = gigaByte * 1024
+
+        var word = "TB"
+        var n = Double(b) / terraByte
+        let d = Double(b)
+        switch d {
+        case 0..<kiloByte:
+            word = "B"
+            n = Double(b)
+        case kiloByte ..< megaByte:
+            word = "KB"
+            n = Double(b)/kiloByte
+        case megaByte ..< gigaByte:
+            word = "MB"
+            n = Double(b)/megaByte
+        case gigaByte ..< terraByte:
+            word = "GB"
+            n = Double(b)/gigaByte
+        default:
+            break
+        }
+        let str = ZStrUtil.NiceDouble(n, maxSig:3) + " " + word
+        return str
+    }
+
     static func GetHemisphereDirectionsFromGeoAlignment(_ alignment:ZAlignment, separator:String, langCode:String) -> String {
         var str = ""
         if alignment & .Top {

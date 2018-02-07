@@ -28,11 +28,18 @@ class ZResource: NSBundleResourceRequest, ZTimerOwner {
             if ready {
                 self?.done = true
                 self!.addToList(self!)
-                ZDebug.Print("Zresource.BeginAccessing. ready conditionally.", self!.sid, self!.tags)
+                ZDebug.Print("ZResource.BeginAccessing. ready conditionally.", self!.sid, self!.tags)
                 ZMainQue.async { () in
                     got(nil)
                 }
                 return
+            } else {
+                ZDebug.Print("ZResource.BeginAccessing. NOT ready conditionally.", self!.sid, self!.tags)
+            }
+            self!.timer.Set(5, owner:self) { [weak self] () in
+                if self != nil {
+                    ZDebug.Print("ZResource still getting:", self!.progress.fractionCompleted, self!.sid, self!.tags)
+                }
             }
             self!.beginAccessingResources() { [weak self] (error) in
                 if error != nil {
@@ -41,7 +48,7 @@ class ZResource: NSBundleResourceRequest, ZTimerOwner {
                 if error == nil {
                     self!.addToList(self!)
                 }
-                ZDebug.Print("Zresource.BeginAccessing. done.", error?.localizedDescription ?? "", self!.sid, self!.tags)
+                ZDebug.Print("ZResource.Done BeginAccessing.", error?.localizedDescription ?? "", self!.sid, self!.tags)
                 ZMainQue.async { [weak self] () in
                     self?.timer.Stop()
                     self?.done = true

@@ -10,12 +10,14 @@ import UIKit
 
 class ZTitleBar : ZStackView {
     enum CloseButtons: String { case left = "arrow.left", down = "arrow.down", cross = "cross", none = "" }
-    let closeButton: ZImageView
+    var closeButton: ZImageView
     let notchInc = 16
     var dots: ZCountDots? = nil
     //    let horStack = ZHStackView(space:16)
     let title: ZLabel
     var sizeCalculated = false
+    weak var closeHandler:ZViewHandler? = nil
+    
     static var Color = ZColor(r:0.2, g:0.3, b:1)
     
     init(text:String = "", closeType:CloseButtons = .cross, showDots:Bool = false, closeAlignX:ZAlignment = .Right) {
@@ -62,8 +64,8 @@ class ZTitleBar : ZStackView {
     override func HandlePressed(_ sender: ZView, pos:ZPos) {
         switch sender.View() {
         case closeButton:
-            if tapTarget != nil && tapTarget! != self {
-                tapTarget?.HandlePressed(self, pos:LocalRect.Center)
+            if closeHandler != nil {
+                closeHandler!.HandleClose(sender:self)
             } else {
                 ZPopTopView(overrideDuration:0, overrideTransition:.fade)
             }
@@ -82,19 +84,12 @@ class ZTitleBar : ZStackView {
                 return true
             }
         }
-        minSize.h = 44
-        if Rect.Min.y == 0 && ZScreen.IsPortrait {
-            minSize.h = 64
-        }
-        if ZScreen.HasNotch() {
-            minSize.h += 16
-        }
+        minSize.h = 44 + ZScreen.StatusBarHeight
     }
     
     func ShowActivity(_ show:Bool = true) {
-        print("**************** SHOWACTIVITY:", show)
-        if show {
-            let activity = ZActivityIndicator()
+        if show && FindCellWithName("activity") == nil {            
+            let activity = ZActivityIndicator(big:false)
             Add(activity, align:.VertCenter | .Right)
             activity.Start()
         } else {

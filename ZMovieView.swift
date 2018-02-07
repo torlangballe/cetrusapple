@@ -9,13 +9,15 @@
 import AVKit
 
 class ZMovieView : ZCustomView {
-    var player:AVPlayer? = nil
+    var player:ZPlayer? = nil
     var seeking = false
-    
-    init(url:String) {
+    var handlePlayPause: ((_ play:Bool)->Void)? = nil
+    var playerLayer:AVPlayerLayer? = nil
+
+    init() {
         super.init(name:"zmovieview")
     }
-    
+
     required init?(coder aDecoder: NSCoder) { fatalError("init(coder:) has not been implemented") }
 
     func SetUrl(_ url:String) {
@@ -23,12 +25,17 @@ class ZMovieView : ZCustomView {
             let playerItem = AVPlayerItem(url:u)
             // [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(playFinished:) name:AVPlayerItemDidPlayToEndTimeNotification object:playerItem];
             player = AVPlayer(playerItem:playerItem)
-            let playerLayer = AVPlayerLayer(player:player!)
-            playerLayer.videoGravity = .resizeAspect
-            self.layer.addSublayer(playerLayer)
-            playerLayer.frame = self.bounds
+            playerLayer = AVPlayerLayer(player:player!)
+            playerLayer!.videoGravity = .resizeAspect
+            self.layer.addSublayer(playerLayer!)
+            playerLayer!.frame = self.bounds
             player?.play()
+            player?.addObserver(self, forKeyPath:"rate", options:NSKeyValueObservingOptions(), context:nil)
         }
+    }
+
+    override func HandleAfterLayout() {
+        playerLayer?.frame = self.bounds
     }
     
     func Play() {
@@ -59,6 +66,12 @@ class ZMovieView : ZCustomView {
                 return ZMath.NanCheck(CMTimeGetSeconds(player!.currentItem!.duration), set:0)
             }
             return 0.0
+        }
+    }
+
+    override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
+        if keyPath == "rate" {
+            handlePlayPause?(player!.rate != 0)
         }
     }
 }

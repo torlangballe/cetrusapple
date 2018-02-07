@@ -35,7 +35,7 @@ class ZLangTextsField : ZStackView, ZTextEditDelegate {
         super.init()
 
         vertical = true
-        textView.target = self
+        textView.SetTarget(self)
 
         Add(textView, align:.Top | .Left | .HorExpand | .NonProp, marg:ZSize(6, 4))
    

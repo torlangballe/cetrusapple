@@ -10,8 +10,7 @@ import Foundation
 
 struct ZAlignment : OptionSet, CustomDebugStringConvertible, CustomStringConvertible {
     
-    let rawValue: Int
-    init(rawValue: Int) { self.rawValue = rawValue }
+    var rawValue: Int
     
     static let None = ZAlignment(rawValue: 0)                 // 0
     static let Left = ZAlignment(rawValue: 1<<0)              // 1
@@ -39,8 +38,49 @@ struct ZAlignment : OptionSet, CustomDebugStringConvertible, CustomStringConvert
     static let Scale = HorScale|VertScale
     static let Out = HorOut|VertOut
     static let Vertical = Top|VertCenter|Bottom|VertExpand|VertShrink|VertOut
-    static let Horizontal = Top|HorCenter|Bottom|HorExpand|HorShrink|HorOut
+    static let Horizontal = Left|HorCenter|Right|HorExpand|HorShrink|HorOut
     
+    init(rawValue: Int) { self.rawValue = rawValue }
+
+    init(string:String) {
+        var a = 0
+        for s in string.split(separator:" ") {
+            switch s {
+            case "left":
+                a |= ZAlignment.Left.rawValue
+            case "horcenter":
+                a |= ZAlignment.HorCenter.rawValue
+            case "right":
+                a |= ZAlignment.Right.rawValue
+            case "top":
+                a |= ZAlignment.Top.rawValue
+            case "vertcenter":
+                a |= ZAlignment.VertCenter.rawValue
+            case "bottom":
+                a |= ZAlignment.Bottom.rawValue
+            case "horexpand":
+                a |= ZAlignment.HorExpand.rawValue
+            case "vertexpand":
+                a |= ZAlignment.VertExpand.rawValue
+            case "horshrink":
+                a |= ZAlignment.HorShrink.rawValue
+            case "vertshrink":
+                a |= ZAlignment.VertShrink.rawValue
+            case "horout":
+                a |= ZAlignment.HorOut.rawValue
+            case "vertout":
+                a |= ZAlignment.VertOut.rawValue
+            case "nonprop":
+                a |= ZAlignment.NonProp.rawValue
+            case "horjustify":
+                a |= ZAlignment.HorJustify.rawValue
+            default:
+                break
+            }
+        }
+        self.rawValue = a
+    }
+
     func FlippedVertical() -> ZAlignment {
         var r = (rawValue & ZAlignment.Horizontal.rawValue)
         if self & ZAlignment.Top { r |= ZAlignment.Bottom.rawValue }
@@ -85,8 +125,8 @@ struct ZAlignment : OptionSet, CustomDebugStringConvertible, CustomStringConvert
         if self & ZAlignment.HorJustify { parts.append("horjustify") }
         return ZStrUtil.Join(parts, sep:" ")
     }
-
-    var debugDescription: String { // 
+    
+    var debugDescription: String { //
         return StringStorage
     }
     
@@ -119,4 +159,5 @@ struct ZAlignment : OptionSet, CustomDebugStringConvertible, CustomStringConvert
 
 func |(a:ZAlignment, b:ZAlignment) -> ZAlignment { return ZAlignment(rawValue: a.rawValue | b.rawValue) }
 func &(a:ZAlignment, b:ZAlignment) -> Bool       { return (a.rawValue & b.rawValue) != 0                }
+func |=(me:inout ZAlignment, a:ZAlignment)       { me.rawValue |= a.rawValue }
 

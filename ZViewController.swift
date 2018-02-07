@@ -16,6 +16,7 @@ func ZGetTopViewController() -> UIViewController? {
 }
 */
 
+var forcingRotationForPortraitOnly = false
 
 func ZGetViewControllerForView(_ view:ZView, base:UIViewController? = UIApplication.shared.keyWindow?.rootViewController) -> UIViewController? {
     if let presented = base?.presentedViewController {
@@ -236,14 +237,23 @@ class ZViewController : UIViewController, UIViewControllerTransitioningDelegate,
     }
     
     open override var shouldAutorotate: Bool {
+        if forcingRotationForPortraitOnly {
+            return true
+        }
         return !(stack.last?.portraitOnly ?? false)
     }
 
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        if forcingRotationForPortraitOnly {
+            return
+        }
         super.viewWillTransition(to: size, with:coordinator)
         coordinator.animate(alongsideTransition: { (context) in
             for (i, v) in self.view.subviews.enumerated() {
                 if var cv = v as? ZContainerView {
+                    if i < self.view.subviews.count - 1 && cv.portraitOnly {
+                        continue
+                    }
                     let uArea = stack[i].useableArea
                     cv.SetAsFullView(useableArea:uArea)
                     cv.Rect = ZRect(size:ZSize(size))
@@ -303,14 +313,18 @@ struct Attributes {
 }
 
 var stack = [Attributes]()
-func ZPresentView(_ view:ZView, duration:Float = 0.5, transition:ZTransitionType = .none, fadeToo:Bool = false, oldTransition:ZTransitionType = .reverse, makeFull:Bool = true, useableArea:Bool = false, deleteOld:Bool = false, lightContent:Bool = true, portraitOnly:Bool = false, done:(()->Void)? = nil) {
+func ZPresentView(_ view:ZView, duration:Float = 0.5, transition:ZTransitionType = .none, fadeToo:Bool = false, oldTransition:ZTransitionType = .reverse, makeFull:Bool = true, useableArea:Bool = false, deleteOld:Bool = false, lightContent:Bool = true, portraitOnly:Bool? = nil, done:(()->Void)? = nil) {
     view.View().isUserInteractionEnabled = false
     var oldView:UIView? = nil
     let win = UIApplication.shared.keyWindow
     if deleteOld {
         stack.removeLast()
     }
-    stack.append(Attributes(duration:duration, transition:transition, oldTransition:oldTransition, lightContent:lightContent, useableArea:useableArea, portraitOnly:portraitOnly))
+    var po = false
+    if let cv = view as? ZContainerView {
+        po = portraitOnly ?? cv.portraitOnly
+    }
+    stack.append(Attributes(duration:duration, transition:transition, oldTransition:oldTransition, lightContent:lightContent, useableArea:useableArea, portraitOnly:po))
     let topView = win?.subviews.first
     var voldTransition = oldTransition
 
@@ -385,6 +399,8 @@ func poptop(_ s: inout Attributes) -> UIView? {
     return  win!.subviews.first
 }
 
+weak var lastView:UIView? = nil
+
 func ZPopTopView(namedView:String = "", animated:Bool = true, overrideDuration:Float = -1, overrideTransition:ZTransitionType = .none, done:(()->Void)? = nil) {
     var s = Attributes()
     let topView = poptop(&s)
@@ -404,7 +420,7 @@ func ZPopTopView(namedView:String = "", animated:Bool = true, overrideDuration:F
         }
     }
     let oldView = topView!.subviews[topView!.subviews.count - 2]
-
+    
     if let pv = popView as! ZContainerView? {
         pv.HandleClosing()
     }
@@ -417,7 +433,17 @@ func ZPopTopView(namedView:String = "", animated:Bool = true, overrideDuration:F
         dur = overrideDuration
     }
     oldView.isHidden = false
-    if let cv = oldView as? ZCustomView {
+    if let cv = oldView as? ZContainerView {
+        if cv.portraitOnly {
+            forcingRotationForPortraitOnly = true
+            let value = UIInterfaceOrientation.portrait.rawValue
+            UIDevice.current.setValue(value, forKey:"orientation")
+            UIViewController.attemptRotationToDeviceOrientation()
+            forcingRotationForPortraitOnly = false
+            let uArea = stack.last!.useableArea
+            cv.SetAsFullView(useableArea:uArea)
+            cv.ArrangeChildren()
+        }
         cv.HandleRevealedAgain()
     }
     ZAnimation.Do(duration:animated ? dur : 0,
@@ -426,6 +452,12 @@ func ZPopTopView(namedView:String = "", animated:Bool = true, overrideDuration:F
             setTransition(popView!, transition:t, screen:ZRect(topView!.frame), fade:0)
     }, completion:{ (Bool) in
         popView?.removeFromSuperview()
+        lastView = popView
+        ZTimer().Set(1) { () in
+            if lastView != nil {
+                ZDebug.Print("View not deinited:", lastView)
+            }
+        }
         done?()
     })
 }

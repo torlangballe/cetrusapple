@@ -15,13 +15,14 @@ class ZShapeView: ZContainerView, ZImageLoader {
     var text: ZText
     var image: ZImage? = nil
     var imageMargin = ZSize(4, 1)
+    var textXMargin = 0.0
     var imageFill = false
     var imageOpacity: Float = 1.0
     var ratio = 0.3
     var count = 5
     var strokeColor = ZColor.White()
     var maxWidth:Double = 0
-    var imageAlignY = ZAlignment.VertCenter
+    var imageAlign = ZAlignment.Center
     var fillBox = false
     
     init(type t: ShapeType, minSize: ZSize) {
@@ -120,7 +121,7 @@ class ZShapeView: ZContainerView, ZImageLoader {
                 canvas.DrawImage(drawImage!, destRect:r, opacity:o)
                 canvas.PopState()
             } else {
-                var a = ZAlignment.HorCenter | imageAlignY | ZAlignment.Shrink
+                var a = imageAlign | ZAlignment.Shrink
                 if fillBox {
                    a = .None
                 }
@@ -130,7 +131,7 @@ class ZShapeView: ZContainerView, ZImageLoader {
         if(text.text != "") {
             var t = text
             t.color = getStateColor(t.color)
-            t.rect = r.Expanded(-(strokeWidth + 2)).Expanded(-imageMargin)
+            t.rect = r.Expanded(-(strokeWidth + 2)).Expanded(ZSize(-textXMargin, 0))
             t.rect.pos.y += 2
             if imageFill {
                 canvas.SetDropShadow(ZSize(0, 0), blur:2)

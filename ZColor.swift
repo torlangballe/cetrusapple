@@ -15,6 +15,7 @@ class ZColor : Hashable {
 
     var undefined: Bool
     var color: UIColor
+  
     init() {
         undefined = true
         color = UIColor()
@@ -103,6 +104,14 @@ class ZColor : Hashable {
         g = (g - 0.5) * multi + 0.5
         b = (b - 0.5) * multi + 0.5
         return ZColor(r:r, g:g, b:b, a:a)
+    }
+    
+    func GetContrastingGray() -> ZColor {
+        let g = GrayScale
+        if g < 0.5 {
+            return ZColor.White()
+        }
+        return ZColor.Black()
     }
     
     var rawColor: UIColor { return color }

@@ -8,6 +8,8 @@
 
 import Foundation
 
+typealias ZDispatchQueue = DispatchQueue
+
 class ZTimerBase : NSObject {
     weak var nsTimer:Timer? = nil
 
@@ -33,7 +35,7 @@ protocol ZTimerOwner {
 class ZRepeater : ZTimerBase {
     var closure:(()->Bool)? = nil
 
-    func Set(_ secs:Double, owner:ZTimerOwner?, now:Bool = false, done:@escaping ()->Bool) {
+    func Set(_ secs:Double, owner:ZTimerOwner? = nil, now:Bool = false, done:@escaping ()->Bool) {
         Stop()
         if now {
             if !done() {
@@ -55,7 +57,7 @@ class ZRepeater : ZTimerBase {
 class ZTimer : ZTimerBase {
     var closure:(()->Void)? = nil
     
-    func Set(_ secs:Double, owner:ZTimerOwner?, done:@escaping ()->Void) {
+    func Set(_ secs:Double, owner:ZTimerOwner? = nil, done:@escaping ()->Void) {
         Stop()
         //        owner?.AddTimer(self)
         closure = done

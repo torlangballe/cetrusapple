@@ -202,7 +202,7 @@ private func animateView(_ view:UIView, from:Float, to:Float, duration:Float, ty
     animation.fillMode = kCAFillModeForwards;
     animation.timingFunction = CAMediaTimingFunction(name:kCAMediaTimingFunctionEaseInEaseOut)
     let key = "ani." + type
-    if view.window == nil {
+    if false { //view.window == nil {
         view.PerformAfterDelay(2.5) { () in
             view.layer.add(animation, forKey:key)
         }

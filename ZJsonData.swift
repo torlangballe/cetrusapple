@@ -11,11 +11,11 @@ import Foundation
 typealias ZJSONData = ZData;
 
 extension ZJSONData {
-    init(object:Encodable) {
+    init<T : Encodable>(object:T) {
         let encoder = JSONEncoder()
         do {
             self = ZData()
-            self = try encoder.encode(self)
+            self = try encoder.encode(object)
         } catch let error {
             self = ZData()
             ZDebug.Print("ZJSONData Encode err:", error)

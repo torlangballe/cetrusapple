@@ -25,8 +25,9 @@ extension ZTime {
     static let IsoFormatWithMSecsWithZone = "yyyy-MM-dd'T'HH:mm:ss.SSSZZZZZ"
     static let IsoFormatCompactWithZone = "yyyyMMdd'T'HHmmssZZZZZ"
     
-    static let Compact = "yyyy-MM-dd' 'HH:mm:ss"
-    
+    static let CompactFormat = "yyyy-MM-dd' 'HH:mm:ss"
+    static let NiceFormat = "yy-MMM-dd' 'HH:mm"
+
 
     static let minute = 60.0
     static let hour = 3600.0
@@ -210,7 +211,18 @@ extension ZTime {
         
         return h
     }
+
+    func IsToday() -> Bool {
+        return NSCalendar.current.isDateInToday(self)
+    }
     
+    func GetNiceString(locale:String = ZLocaleEngUsPosix, timezone: ZTimeZone? = nil) -> String {
+        if IsToday() {
+            return ZLocale.GetToday() + " " + GetString(format:"HH:mm", locale:locale, timezone:timezone)
+        }
+        return GetString(format:ZTime.NiceFormat, locale:locale, timezone:timezone)
+    }
+
     func GetString(format:String = ZTime.IsoFormat, locale:String = ZLocaleEngUsPosix, timezone: ZTimeZone? = nil) -> String {
         let formatter = DateFormatter()
         formatter.dateFormat = format

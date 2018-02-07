@@ -366,6 +366,15 @@ class ZStrUtil {
         return out
     }
     
+    class func HashToU64(_ str:String) -> UInt64 {
+        var result = UInt64 (5381)
+        let buf = [UInt8](str.utf8)
+        for b in buf {
+            result = 127 * (result & 0x00ffffffffffffff) + UInt64(b)
+        }
+        return result
+    }
+
     class func MakeHashTagWord(_ str:String) -> String {
         let split = ZStrUtil.SplitByChars(str, chars:" .-,/()_")
         var words = [String]()
@@ -419,7 +428,8 @@ class ZStrUtil {
     }
     
     class func CopyToCCharArray(carray:UnsafeMutablePointer<Int8>, str:String) { // this requires pointer to FIRST tuple using .0
-        _ = strlcpy(carray, str, MemoryLayout.size(ofValue:carray))
+        let c = str.utf8.count + 1
+        _ = strlcpy(carray, str, c) // str is coerced to c-string amazingly enough
     }
 
     class func StrFromCCharArray(_ carray:UnsafeMutablePointer<Int8>?) -> String { // this requires pointer to FIRST tuple using .0 if it's char[256] etc
@@ -433,6 +443,33 @@ class ZStrUtil {
         let pointer = UnsafeMutablePointer<Int8>.allocate(capacity:len)
         strcpy(pointer, str)
         return pointer
+    }
+    
+    class func NiceDouble(_ d:Double, maxSig:Int = 8) -> String {
+        let format = "%.\(maxSig)lf"
+        var str = String(format:format, d)
+        while true {
+            switch str.lastCharAsString {
+            case "0":
+                str.removeLast()
+            case ".":
+                str.removeLast()
+                return str
+            default:
+                return str
+            }
+        }
+        return str
+    }
+    
+    class func SplitLines(str:String, skipEmpty:Bool = true) -> [String] {
+        var lines = [String]()
+        str.enumerateLines { line, stop in
+            if !skipEmpty || !line.isEmpty {
+                lines.append(line)
+            }
+        }
+        return lines
     }
 }
 

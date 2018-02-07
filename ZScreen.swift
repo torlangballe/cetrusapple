@@ -22,6 +22,12 @@ class ZScreen {
         }
     }
 
+    static var StatusBarHeight : Double {
+        get {
+            return Double(UIApplication.shared.statusBarFrame.size.height)
+        }
+    }
+    
     static var IsTall: Bool {
         get {
             return Main.size.h > 480
@@ -87,12 +93,20 @@ class ZScreen {
     }
     
     static func HasNotch() -> Bool {
-        var notch = false
         if #available(iOS 11.0, *) {
             if ((UIApplication.shared.keyWindow?.safeAreaInsets.top)! > CGFloat(0.0)) {
-                notch = true
+                return true
             }
         }
-        return notch
+        return false
+    }
+
+    static func HasSwipeUpAtBottom() -> Bool {
+        if #available(iOS 11.0, *) {
+            if (UIApplication.shared.keyWindow?.safeAreaInsets.bottom)! != 0 {
+                return true
+            }
+        }
+        return false
     }
 }

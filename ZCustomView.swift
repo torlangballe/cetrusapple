@@ -236,7 +236,7 @@ class ZCustomView: UIControl, ZView, UIGestureRecognizerDelegate, ZTimerOwner {
     
     func HandlePressed(_ sender: ZView, pos:ZPos) {
     }
-    
+
     @discardableResult func HandleTouched(_ sender:ZView, state:ZGestureState, pos:ZPos, inside:Bool) -> Bool {
         return false
     }
@@ -362,6 +362,7 @@ class ZCustomView: UIControl, ZView, UIGestureRecognizerDelegate, ZTimerOwner {
             let gtap = UITapGestureRecognizer(target:self, action:#selector(self.handleGesture(_:)))
             gtap.numberOfTapsRequired = taps
             gtap.numberOfTouchesRequired = touches
+            gtap.cancelsTouchesInView = true
             addGesture(gtap, view:view, handler:self)
             view.View().addGestureRecognizer(gtap)
             for g in view.View().gestureRecognizers ?? [] {
@@ -369,7 +370,14 @@ class ZCustomView: UIControl, ZView, UIGestureRecognizerDelegate, ZTimerOwner {
                     tg.require(toFail:gtap)
                 }
             }
-
+            if view.View().superview != nil {
+                for g in view.View().superview?.gestureRecognizers ?? [] {
+                    if let tg = g as? UITapGestureRecognizer {
+                        tg.require(toFail:gtap)
+                    }
+                }
+            }
+            
         case .longpress:
             let glong = UILongPressGestureRecognizer(target:self, action:#selector(self.handleGesture(_:)))
             glong.numberOfTapsRequired = taps - 1
@@ -503,6 +511,5 @@ private func addGesture(_ g: UIGestureRecognizer, view:ZView, handler:ZCustomVie
     view.View().isUserInteractionEnabled = true
     g.delaysTouchesEnded = true
     g.delegate = handler
-    //view.View().addGestureRecognizer(g)
 }
 

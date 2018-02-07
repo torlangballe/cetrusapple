@@ -13,10 +13,12 @@ class ZTextView : UITextView, UITextViewDelegate, ZTextBase, ZView {
     var minWidth: Double = 0
     var maxWidth: Double = 0
     var objectName = "ZTextView"
-    var target: ZTextEditDelegate? = nil
+    private var target: ZTextEditDelegate? = nil
     var useMenu = true
     var maxLines = 0
     var edited = false
+    var clearButton = ZImageView(namedImage:"ztext.clear@3x.png")
+    var placeHolderText = ""
 
     var Color: ZColor {
         get { return ZColor(color:textColor!) }
@@ -54,7 +56,7 @@ class ZTextView : UITextView, UITextViewDelegate, ZTextBase, ZView {
         return self.textInputMode!.primaryLanguage!
     }
 
-    init(text:String="", minWidth:Double=0, maxWidth:Double=0, font:ZFont?=nil, alignment:ZAlignment = .Left, lines:Int=0, margins:ZSize? = nil) {
+    init(text:String="", minWidth:Double=0, maxWidth:Double=0, font:ZFont?=nil, alignment:ZAlignment = .Left, lines:Int=0, clearColor:ZColor? = nil) {
         self.minWidth = minWidth
         self.maxWidth = maxWidth
         
@@ -67,13 +69,35 @@ class ZTextView : UITextView, UITextViewDelegate, ZTextBase, ZView {
         //        self.textContainer.maximumNumberOfLines = lines
         self.SetAlignment(alignment)
         self.delegate = self
-        if margins != nil {
-            self.contentInset = UIEdgeInsets(top:CGFloat(margins!.h), left:CGFloat(margins!.w), bottom:CGFloat(margins!.h), right:CGFloat(margins!.w))
+        if clearColor != nil {
+            self.addSubview(clearButton)
+            clearButton.HandlePressedInPosFunc = { [weak self] pos in
+                self?.text?.removeAll()
+                self?.Expose() // removeAll above doesn't seem to trigger changed eventd
+            }
+        }
+    }
+    
+    override func draw(_ rect: CGRect) {
+        if clearButton.image != nil {
+            let c = contentInset
+            let m = ZSize(6 + Double(c.right), 6 + Double(c.bottom))
+            clearButton.Rect = LocalRect.Align(ZSize(clearButton.image!.size), align:.Right | .Bottom, marg:m)
+        }
+        if !placeHolderText.isEmpty && self.text!.isEmpty {
+            let canvas = ZCanvas()
+            var text = ZText()
+            text.color = ZColor(color:backgroundColor ?? UIColor.white).GetContrastingGray().OpacityChanged(0.2)
+            text.text = placeHolderText
+            text.alignment = .Top | .Left
+            text.font = font ?? ZFont.Nice(20)
+            text.rect = LocalRect.Expanded(ZSize(-6, -8))
+            text.Draw(canvas)
         }
     }
     
     func SetMargins(_ margins:ZRect) {
-        self.contentInset = UIEdgeInsetsMake(CGFloat(margins.Min.y), CGFloat(margins.Min.x), CGFloat(margins.Max.y), CGFloat(margins.Max.x))
+        self.contentInset = UIEdgeInsetsMake(CGFloat(margins.Min.y), CGFloat(margins.Min.x), -CGFloat(margins.Max.y), -CGFloat(margins.Max.x))
     }
     
     func View() -> UIView {
@@ -87,24 +111,27 @@ class ZTextView : UITextView, UITextViewDelegate, ZTextBase, ZView {
     }
     
     override func sizeThatFits(_ size: CGSize) -> CGSize {
+        let inset = self.contentInset
         var tinfo = ZText()
         tinfo.text = self.text
         tinfo.font = self.font!
         var vsize = size
         vsize.height = 9999
         tinfo.rect = ZRect(size:ZSize(vsize))
+        tinfo.rect += ZRect(Double(inset.left), Double(inset.top), -Double(inset.right), -Double(inset.bottom))
         tinfo.maxLines = max(1, maxLines) // self.textContainer.maximumNumberOfLines
         var s = tinfo.GetBounds().size
         
-        let inset = self.contentInset
-        
-        s.w += Double(inset.right - inset.left)
-        s.h += Double(inset.bottom - inset.top)
+        s.w += Double(inset.left + inset.right)
+        s.h += Double(inset.top + inset.bottom)
         
         s.h *= 1.1
         s.h += 12
+        
+        
         return s.GetCGSize()
     }
+    
     
     override func canPerformAction(_ action:Selector, withSender sender:Any?) -> Bool {
         if !useMenu {
@@ -198,6 +225,7 @@ class ZTextView : UITextView, UITextViewDelegate, ZTextBase, ZView {
 
     func textViewDidChange(_ textView:UITextView) {
         target?.HandleTextDidChange(self)
+        Expose() // for drawing placeholders
     }
     
     func textViewShouldBeginEditing(_ textView: UITextView) -> Bool {

@@ -27,7 +27,7 @@ class ZDatePartsField : ZShapeView {
         
         super.init(type:.roundRect, minSize: ZSize(40, 38))
         
-        imageMargin = ZSize(10, 0)
+        textXMargin = 10
         setTextFromParts()
         
         AddTarget(self, forEventType:.pressed)

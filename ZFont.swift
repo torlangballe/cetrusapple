@@ -30,6 +30,8 @@ extension ZFont {
     func NewWithSize(_ size:Float64) -> ZFont? {
         return ZFont(name:self.fontName, size)
     }
+    
+    static var appFont:ZFont = ZFont.Nice(20)
 }
 
 /*

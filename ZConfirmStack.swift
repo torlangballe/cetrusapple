@@ -61,6 +61,9 @@ class ZConfirmStack : ZStackView {
     
     @discardableResult static func PushViewWithTitleBar(_ view:ZView, title:String) -> ZStackView {
         let v1 = ZVStackView(space:0)
+        if let cv = view as? ZContainerView {
+            v1.portraitOnly = cv.portraitOnly
+        }
         let titleBar = ZTitleBar(text:title, closeType:.cross)
         v1.Add(titleBar, align:.Top | .HorCenter | .HorExpand | .NonProp)
         v1.Add(view.View(), align:.HorCenter | .Bottom | .Expand | .NonProp)

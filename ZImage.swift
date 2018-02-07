@@ -262,50 +262,45 @@ extension ZImage {
     static var MainCache = ZImageCache()
     
     @discardableResult static func DownloadFromUrl(_ url:String, cache:Bool = true, maxSize:ZSize? = nil, done:((_ image:ZImage?)->Void)? = nil) -> ZURLSessionDataTask? {
-        
         if cache {
             return MainCache.DownloadFromUrl(url, done:done)
         }
         //        let start = ZTime.Now
-        if let nsurl = URL(string:url) {
-            let task = URLSession.shared.dataTask(with: nsurl) { (indata, _, error) in
-                guard let data = indata , error == nil else {
-                    if error != nil {
-                        ZDebug.Print("ZImage.DownloadFromUrl error:", error!)
-                    }
-                    ZDebug.Print("ZImage.DownloadFromUrl error:", error!)
-                    done?(nil)
-                    return
-                }
-                var scale:CGFloat = 1.0
-                let name = nsurl.deletingPathExtension().lastPathComponent
-                if name.hasSuffix("@2x") {
-                    scale = 2
-                } else if name.hasSuffix("@3x") {
-                    scale = 3
-                }
-                if var image = ZImage(data:data, scale:scale) {
-                    if maxSize != nil && (image.Size.w > maxSize!.w || image.Size.h > maxSize!.h) {
-                        if let small = image.GetScaledInSize(maxSize!) {
-                            ZDebug.Print("ZImage.Download: Scaling too big image:", image.Size, "max:", maxSize!, url)
-                            image = small
-                        } else {
-                            ZDebug.Print("ZImage.Download: Failing too big image not scaleable:", image.Size, "max:", maxSize!, url)
-                            DispatchQueue.main.async { () -> Void in
-                                done?(nil)
-                            }
-                            return
-                        }
-                    }
-                    DispatchQueue.main.async { () -> Void in
-                        done!(image)
-                    }
-                }
+        let req = ZUrlRequest.Make(.Get, url:url)
+        return ZUrlSession.Send(req, makeStatusCodeError:true) { (resp, data, err, code) in
+            if err != nil {
+                ZDebug.Print("ZImage.DownloadFromUrl error:", err!.localizedDescription, url)
+                done?(nil)
+                return
             }
-            task.resume()
-            return task
+            if data == nil {
+                ZDebug.Print("ZImage.DownloadFromUrl data=null:", url)
+                done?(nil)
+                return
+            }
+            var scale:CGFloat = 1.0
+            let name = req.url!.deletingPathExtension().lastPathComponent
+            if name.hasSuffix("@2x") {
+                scale = 2
+            } else if name.hasSuffix("@3x") {
+                scale = 3
+            }
+            if var image = ZImage(data:data!, scale:scale) {
+                if maxSize != nil && (image.Size.w > maxSize!.w || image.Size.h > maxSize!.h) {
+                    if let small = image.GetScaledInSize(maxSize!) {
+                        ZDebug.Print("ZImage.Download: Scaling too big image:", image.Size, "max:", maxSize!, url)
+                        image = small
+                    } else {
+                        ZDebug.Print("ZImage.Download: Failing too big image not scaleable:", image.Size, "max:", maxSize!, url)
+                        done?(nil)
+                        return
+                    }
+                }
+                done!(image)
+            } else {
+                done!(nil)
+            }
         }
-        return nil
     }
     
     func SaveToPng(_ file:ZFileUrl) -> Error? {
@@ -484,10 +479,10 @@ class ZImageUploader {
 }
 
 class ZImageCache : ZTimerOwner {
-    var max = 500
     var maxHours = 24.0
     var maxSize:ZSize? = nil
-    
+    var maxByteSize:Int64? = nil
+
     struct Cache {
         var image: ZImage? = nil
         var stamp = ZTime()
@@ -496,6 +491,10 @@ class ZImageCache : ZTimerOwner {
     var cache = [String:Cache]()
 
     @discardableResult func DownloadFromUrl(_ url:String, done:((_ image:ZImage?)->Void)? = nil) -> ZURLSessionDataTask? {
+        if url.isEmpty {
+            done?(nil)
+            return nil
+        }
         if var c = cache[url] {
             if c.getting {
                 if c.stamp.Since() > 60 {
@@ -513,13 +512,20 @@ class ZImageCache : ZTimerOwner {
             done?(c.image)
             return nil
         }
-        if cache.count > max {
-            cache.removeAll()
-        }
+        var totalSize:Int64 = 0
         for (u, c) in cache {
             if c.stamp.Since() > maxHours * 3600 || !c.getting && c.image == nil && ZMath.RandomN(10) == 5 {
                 cache.removeValue(forKey:u)
+            } else {
+                totalSize += imageSize(c.image)
             }
+        }
+        while maxByteSize != nil && maxByteSize! < totalSize && cache.count > 0 {
+            let oldestTupple = cache.reduce(cache.first!) { (r, t) in
+                return t.1.stamp < r.1.stamp ? t : r
+            }
+            totalSize -= imageSize(oldestTupple.1.image)
+            cache.removeValue(forKey:oldestTupple.0)
         }
         var c2 = Cache()
         c2.stamp = ZTime.Now
@@ -530,8 +536,19 @@ class ZImageCache : ZTimerOwner {
                 c3.image = image
                 c3.getting = false
                 self.cache[url] = c3
+                if image == nil {
+                    print("null image:", url)
+                }
             }
             done?(image)
         }
     }
+    
+    private func imageSize(_ image:ZImage?) -> Int64 {
+        if image != nil {
+            return Int64(ZSize(image!.size).Area() * 3)
+        }
+        return 0
+    }
+
 }

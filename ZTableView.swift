@@ -3,7 +3,6 @@
 //  Zed
 //
 //  Created by Tor Langballe on /4/12/15.
-//  Copyright © 2015 Capsule.fm. All rights reserved.
 //
 
 import UIKit
@@ -69,7 +68,7 @@ class ZTableView : UITableView, ZView, UITableViewDelegate, UITableViewDataSourc
             if selection.row != -1 {
                 Select(selection.row, section:selection.section);
             }
-            contentInset = UIEdgeInsetsMake(CGFloat(margins.h), CGFloat(margins.w), CGFloat(margins.h), CGFloat(margins.w))
+            contentInset = UIEdgeInsetsMake(CGFloat(margins.h), 0, CGFloat(margins.h), 0)
             first = false
         }
         super.layoutSubviews()
@@ -91,11 +90,21 @@ class ZTableView : UITableView, ZView, UITableViewDelegate, UITableViewDataSourc
         reloadRows(at: indexPathsForVisibleRows ?? [], with:animate ? UITableViewRowAnimation.automatic : UITableViewRowAnimation.none)
     }
     
-    func ReloadData(animate:Bool = false) {
+    func ScrollToMakeRowVisible(_ row:Int, animated:Bool = true) {
+        let path = makeIndexPathFromIndex(Index(row:row, section:0))
+        scrollToRow(at: path, at:.none, animated:animated)
+        print("-------------------------- scrollToRow:", row)
+    }
+    
+    func ReloadData(row:Int? = nil, animate:Bool = false) {
         if animate {
             self.reloadSections([0], with:UITableViewRowAnimation.fade)
         } else {
-            reloadData()
+            if row != nil {
+                reloadRows(at:[makeIndexPathFromIndex(Index(row:row!, section:0))], with:UITableViewRowAnimation.none)
+            } else {
+                reloadData()
+            }
         }
         //        let range = NSMakeRange(0, numberOfSections)
         //        let indexSet = NSIndexSet(indexesInRange:range)
@@ -140,16 +149,21 @@ class ZTableView : UITableView, ZView, UITableViewDelegate, UITableViewDataSourc
         }
         return nil
     }
-    
-    static func GetIndexFromRowView(_ view:ZView) -> Int? {
-        var p:UIView? = view.View()
+
+    static func GetParentTableViewFromRow(_ child:ZContainerView) -> ZTableView {
+        var p:UIView? = child.View()
         while p != nil {
             if let v = p as? ZTableView {
-                return v.GetIndexFromRowView(view)
+                return v
             }
             p = p?.superview
         }
-        return nil
+        fatalError("ZTableView.GetParentTableViewFromRow failed!")
+    }
+
+    static func GetIndexFromRowView(_ view:ZContainerView) -> Int {
+        let v = GetParentTableViewFromRow(view) 
+        return v.GetIndexFromRowView(view) ?? -1 // -1 should never happen
     }
     
     func Select(_ row:Int, section:Int = 0) {
@@ -161,7 +175,7 @@ class ZTableView : UITableView, ZView, UITableViewDelegate, UITableViewDataSourc
                     deselectRow(at: makeIndexPathFromIndex(oldSelection), animated:true)
                 }
             } else {
-                selectRow(at: makeIndexPathFromIndex(selection), animated:true, scrollPosition:UITableViewScrollPosition.bottom) // none means least movement
+                selectRow(at: makeIndexPathFromIndex(selection), animated:true, scrollPosition:UITableViewScrollPosition.none) // none means least movement
             }
         }
     }
@@ -212,12 +226,13 @@ class ZTableView : UITableView, ZView, UITableViewDelegate, UITableViewDataSourc
         cell.isEditing = true
         let index = ZTableView.Index(path:indexPath)
         var r = ZRect(size:ZSize(Rect.size.w, owner!.TableViewGetHeightOfItem(index)))
-        r = r.Expanded(ZSize(-margins.w * 2, 0))
+        r = r.Expanded(ZSize(-margins.w, 0))
         cell.frame = r.GetCGRect()
         cell.backgroundColor = UIColor.clear
         
         let customView = owner!.TableViewSetupCell(ZSize(cell.frame.size), index:index)
         customView?.frame = cell.frame
+        customView?.frame.size.height = CGFloat(customView!.minSize.h)
         if let cv = customView as? ZContainerView {
             cv.ArrangeChildren()
         }

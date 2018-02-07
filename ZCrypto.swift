@@ -65,9 +65,27 @@ struct ZCrypto {
         let data = Data(bytes:result)
         return (data as ZData).GetHexString()
     }
-
     
     static func MakeUuid() -> String {
         return UUID().uuidString
     }
+    
+    static func MD5(data:ZData) -> [UInt8] {
+        var digest = [UInt8](repeating: 0, count: Int(CC_MD5_DIGEST_LENGTH))
+        data.withUnsafeBytes { bytes in
+            CC_MD5(bytes, CC_LONG(data.count), &digest)
+        }
+        return digest
+    }
+
+    static func MD5ToHex(data:ZData) -> String {
+        var str = ""
+        for b in MD5(data:data) {
+            str += String(format:"%x", b)
+        }
+        return str
+    }
 }
+
+
+

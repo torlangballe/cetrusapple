@@ -80,18 +80,20 @@ extension ZRange {
 }
 
 extension Array {
-    mutating func removeIf(_ check:(_ object:Element)-> Bool) {
-        for (i, o) in enumerated() {
-            if check(o) {
+    @discardableResult mutating func removeIf(_ check:(_ object:Element)-> Bool) -> Bool {
+        var i = 0
+        while i < count {
+            if check(self[i]) {
                 remove(at: i)
-                removeIf(check)
-                break
+            } else {
+                i += 1
             }
         }
+        return false
     }
     
     mutating func shuffle () {
-        for i in (0..<self.count).reversed() {
+        for i in (0 ..< self.count).reversed() {
             let ix1 = i
             let ix2 = Int(arc4random_uniform(UInt32(i+1)))
             (self[ix1], self[ix2]) = (self[ix2], self[ix1])
@@ -153,6 +155,34 @@ extension Array where Element : Equatable {
             return true
         }
         return false
+    }
+    
+}
+
+extension Array {
+    func Max<T:Comparable>(get:(_ e:Element)->T) -> Element {
+        return reduce(first!) { (r, e) in
+            if get(r) < get(e) {
+                return e
+            }
+            return r
+        }
+    }
+    func Min<T:Comparable>(get:(_ e:Element)->T) -> Element {
+        return reduce(first!) { (r, e) in
+            if get(r) > get(e) {
+                return e
+            }
+            return r
+        }
+    }
+    mutating func popFirst() -> Element? {
+        if count == 0 {
+            return nil
+        }
+        let e = first!
+        remove(at:0)
+        return e
     }
 }
 

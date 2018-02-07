@@ -74,7 +74,7 @@ class ZTextField : UITextField, UITextFieldDelegate, ZTextBase, ZView {
     var margin = ZSize()
     var useMenu = true
     var edited = false
-    weak var target: ZTextEditDelegate? = nil
+    private weak var target: ZTextEditDelegate? = nil
 
     var Color: ZColor {
         get { return ZColor(color:textColor!) }

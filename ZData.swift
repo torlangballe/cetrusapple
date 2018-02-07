@@ -20,12 +20,13 @@ extension ZData {
         }
     }
     
-    static func FromUrl(_ url:ZUrl) -> ZData? {
+    static func FromUrl(_ url:ZUrl) -> (ZData?, ZError?) {
         do {
-            return try Data(contentsOf:url.url!)
+            let d = try Data(contentsOf:url.url!)
+            return (d, nil)
         } catch let error as NSError {
             ZDebug.Print("ZData.FromUrl error:", error.localizedDescription)
-            return nil
+            return (nil, error as? ZError)
         }
     }
     

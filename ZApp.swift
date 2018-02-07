@@ -34,7 +34,7 @@ class ZApp : ZObject {
         }
         return ("", 0, 0)
     }
-    
+
     func GetRuntimeSecs() -> Double {
         return ZTime.Now - activationTime
     }

@@ -69,8 +69,8 @@ class ZImageView: UIImageView, ZView, ZImageLoader, ZTimerOwner {
     convenience init(url:String, maxSize:ZSize = ZSize(), downloaded:((_ success:Bool)->Void)?=nil) {
         self.init(zimage:nil, name:url, maxSize:maxSize)
         downloadUrl = url
-        self.DownloadFromUrl(url) { (sucess) in
-            
+        if !url.isEmpty {
+            self.DownloadFromUrl(url) { (sucess) in }
         }
     }
     
@@ -152,7 +152,7 @@ class ZImageView: UIImageView, ZView, ZImageLoader, ZTimerOwner {
                 }
                 if inside && !handled {
                     if handlePressedInPosFunc != nil {
-                        handlePressedInPosFunc!(pos)
+                        handlePressedInPosFunc!(pos)                        
                     } else {
                         tapTarget?.HandlePressed(self, pos:ZPos(touches.first!.location(in: self)))
                     }

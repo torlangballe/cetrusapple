@@ -13,9 +13,9 @@ typealias ZMatrix = CGAffineTransform
 func ZMatrixForRotatingAroundPoint(_ point:ZPos, deg:Double) -> ZMatrix {
     var transform = CGAffineTransform.identity;
     transform = transform.translatedBy(x:CGFloat(point.x), y:CGFloat(point.y))
-    let r = CGAffineTransform.identity.rotated(by:CGFloat(ZMath.DegToRad(deg)))
-//    transform = transform.rotated(by: CGFloat(ZMath.DegToRad(deg)))
-    transform = transform.concatenating(r)
+//    let r = CGAffineTransform.identity.rotated(by:CGFloat(ZMath.DegToRad(deg)))
+    transform = transform.rotated(by: CGFloat(ZMath.DegToRad(deg)))
+//    transform = transform.concatenating(r)
     transform = transform.translatedBy(x:CGFloat(-point.x), y:CGFloat(-point.y))
 
     return transform

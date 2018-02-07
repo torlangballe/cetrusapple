@@ -38,6 +38,9 @@ struct ZSize
         let m = max(w, h)
         return ZSize(m, m)
     }
+    func Area() -> Float64 {
+        return w * h
+    }
 }
 
 func +(me:ZSize, a:ZSize) -> ZSize       { return ZSize(me.w + a.w, me.h + a.h) }

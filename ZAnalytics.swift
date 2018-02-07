@@ -7,7 +7,7 @@
 //
 
 import Foundation
-import Fabric
+//import Fabric
 import Crashlytics
 
 //import HockeySDK
@@ -83,8 +83,6 @@ class ZAnalytics {
  
     func InitCrashReporter() {
         Crashlytics().debugMode = true
-        Fabric.sharedSDK().debug = true
-        Fabric.with([Crashlytics.self])
         /*
         let shared = BITHockeyManager.shared()
         shared.configure(withIdentifier:"b8c90f7a36c0459899bda324de819f9e")

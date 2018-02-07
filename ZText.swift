@@ -71,6 +71,7 @@ struct ZText {
         let pstyle = NSParagraphStyle.default.mutableCopy() as! NSMutableParagraphStyle
         pstyle.lineBreakMode = ZText.GetNativeWrapMode(wrap)
         pstyle.alignment = ZText.GetTextAdjustment(alignment)
+//        pstyle.allowsDefaultTighteningForTruncation = true
         if lineSpacing != 0.0 {
             pstyle.maximumLineHeight = font.lineHeight + CGFloat(lineSpacing)
             pstyle.lineSpacing = CGFloat(lineSpacing) // CGFloat(max(0.0, lineSpacing))

@@ -22,6 +22,7 @@ struct ZInAppProduct {
 class ZInAppPurchases : NSObject, SKProductsRequestDelegate, SKPaymentTransactionObserver {
 
     var allSKProducts = [SKProduct]()
+    var saveStoreCountryCodeFunc: ((_ ccode:String)->Void)? = nil
     var handlePurchaseSuccess: ((_ productId: String, _ done:@escaping ()->Void)->Void)? = nil
     //    private var purchasedProductIdentifiers = Set()
     var productsRequest: SKProductsRequest?
@@ -52,7 +53,7 @@ class ZInAppPurchases : NSObject, SKProductsRequestDelegate, SKPaymentTransactio
             if first {
                 first = false
                 if let ccode = (skp.priceLocale as NSLocale).object(forKey: .countryCode) as? String {
-                    mainDevice.SetStoreCountryCode(ccode.lowercased())
+                    saveStoreCountryCodeFunc?(ccode.lowercased())
                 }
             }
         }

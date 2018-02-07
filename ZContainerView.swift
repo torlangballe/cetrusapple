@@ -17,7 +17,7 @@ class ZContainerView: ZCustomView {
     var cells:[Cell]
     var margin = ZRect()
     var liveArrange = false
-    
+    var portraitOnly = false
     
     override init(name: String = "ZContainerView") { // required 
         cells = [Cell]()
@@ -27,6 +27,10 @@ class ZContainerView: ZCustomView {
     }
     
     required init?(coder aDecoder: NSCoder) { fatalError("init(coder:) has not been implemented") }
+    
+//    deinit {
+//        print("ZContainerView.DeInit()")
+//    }
     
     func AddCell(_ cell: Cell, index:Int = -1) {
         if index == -1 {
@@ -58,8 +62,8 @@ class ZContainerView: ZCustomView {
     func SetAsFullView(useableArea: Bool) {
         frame = UIScreen.main.bounds
         let h = UIApplication.shared.statusBarFrame.size.height
-        if h > 20 {
-            frame.size.height -= UIApplication.shared.statusBarFrame.size.height
+        if h > 20 && !ZScreen.HasNotch() {
+            frame.size.height -= h
         } else if useableArea {
             margin.Min.y = Double(h)
         }
@@ -71,9 +75,9 @@ class ZContainerView: ZCustomView {
         Expose()
     }
     
-    func ArrangeChildrenAnimated() {
+    func ArrangeChildrenAnimated(onlyChild:ZView? = nil) {
         ZAnimation.Do(duration:0.6, animations: { () in
-            self.ArrangeChildren()
+            self.ArrangeChildren(onlyChild:onlyChild)
         })
     }
     
@@ -91,6 +95,9 @@ class ZContainerView: ZCustomView {
     func ArrangeChildren(onlyChild:ZView? = nil) {
         HandleBeforeLayout()
         let r = ZRect(size:Rect.size) + margin
+        for c in cells {
+            (c.view as? ZCustomView)?.HandleBeforeLayout()
+        }
         for c in cells where c.alignment != .None {
             if onlyChild == nil || c.view == onlyChild!.View() {
                 arrangeChild(c, r:r)
@@ -100,6 +107,9 @@ class ZContainerView: ZCustomView {
             }
         }
         HandleAfterLayout()
+        for c in cells {
+            (c.view as? ZCustomView)?.HandleAfterLayout()
+        }
     }
 
     @discardableResult func CollapseChild(_ view:ZView, collapse:Bool = true, arrange:Bool = false) -> Bool {

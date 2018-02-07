@@ -231,3 +231,9 @@ func getUIViewChild(_ view: UIView, path: String) -> UIView? {
     
     return nil
 }
+
+
+protocol ZViewHandler: class {
+    func HandleClose(sender:ZView)
+}
+

@@ -221,7 +221,7 @@ class ZBallSelector : ZContainerView {
         text.color = color
         text.text = "\(Int(value * 100))%"
         text.alignment = .Center
-        text.font = CUtil.Font(incSize:-2)
+        text.font = ZFont.appFont
         text.rect = rect
         text.Draw(canvas)
     }
