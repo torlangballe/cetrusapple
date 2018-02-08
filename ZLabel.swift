@@ -57,6 +57,7 @@ class ZLabel: UILabel, ZView {
         if maxWidth != 0 {
             box.w = maxWidth
         }
+        maximize(&box.w, Double(size.width))
         box.h = 99999;
         var gs = super.sizeThatFits(box.GetCGSize())
         if minWidth != 0.0 {

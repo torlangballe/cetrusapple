@@ -290,9 +290,9 @@ class ZTextField : UITextField, UITextFieldDelegate, ZTextBase, ZView {
         var col = color
         if col.undefined {
             if self.Color.GrayScale > 0.5 {
-                col = ZColor(white:1, a:0.2)
+                col = ZColor(white:1, a:0.3)
             } else {
-                col = ZColor(white:0, a:0.2)
+                col = ZColor(white:0, a:0.3)
             }
         }
         self.placeholder = placeholder

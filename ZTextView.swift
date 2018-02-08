@@ -87,7 +87,7 @@ class ZTextView : UITextView, UITextViewDelegate, ZTextBase, ZView {
         if !placeHolderText.isEmpty && self.text!.isEmpty {
             let canvas = ZCanvas()
             var text = ZText()
-            text.color = ZColor(color:backgroundColor ?? UIColor.white).GetContrastingGray().OpacityChanged(0.2)
+            text.color = ZColor(color:backgroundColor ?? UIColor.white).GetContrastingGray().OpacityChanged(0.3)
             text.text = placeHolderText
             text.alignment = .Top | .Left
             text.font = font ?? ZFont.Nice(20)

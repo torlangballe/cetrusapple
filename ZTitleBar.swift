@@ -67,7 +67,7 @@ class ZTitleBar : ZStackView {
             if closeHandler != nil {
                 closeHandler!.HandleClose(sender:self)
             } else {
-                ZPopTopView(overrideDuration:0, overrideTransition:.fade)
+                ZPopTopView() //overrideDuration:0) //, overrideTransition:.fade)
             }
         default:
             break
