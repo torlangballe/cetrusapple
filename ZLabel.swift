@@ -58,13 +58,14 @@ class ZLabel: UILabel, ZView {
             box.w = maxWidth
         }
         maximize(&box.w, Double(size.width))
-        box.h = 99999;
+        if self.numberOfLines > 1 {
+            box = ZSize(9999.0,  Double(font.lineHeight) * Double(self.numberOfLines) * 1.1)
+        } else {
+            box.h = 99999;
+        }
         var gs = super.sizeThatFits(box.GetCGSize())
         if minWidth != 0.0 {
             maximize(&gs.width, CGFloat(minWidth))
-        }
-        if self.numberOfLines > 1 {
-            maximize(&gs.height, font.lineHeight * CGFloat(self.numberOfLines) * 1.2)
         }
         maximize(&gs.height, font.pointSize * 1.2)
         gs.width -= CGFloat(margin.size.w) // margin is typically 10, -10, so must subtract

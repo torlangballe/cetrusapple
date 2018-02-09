@@ -12,14 +12,13 @@ class ZHelpNote {
     static var font = ZFont.Nice(18)
     static var textColor = ZColor.White()
     
-    static func Add(text:String, to:ZContainerView, close:Bool = true, key:String, align:ZAlignment, marg:ZSize = ZSize(6, 6), bgcol:ZColor = ZColor(), count:Int? = nil) {
+    static func Add(text:String, to:ZContainerView, close:Bool = true, key:String, lines:Int = 0, align:ZAlignment, marg:ZSize = ZSize(6, 6), bgcol:ZColor = ZColor(), count:Int? = nil) {
         let v = ZKeyValueStore.IncrementInt(key)
         if count != nil && v <= count! || v <= 1 {
             let stack = ZHStackView(space:8)
             to.Add(stack, align:align, marg:marg)
             
-            let label = ZLabel(text:text, lines:0, font:font, align:.Center, color:textColor)
-            label.maxWidth = 100
+            let label = ZLabel(text:text, lines:lines, font:font, align:.Center, color:textColor)
             stack.Add(label, align:.Left | .VertCenter | .HorExpand | .NonProp)
             
             if close {
