@@ -14,7 +14,7 @@ import UserNotifications
 
 // https://www.raywenderlich.com/123862/push-notifications-tutorial
 
-@UIApplicationMain // this adds a main function that sets UIApplicationDelegate and runs event loop I think
+// @UIApplicationMain // this adds a main function that sets UIApplicationDelegate and runs event loop I think
 class ZAppController : UIResponder, UIApplicationDelegate, UNUserNotificationCenterDelegate {
     var window: UIWindow? = nil
     
@@ -282,5 +282,13 @@ class ZAppController : UIResponder, UIApplicationDelegate, UNUserNotificationCen
 //        AWSS3TransferUtility.interceptApplication(application, handleEventsForBackgroundURLSession: identifier, completionHandler: completionHandler)
     }
 
+    static func RunApp(delegateClass:Swift.AnyClass) {
+        UIApplicationMain(CommandLine.argc, convertArgs(CommandLine.unsafeArgv), nil, NSStringFromClass(delegateClass.self))
+    }
 }
+
+private func convertArgs(_ args:UnsafeMutablePointer<UnsafeMutablePointer<Int8>?>) -> UnsafeMutablePointer<UnsafeMutablePointer<Int8>>! {
+    return UnsafeMutableRawPointer(args).bindMemory(to: UnsafeMutablePointer<Int8>.self, capacity: Int(CommandLine.argc))
+}
+
 

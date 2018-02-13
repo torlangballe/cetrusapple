@@ -19,10 +19,22 @@ class ZStackView: ZContainerView {
     
     required init?(coder aDecoder: NSCoder) { fatalError("init(coder:) has not been implemented") }
     
+    private func getCellFitSizeInTotal(total:ZSize, cell:ZContainerView.Cell) -> CGSize {
+        var tot = total - cell.margin
+        if cell.alignment & .HorCenter {
+            tot.w -= cell.margin.w
+        }
+        if cell.alignment & .VertCenter {
+            tot.h -= cell.margin.h
+        }
+        return tot.GetCGSize()
+    }
+    
     @discardableResult override func CalculateSize(_ total: ZSize) -> ZSize { // can force size calc without needed result
         var s = ZSize(0, 0)
         for c1 in cells where !c1.collapsed && !c1.free {
-            var fs = ZSize(c1.view.sizeThatFits(total.GetCGSize()))
+            var tot = getCellFitSizeInTotal(total:total, cell:c1)
+            var fs = ZSize(c1.view.sizeThatFits(tot))
             var m = c1.margin
             if (c1.alignment & .MarginIsOffset) {
                 m = ZSize(0, 0)
@@ -96,7 +108,8 @@ class ZStackView: ZContainerView {
         cs += margin.size[vertical] // subtracts margin, since we've already indented for that
         let diff = r.size[vertical] - cs
         for c3 in cells where !c3.collapsed && !c3.free {
-            var s = ZSize(c3.view.sizeThatFits(r.size.GetCGSize()))
+            let tot = getCellFitSizeInTotal(total:r.size, cell:c3)
+            var s = ZSize(c3.view.sizeThatFits(tot))
             if decs > 0 && (c3.alignment & ashrink) && diff != 0 {
                 s[vertical] += diff / Double(decs)
             } else if incs > 0 && (c3.alignment & aexpand) && diff != 0 {

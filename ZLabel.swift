@@ -59,7 +59,7 @@ class ZLabel: UILabel, ZView {
         }
         maximize(&box.w, Double(size.width))
         if self.numberOfLines > 1 {
-            box = ZSize(9999.0,  Double(font.lineHeight) * Double(self.numberOfLines) * 1.1)
+            box = ZSize(Double(size.width), Double(font.lineHeight) * Double(self.numberOfLines) * 1.1)
         } else {
             box.h = 99999;
         }

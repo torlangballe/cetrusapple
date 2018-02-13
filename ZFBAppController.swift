@@ -1,9 +1,7 @@
 //
-//  FBAppDelegate.swift
-//  capsule.fm
+//  FBAppController.swift
 //
 //  Created by Tor Langballe on /13/12/17.
-//  Copyright © 2017 Capsule.fm. All rights reserved.
 //
 
 import Foundation

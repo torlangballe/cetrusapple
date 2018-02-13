@@ -46,6 +46,7 @@ class ZInAppPurchases : NSObject, SKProductsRequestDelegate, SKPaymentTransactio
         for skp in response.products {
             var p = ZInAppProduct()
             p.sid = skp.productIdentifier
+            formatter.numberStyle = .currencyISOCode
             formatter.locale = skp.priceLocale
             p.price = formatter.string(from: skp.price) ?? "?"
             p.name = skp.localizedTitle

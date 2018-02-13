@@ -34,6 +34,7 @@ class ZImageView: UIImageView, ZView, ZImageLoader, ZTimerOwner {
     var objectName: String
     var maxSize = ZSize()
     var minSize : ZSize? = nil
+    var margin = ZSize()
     var hightlightTint = ZColor(white:0.4)
     var touchDownRepeatSecs = 0.0
     var touchDownRepeats = 0
@@ -52,12 +53,13 @@ class ZImageView: UIImageView, ZView, ZImageLoader, ZTimerOwner {
         isAccessibilityElement = true
     }
     
-    init(namedImage:String, insets:ZRect = ZRect.Null, maxSize:ZSize = ZSize()) {
+    init(namedImage:String, scaleInsets:ZRect = ZRect.Null, maxSize:ZSize = ZSize()) {
         objectName = namedImage
         self.maxSize = maxSize
+        
         if var image = ZImage(named:namedImage) {
-            if !insets.IsNull {
-                image = image.MakeScaleImage(capInsets:insets)
+            if !scaleInsets.IsNull {
+                image = image.MakeScaleImage(capInsets:scaleInsets)
             }
             super.init(image:image)
             self.contentMode = UIViewContentMode.scaleAspectFit
@@ -183,7 +185,8 @@ class ZImageView: UIImageView, ZView, ZImageLoader, ZTimerOwner {
         if !maxSize.IsNull(){
             return maxSize.GetCGSize()
         }
-        return super.sizeThatFits(size)
+        let s = ZSize(super.sizeThatFits(size))
+        return (s + margin * 2.0).GetCGSize()
     }
     
     func SetImage(_ image:ZImage?, downloadUrl:String = "") {

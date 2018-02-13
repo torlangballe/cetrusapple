@@ -30,7 +30,7 @@ class ZScreen {
     
     static var IsTall: Bool {
         get {
-            return Main.size.h > 480
+            return Main.size.h > 568
         }
     }
 

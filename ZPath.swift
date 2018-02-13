@@ -176,7 +176,7 @@ class ZPath {
         let delta = (rect.size.w / 2) - 1
         let inAmount = (1 - inRatio)
         for i in 0 ..< points * 2 {
-            let deg = Double(360 * i) / Double(points * 2) - 54
+            let deg = Double(360 * i + 720) / Double(points * 2) 
             var d = ZMath.AngleDegToPos(deg) * delta
             if (i & 1) != 0 {
                 d *= inAmount

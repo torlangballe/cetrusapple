@@ -40,7 +40,13 @@ class ZFileUrl : ZUrl {
     }
     
     var FilePath : String {
-        get { return url?.path ?? "" }
+        get {
+            let str = url?.path ?? ""
+            if IsFolder() && str.lastCharAsString != "/" {
+                return str + "/"
+            }
+            return str
+        }
     }
 
     func IsFolder() -> Bool {

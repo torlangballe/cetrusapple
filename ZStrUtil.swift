@@ -13,13 +13,13 @@ import Foundation
 typealias ZStringCompareOptions = NSString.CompareOptions
 
 class ZStrUtil {
-    @discardableResult class func SaveToFile(_ str:String, file:ZFileUrl) -> Bool {
+    @discardableResult class func SaveToFile(_ str:String, file:ZFileUrl) -> Error? {
         do {
             try str.write(to: file.url! as URL, atomically:true, encoding:String.Encoding.utf8)
-        } catch {
-            return false
+        } catch let error as NSError {
+            return error
         }
-        return true
+        return nil
     }
     
     class func LoadFromFile(_ file:ZFileUrl) -> (String, Error?) {
