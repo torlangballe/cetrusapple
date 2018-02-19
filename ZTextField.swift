@@ -24,6 +24,10 @@ protocol ZTextBase {
     var KeyboardLocale : String { get }
 }
 
+func ZTextDismissKeyboard() {
+    UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+}
+
 extension ZTextBase {
     var SelectedText: String {
         get {

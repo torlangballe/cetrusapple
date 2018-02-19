@@ -8,6 +8,8 @@
 
 import Foundation
 
+typealias ZOutputStream = OutputStream
+
 private func dm() -> FileManager {
     return FileManager.default
 }
@@ -49,6 +51,14 @@ class ZFileUrl : ZUrl {
         }
     }
 
+    func OpenOutput(append:Bool = false) -> (ZOutputStream?, ZError?) {
+        if let stream = OutputStream(url:url!, append:append) {
+            stream.open()
+            return (stream, stream.streamError as! ZError?)
+        }
+        return (nil, ZError(message:"couldm't make stream"))
+    }
+    
     func IsFolder() -> Bool {
         return IsDirectory()
     }

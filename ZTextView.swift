@@ -13,7 +13,7 @@ class ZTextView : UITextView, UITextViewDelegate, ZTextBase, ZView {
     var minWidth: Double = 0
     var maxWidth: Double = 0
     var objectName = "ZTextView"
-    private var target: ZTextEditDelegate? = nil
+    private weak var target: ZTextEditDelegate? = nil
     var useMenu = true
     var maxLines = 0
     var edited = false

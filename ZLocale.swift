@@ -61,6 +61,10 @@ struct ZLocale {
         
         if !ZStrUtil.SplitToArgs(bcp, sep:"-", a:&lang, b:&ccode) {
             if !ZStrUtil.SplitToArgs(bcp, sep:"_", a:&lang, b:&ccode) {
+                let parts = ZStrUtil.Split(bcp, sep:"-")
+                if parts.count > 2 {
+                    return (parts.first!, parts.last!)
+                }
                 return (bcp, "")
             }
         }

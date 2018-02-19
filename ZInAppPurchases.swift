@@ -95,7 +95,9 @@ class ZInAppPurchases : NSObject, SKProductsRequestDelegate, SKPaymentTransactio
     
     func paymentQueueRestoreCompletedTransactionsFinished(_ queue:SKPaymentQueue) {
         for transaction in queue.transactions {
-            let _ = transaction.payment.productIdentifier
+            let prodId = transaction.payment.productIdentifier
+            print("prod bought:", prodId)
+            
         }
     }
     

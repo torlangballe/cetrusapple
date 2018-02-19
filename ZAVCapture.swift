@@ -187,7 +187,7 @@ class ZAVCapture : NSObject, AVCaptureVideoDataOutputSampleBufferDelegate, AVCap
 
     private func cameraWithPosition(_ pos:AVCaptureDevice.Position) -> AVCaptureDevice? {
         
-        if let camera = AVCaptureDevice.DiscoverySession(deviceTypes: [AVCaptureDevice.DeviceType.builtInWideAngleCamera], mediaType: AVMediaType.video, position: AVCaptureDevice.Position.front).devices.first {
+        if let camera = AVCaptureDevice.DiscoverySession(deviceTypes: [AVCaptureDevice.DeviceType.builtInWideAngleCamera], mediaType:AVMediaType.video, position:pos).devices.first {
             return camera
         }
 //
@@ -209,7 +209,9 @@ class ZAVCapture : NSObject, AVCaptureVideoDataOutputSampleBufferDelegate, AVCap
     
         var newCamera:AVCaptureDevice? = nil
         
-        let pos = (currentCameraInput.device.position == .back) ? AVCaptureDevice.Position.front : AVCaptureDevice.Position.back
+        isBack = !isBack
+//        let pos = (currentCameraInput.device.position == .back) ? AVCaptureDevice.Position.front : AVCaptureDevice.Position.back
+        let pos = isBack ? AVCaptureDevice.Position.back : AVCaptureDevice.Position.front
         newCamera = cameraWithPosition(pos)
 
         do {
@@ -220,7 +222,6 @@ class ZAVCapture : NSObject, AVCaptureVideoDataOutputSampleBufferDelegate, AVCap
         }
         captureSession.commitConfiguration()
         SetPreviewOrientation(ZScreen.Orientation())
-        isBack = !isBack
         return nil
     }
     

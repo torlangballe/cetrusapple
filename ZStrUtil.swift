@@ -471,5 +471,36 @@ class ZStrUtil {
         }
         return lines
     }
+    
+    class func Base64CharToNumber(_ char:Int) -> Int {
+        let iA = Int(UnicodeScalar("A")!.value)
+        let iZ = Int(UnicodeScalar("Z")!.value)
+        let ia = Int(UnicodeScalar("a")!.value)
+        let iz = Int(UnicodeScalar("z")!.value)
+        let i0 = Int(UnicodeScalar("0")!.value)
+        let i9 = Int(UnicodeScalar("9")!.value)
+        let iPlus = Int(UnicodeScalar("+")!.value)
+        let iSlash = Int(UnicodeScalar("/")!.value)
+        
+        switch char {
+        case iA ... iZ:
+            return char - iA
+            
+        case ia ... iz:
+            return char - ia + 26
+        
+        case i0 ... i9:
+            return char - i0 + 26 + 26
+        
+        case iPlus:
+            return 62
+        
+        case iSlash:
+            return 63
+
+        default:
+            return -1
+        }
+    }
 }
 

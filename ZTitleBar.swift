@@ -70,6 +70,7 @@ class ZTitleBar : ZStackView {
                 ZPopTopView() //overrideDuration:0) //, overrideTransition:.fade)
             }
         default:
+            ZTextDismissKeyboard()
             break
         }
     }

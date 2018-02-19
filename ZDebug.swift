@@ -13,6 +13,8 @@ struct ZDebug {
     static var storePrintLines = 0
     static var storedLines = [String]()
     static var lastStampTime = ZTime.Null
+    static var printHooks = [(String)->()]()
+
     static func Print(_ items: Any?..., separator: String = " ", terminator: String = "\n") {
         var str = ""
         if ZTime.UpdateIfOlderThanSecs(3, time:&lastStampTime) {
@@ -31,17 +33,19 @@ struct ZDebug {
             }
             ZDebug.storedLines.append(str)
         }
+        for h in printHooks {
+            h(str)
+        }
         mutex.Unlock()
         print(str, terminator:terminator)
     }
-/*
+
     static func ErrorOnRelease() {
         if !_isDebugAssertConfiguration() {
-            for i in 1...1000 {
+            for _ in 1...100 {
                 Print("Should not run on ")
             }
         }
     }
- */
 }
 

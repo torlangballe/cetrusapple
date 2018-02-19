@@ -1,9 +1,8 @@
 //
 //  ZAccessibility.swift
-//  Zed
+//  Cetrus
 //
 //  Created by Tor Langballe on /28/11/15.
-//  Copyright © 2015 Capsule.fm. All rights reserved.
 //
 
 import UIKit

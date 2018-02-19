@@ -1,9 +1,8 @@
 //
 //  ZActivity.swift
-//  capsulefm
+//  Cetrus
 //
 //  Created by Tor Langballe on /11/12/15.
-//  Copyright © 2015 Capsule.fm. All rights reserved.
 //
 
 import UIKit

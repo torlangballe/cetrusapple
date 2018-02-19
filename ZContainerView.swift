@@ -82,7 +82,8 @@ class ZContainerView: ZCustomView {
     }
     
     func arrangeChild(_ c:Cell, r:ZRect) {
-        let s = ZSize(c.view.sizeThatFits(r.GetCGRect().size))
+        let ir = r.Expanded(c.margin * -2.0)
+        let s = ZSize(c.view.sizeThatFits(ir.GetCGRect().size))
         var rv = r.Align(s, align:c.alignment, marg:c.margin, maxSize:c.maxSize)
         if c.handleTransition != nil {
             if let r = c.handleTransition!(s, ZScreen.Orientation(), r, rv) {
