@@ -366,13 +366,13 @@ class ZCustomView: UIControl, ZView, UIGestureRecognizerDelegate, ZTimerOwner {
             addGesture(gtap, view:view, handler:self)
             view.View().addGestureRecognizer(gtap)
             for g in view.View().gestureRecognizers ?? [] {
-                if let tg = g as? UITapGestureRecognizer {
+                if let tg = g as? UITapGestureRecognizer, tg != gtap {
                     tg.require(toFail:gtap)
                 }
             }
             if view.View().superview != nil {
                 for g in view.View().superview?.gestureRecognizers ?? [] {
-                    if let tg = g as? UITapGestureRecognizer {
+                    if let tg = g as? UITapGestureRecognizer, tg != gtap {
                         tg.require(toFail:gtap)
                     }
                 }

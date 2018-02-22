@@ -185,6 +185,10 @@ class ZStrUtil {
         return str.addingPercentEncoding(withAllowedCharacters: characterSet as CharacterSet)!
     }
 
+    class func UrlQueryQuote(_ str: String) -> String {
+        return str.addingPercentEncoding(withAllowedCharacters:NSCharacterSet.urlQueryAllowed) ?? ""
+    }
+    
     @discardableResult class func HasPrefix(_ str:String, prefix:String, rest:inout String) -> Bool {
         if str.hasPrefix(prefix) {
             rest = ZStrUtil.Body(str, pos:prefix.count)

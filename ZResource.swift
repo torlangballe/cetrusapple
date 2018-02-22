@@ -10,6 +10,10 @@ import Foundation
 
 var list = [ZResource]()
 
+// NSBundleOnDemandResourceExceededMaximumSizeError: 4993
+// NSBundleOnDemandResourceInvalidTagError: 4994
+// NSBundleOnDemandResourceOutOfSpaceError: 4992
+
 @available(iOS 9.0, *)
 class ZResource: NSBundleResourceRequest, ZTimerOwner {
     var sid = ""

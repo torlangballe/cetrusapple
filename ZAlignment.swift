@@ -1,5 +1,5 @@
 //
-//  zalignment.swift
+//  ZAlignment.swift
 //  Cetrus
 //
 //  Created by Tor Langballe on /23/9/14.
