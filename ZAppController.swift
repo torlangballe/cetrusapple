@@ -163,9 +163,6 @@ class ZAppController : UIResponder, UIApplicationDelegate, UNUserNotificationCen
         } else {
             // Fallback on earlier versions
         }
-
-        let (_, ver, _) = ZApp.Version
-        ZKeyValueStore.SetDouble(Double(ver), key:"ZVerson")
         
 //!        FBSDKApplicationDelegate.sharedInstance().application(UIApplication.shared, didFinishLaunchingWithOptions:launchOptions)
 

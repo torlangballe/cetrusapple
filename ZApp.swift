@@ -14,7 +14,8 @@ class ZApp : ZObject {
     var backgroundTime = ZTime.Null // -1 if not in background
     var startTime = ZTime.Now
     var startedCount = 0
-    
+    var oldVersion = 0.0
+
     var IsActive: Bool {
         return !activationTime.IsNull
     }
@@ -47,6 +48,12 @@ class ZApp : ZObject {
         activationTime = ZTime.Now
         super.init()
         mainZApp = self
+    }
+
+    func setVersions() { // this needs to be called by inheriting class, or strange stuff happens if called by ZApp
+        let (_, ver, _) = ZApp.Version
+        oldVersion = ZKeyValueStore.DoubleForKey("ZVerson")
+        ZKeyValueStore.SetDouble(Double(ver), key:"ZVerson")
     }
 /*
     func HandleScreenLocked() {
