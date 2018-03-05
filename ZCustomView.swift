@@ -311,7 +311,7 @@ class ZCustomView: UIControl, ZView, UIGestureRecognizerDelegate, ZTimerOwner {
             mainZApp?.HandleShake()
         }
     }
-
+/*
     override func remoteControlReceived(with event: UIEvent?) {
         if event!.type == UIEventType.remoteControl {
             let command:ZAudioRemoteCommand
@@ -353,6 +353,7 @@ class ZCustomView: UIControl, ZView, UIGestureRecognizerDelegate, ZTimerOwner {
             mainZApp?.HandleAudioRemote(command)
         }
     }
+    */
     
     func AddGestureTo(_ view:ZView, type:ZGestureType, taps:Int = 1, touches:Int = 1, duration:Float = 0.8, movement:Float = 10, dir:ZAlignment = .None) {
         view.View().isUserInteractionEnabled = true

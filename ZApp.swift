@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import MediaPlayer
 
 class ZApp : ZObject {
     static var appFile: ZFileUrl? = nil
@@ -55,15 +56,21 @@ class ZApp : ZObject {
         oldVersion = ZKeyValueStore.DoubleForKey("ZVerson")
         ZKeyValueStore.SetDouble(Double(ver), key:"ZVerson")
     }
-/*
-    func HandleScreenLocked() {
-        ZScreen.isLocked = true
-    }
     
-    func HandleScreenUnlocked() {
-        ZScreen.isLocked = false
+    func EnableAudioRemote(_ command:ZAudioRemoteCommand, on:Bool) {
+        let commandCenter = MPRemoteCommandCenter.shared()
+        switch command {
+        case .nextTrack:
+            commandCenter.nextTrackCommand.isEnabled = on
+        case .previousTrack:
+            commandCenter.previousTrackCommand.isEnabled = on
+        case .togglePlayPause:
+            commandCenter.togglePlayPauseCommand.isEnabled = on
+        default:
+            break
+        }
     }
-*/
+
     func HandleAppNotification(_ notification:ZNotification, action:String) { }
     func HandlePushNotificationWithDictionary(_ dict:[String:AnyObject], fromStartup:Bool, whileActive:Bool) { }
     func HandleLocationRegionCross(regionId:String, enter:Bool, fromAdd:Bool) { }

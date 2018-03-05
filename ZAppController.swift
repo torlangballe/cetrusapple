@@ -103,8 +103,22 @@ class ZAppController : UIResponder, UIApplicationDelegate, UNUserNotificationCen
         mainZApp?.HandleRemoteAudioSeekTo(posSecs:event.positionTime)
         return .success
     }
+
+    @objc func togglePlayPause(event: MPChangePlaybackPositionCommandEvent) -> MPRemoteCommandHandlerStatus {
+        mainZApp?.HandleAudioRemote(.togglePlayPause)
+        return .success
+    }
+
+    @objc func nextTrack(event: MPChangePlaybackPositionCommandEvent) -> MPRemoteCommandHandlerStatus {
+        mainZApp?.HandleAudioRemote(.nextTrack)
+        return .success
+    }
     
-    
+    @objc func previousTrack(event: MPChangePlaybackPositionCommandEvent) -> MPRemoteCommandHandlerStatus {
+        mainZApp?.HandleAudioRemote(.previousTrack)
+        return .success
+    }
+
     @objc func lowDiskSpaceForOnDemandResource(notification:NSNotification) {
         ZDebug.Print("lowDiskSpaceForOnDemandNSBundle")
     }
@@ -187,9 +201,19 @@ class ZAppController : UIResponder, UIApplicationDelegate, UNUserNotificationCen
         }
         
         let commandCenter = MPRemoteCommandCenter.shared()
+        
         commandCenter.changePlaybackPositionCommand.isEnabled = true
         commandCenter.changePlaybackPositionCommand.addTarget(self, action:#selector(ZAppController.changedThumbSliderOnLockScreen))
-        
+
+        commandCenter.togglePlayPauseCommand.isEnabled = true
+        commandCenter.togglePlayPauseCommand.addTarget(self, action:#selector(ZAppController.togglePlayPause))
+
+        commandCenter.nextTrackCommand.isEnabled = true
+        commandCenter.nextTrackCommand.addTarget(self, action:#selector(ZAppController.nextTrack))
+
+        commandCenter.previousTrackCommand.isEnabled = true
+        commandCenter.previousTrackCommand.addTarget(self, action:#selector(ZAppController.previousTrack))
+
 
         //        GeneralNSObject.registerAppforDetectLockState(mainZApp!)
 

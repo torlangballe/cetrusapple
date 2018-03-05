@@ -77,11 +77,10 @@ class ZSoundPlayer: NSObject, AVAudioPlayerDelegate {
     }
 
     static func SetCurrentTrackPos(_ pos:Double, duration:Double) {
-        let songInfo: [String:Any] = [
-            MPNowPlayingInfoPropertyElapsedPlaybackTime: pos as Any,
-            MPMediaItemPropertyPlaybackDuration: duration as Any,
-            MPNowPlayingInfoPropertyPlaybackRate: 1.0 as Any
-        ]
+        var songInfo = MPNowPlayingInfoCenter.default().nowPlayingInfo ?? [String : Any]()
+        songInfo[MPNowPlayingInfoPropertyElapsedPlaybackTime] = pos as Any
+        songInfo[MPMediaItemPropertyPlaybackDuration] = duration as Any
+        songInfo[MPNowPlayingInfoPropertyPlaybackRate] = 1.0 as Any
         MPNowPlayingInfoCenter.default().nowPlayingInfo = songInfo
     }
     
@@ -89,9 +88,8 @@ class ZSoundPlayer: NSObject, AVAudioPlayerDelegate {
         var songInfo = [String:AnyObject]()
         if image != nil {            
             let imageArtwork = MPMediaItemArtwork.init(boundsSize:image!.size) { (size) in
-                return image!
+                return image!.GetScaledInSize(ZSize(size))!
             }
-
             songInfo[MPMediaItemPropertyArtwork] = imageArtwork
         }
         songInfo[MPMediaItemPropertyTitle] = title as AnyObject?
