@@ -75,19 +75,18 @@ extension ZImage {
         if proportional {
             vsize = ZRect(size:size).Align(ZSize(self.size), align:.Center | .Shrink | .ScaleToFitProportionally).size
         }
-        let cgImage = self.cgImage
         let width = Int(vsize.w) / Int(self.scale)
         let height = Int(vsize.h) / Int(self.scale)
-        let bitsPerComponent = cgImage?.bitsPerComponent
-        let bytesPerRow = cgImage?.bytesPerRow
-        let colorSpace = cgImage?.colorSpace
-        let bitmapInfo = cgImage?.bitmapInfo
-        if let context = CGContext(data: nil, width: width, height: height, bitsPerComponent: bitsPerComponent!, bytesPerRow: bytesPerRow!, space: colorSpace!, bitmapInfo: (bitmapInfo?.rawValue)!) {
-            context.interpolationQuality = CGInterpolationQuality.high
-            context.draw(cgImage!, in: CGRect(origin:CGPoint.zero, size:CGSize(width:CGFloat(width), height:CGFloat(height))))
-            if let cgimage = context.makeImage() {
-                let image = ZImage(cgImage:cgimage)
-                return image
+
+        if let imageRef = self.cgImage, let colorSpaceInfo = imageRef.colorSpace {
+            let bitmapInfo = imageRef.bitmapInfo
+            if let context = CGContext(data: nil, width:width, height:height, bitsPerComponent:imageRef.bitsPerComponent, bytesPerRow:imageRef.bytesPerRow, space:colorSpaceInfo, bitmapInfo:bitmapInfo.rawValue) {
+                context.interpolationQuality = CGInterpolationQuality.high
+                context.draw(cgImage!, in: CGRect(origin:CGPoint.zero, size:CGSize(width:CGFloat(width), height:CGFloat(height))))
+                if let cgimage = context.makeImage() {
+                    let image = ZImage(cgImage:cgimage)
+                    return image
+                }
             }
         }
         return nil

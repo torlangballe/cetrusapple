@@ -91,6 +91,7 @@ private func checkStatusCode(_ response:ZUrlResponse!, check:Bool, error:inout E
 }
 
 class ZUrlSession {
+    static var transactionMutex = ZMutex()
     static var transactions = [(String, Int, Bool)]() // url, length, upload
     
     @discardableResult static func Send(_ request:ZUrlRequest, onMain:Bool = true, async:Bool = true, sessionCount:Int = -1, makeStatusCodeError:Bool = false, done:@escaping (_ response:ZUrlResponse?, _ data:ZData?, _ error:Error?, _ sessionCount:Int)->Void) -> ZURLSessionDataTask? {
@@ -99,13 +100,17 @@ class ZUrlSession {
             return nil
         }
         if request.httpBody != nil {
+            transactionMutex.Lock()
             transactions.append((request.url!.absoluteString, request.httpBody!.count, true))
+            transactionMutex.Unlock()
         }
         let task = URLSession.shared.dataTask(with:(request as URLRequest)) { (data, response, error) in
             var verror = error
             checkStatusCode(response, check:makeStatusCodeError, error:&verror)
             if data != nil {
+                transactionMutex.Lock()
                 transactions.append((request.url!.absoluteString, data!.count, false))
+                transactionMutex.Unlock()
             }
             if onMain {
                 ZMainQue.async {
