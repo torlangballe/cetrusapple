@@ -30,6 +30,7 @@ protocol ZView {
     func Parent() -> ZView?
     func SetBackgroundColor(_ color:ZColor)
     func SetCornerRadius(_ radius:Double)
+    func SetStroke(width:Double, color:ZColor)
     func Expose(_ fadeIn:Float)
     //    func ExposeWithFadeIn(fadeIn:Float)
     func Scale(_ scale:Double)
@@ -132,6 +133,10 @@ extension ZView {
     func SetCornerRadius(_ radius:Double) {
         View().layer.masksToBounds = true
         View().layer.cornerRadius = CGFloat(radius)
+    }
+    func SetStroke(width:Double, color:ZColor) {
+        View().layer.borderWidth = CGFloat(width)
+        View().layer.borderColor = color.rawColor.cgColor
     }
     func Expose(_ fadeIn:Float = 0) {
         View().setNeedsDisplay()

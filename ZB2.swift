@@ -102,7 +102,7 @@ class ZBackblazeB2 {
                     if error == nil {
                         self.UploadFileToUrlWithToken(fileData, name:name, mimeType:mimeType, uploadUrl:uploadUrl, uploadToken:uploadToken) { (error, fileId) in
                             if error == nil {
-                                let url = "https://f001.backblaze.com/file/" + ZStrUtil.UrlQuote(bucketName) + "/" + ZStrUtil.UrlQuote(name)
+                                let url = "https://f001.backblazeb2.com/file/" + ZStrUtil.UrlQuote(bucketName) + "/" + ZStrUtil.UrlQuote(name)
                                 done(url, fileId, error )
                             } else {
                                 done("", "", error)

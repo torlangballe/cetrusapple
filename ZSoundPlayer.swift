@@ -77,26 +77,30 @@ class ZSoundPlayer: NSObject, AVAudioPlayerDelegate {
     }
 
     static func SetCurrentTrackPos(_ pos:Double, duration:Double) {
-        var songInfo = MPNowPlayingInfoCenter.default().nowPlayingInfo ?? [String : Any]()
-        songInfo[MPNowPlayingInfoPropertyElapsedPlaybackTime] = pos as Any
-        songInfo[MPMediaItemPropertyPlaybackDuration] = duration as Any
-        songInfo[MPNowPlayingInfoPropertyPlaybackRate] = 1.0 as Any
-        MPNowPlayingInfoCenter.default().nowPlayingInfo = songInfo
+        ZMainQue.async {
+            var songInfo = MPNowPlayingInfoCenter.default().nowPlayingInfo ?? [String : Any]()
+            songInfo[MPNowPlayingInfoPropertyElapsedPlaybackTime] = pos as Any
+            songInfo[MPMediaItemPropertyPlaybackDuration] = duration as Any
+            songInfo[MPNowPlayingInfoPropertyPlaybackRate] = 1.0 as Any
+            MPNowPlayingInfoCenter.default().nowPlayingInfo = songInfo
+        }
     }
-    
+
     static func SetCurrentTrackPlayingMetadata(_ image:ZImage?, title:String, album:String = "", pos:Double? = nil) {
-        var songInfo = [String:AnyObject]()
-        if image != nil {            
-            let imageArtwork = MPMediaItemArtwork.init(boundsSize:image!.size) { (size) in
-                return image!.GetScaledInSize(ZSize(size))!
+        ZMainQue.async {
+            var songInfo = [String:AnyObject]()
+            if image != nil {
+                let imageArtwork = MPMediaItemArtwork.init(boundsSize:image!.size) { (size) in
+                    return image!.GetScaledInSize(ZSize(size))!
+                }
+                songInfo[MPMediaItemPropertyArtwork] = imageArtwork
             }
-            songInfo[MPMediaItemPropertyArtwork] = imageArtwork
+            songInfo[MPMediaItemPropertyTitle] = title as AnyObject?
+            if !album.isEmpty {
+                songInfo[MPMediaItemPropertyAlbumTitle] =  album as AnyObject?
+            }
+            MPNowPlayingInfoCenter.default().nowPlayingInfo = songInfo
         }
-        songInfo[MPMediaItemPropertyTitle] = title as AnyObject?
-        if !album.isEmpty {
-            songInfo[MPMediaItemPropertyAlbumTitle] =  album as AnyObject?
-        }
-        MPNowPlayingInfoCenter.default().nowPlayingInfo = songInfo
     }
     
     static func Vibrate() {

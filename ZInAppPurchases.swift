@@ -50,6 +50,9 @@ class ZInAppPurchases : NSObject, SKProductsRequestDelegate, SKPaymentTransactio
             formatter.locale = skp.priceLocale
             p.price = formatter.string(from: skp.price) ?? "?"
             p.name = skp.localizedTitle
+            if p.name.isEmpty {
+                p.name = ZStrUtil.Join(ZStrUtil.SplitCamelCase(p.sid), sep:" ")
+            }
             products.append(p)
             if first {
                 first = false
@@ -96,8 +99,8 @@ class ZInAppPurchases : NSObject, SKProductsRequestDelegate, SKPaymentTransactio
     func paymentQueueRestoreCompletedTransactionsFinished(_ queue:SKPaymentQueue) {
         for transaction in queue.transactions {
             let prodId = transaction.payment.productIdentifier
-            print("prod bought:", prodId)
-            
+            ZAlert.Say(ZTS("Restored purchase: ") + prodId)
+            handlePurchaseSuccess?(prodId) { () in }
         }
     }
     

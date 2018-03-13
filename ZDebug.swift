@@ -41,11 +41,15 @@ struct ZDebug {
     }
 
     static func ErrorOnRelease() {
-        if !_isDebugAssertConfiguration() {
+        if IsRelease() {
             for _ in 1...100 {
                 Print("Should not run on ")
             }
         }
+    }
+    
+    static func IsRelease() -> Bool {
+        return !_isDebugAssertConfiguration()
     }
 }
 
