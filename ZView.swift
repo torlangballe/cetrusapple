@@ -36,6 +36,7 @@ protocol ZView {
     func Scale(_ scale:Double)
     func GetContainer() -> ZContainerView?
     func CollapseInParent(collapse:Bool, arrange:Bool)
+    func GetContainerAndCellIndex() -> (ZContainerView, Int)?
 }
 
 typealias ZViewContentMode = UIViewContentMode
@@ -166,7 +167,18 @@ extension ZView {
             c.CollapseChild(self, collapse:collapse, arrange:arrange)
         }
     }
-    
+
+    func GetContainerAndCellIndex() -> (ZContainerView, Int)? {
+        if let container = GetContainer() {
+            for (i, c) in container.cells.enumerated() {
+                if c.view == View() {
+                    return (container, i)
+                }
+            }
+        }
+        return nil
+    }
+
     func GetViewRenderedAsImage() -> ZImage? {
         UIGraphicsBeginImageContextWithOptions(View().bounds.size, View().isOpaque, 0.0);
         View().layer.render(in: UIGraphicsGetCurrentContext()!)

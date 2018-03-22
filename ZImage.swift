@@ -78,20 +78,21 @@ extension ZImage {
         let width = Int(vsize.w) / Int(self.scale)
         let height = Int(vsize.h) / Int(self.scale)
 
-        if let imageRef = self.cgImage, let colorSpaceInfo = imageRef.colorSpace {
-            let bitmapInfo = imageRef.bitmapInfo
-            if let context = CGContext(data: nil, width:width, height:height, bitsPerComponent:imageRef.bitsPerComponent, bytesPerRow:imageRef.bytesPerRow, space:colorSpaceInfo, bitmapInfo:bitmapInfo.rawValue) {
-                context.interpolationQuality = CGInterpolationQuality.high
-                context.draw(cgImage!, in: CGRect(origin:CGPoint.zero, size:CGSize(width:CGFloat(width), height:CGFloat(height))))
-                if let cgimage = context.makeImage() {
-                    let image = ZImage(cgImage:cgimage)
-                    return image
-                }
+        let colorSpaceInfo = CGColorSpaceCreateDeviceRGB()
+        if let context = CGContext(data: nil, width: width, height: height, bitsPerComponent: 8, bytesPerRow: 0, space: colorSpaceInfo, bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue) {
+            context.interpolationQuality = CGInterpolationQuality.high
+            context.draw(cgImage!, in: CGRect(origin:CGPoint.zero, size:CGSize(width:CGFloat(width), height:CGFloat(height))))
+            if let cgimage = context.makeImage() {
+                let image = ZImage(cgImage:cgimage)
+                return image
+            } else {
+                print("no image")
             }
+        } else {
+            print("no context")
         }
         return nil
     }
-    
     
     func GetCropped(_ crop:ZRect) -> ZImage {
         let imageRef = self.cgImage?.cropping(to: crop.GetCGRect())
@@ -260,21 +261,25 @@ extension ZImage {
 extension ZImage {
     static var MainCache = ZImageCache()
     
-    @discardableResult static func DownloadFromUrl(_ url:String, cache:Bool = true, maxSize:ZSize? = nil, done:((_ image:ZImage?)->Void)? = nil) -> ZURLSessionDataTask? {
+    @discardableResult static func DownloadFromUrl(_ url:String, cache:Bool = true, maxSize:ZSize? = nil, done:((_ image:ZImage?)->Void)? = nil) -> ZURLSessionTask? {
         if cache {
             return MainCache.DownloadFromUrl(url, done:done)
         }
         //        let start = ZTime.Now
         let req = ZUrlRequest.Make(.Get, url:url)
-        return ZUrlSession.Send(req, makeStatusCodeError:true) { (resp, data, err, code) in
+        return ZUrlSession.Send(req, onMain:false, makeStatusCodeError:true) { (resp, data, err, code) in
             if err != nil {
                 ZDebug.Print("ZImage.DownloadFromUrl error:", err!.localizedDescription, url)
-                done?(nil)
+                ZMainQue.async {
+                    done?(nil)
+                }
                 return
             }
             if data == nil {
                 ZDebug.Print("ZImage.DownloadFromUrl data=null:", url)
-                done?(nil)
+                ZMainQue.async {
+                    done?(nil)
+                }
                 return
             }
             var scale:CGFloat = 1.0
@@ -291,13 +296,19 @@ extension ZImage {
                         image = small
                     } else {
                         ZDebug.Print("ZImage.Download: Failing too big image not scaleable:", image.Size, "max:", maxSize!, url)
-                        done?(nil)
+                        ZMainQue.async {
+                            done?(nil)
+                        }
                         return
                     }
                 }
-                done!(image)
+                ZMainQue.async {
+                    done?(image)
+                }
             } else {
-                done!(nil)
+                ZMainQue.async {
+                    done?(nil)
+                }
             }
         }
     }
@@ -489,7 +500,7 @@ class ZImageCache : ZTimerOwner {
     }
     var cache = [String:Cache]()
 
-    @discardableResult func DownloadFromUrl(_ url:String, done:((_ image:ZImage?)->Void)? = nil) -> ZURLSessionDataTask? {
+    @discardableResult func DownloadFromUrl(_ url:String, done:((_ image:ZImage?)->Void)? = nil) -> ZURLSessionTask? {
         if url.isEmpty {
             done?(nil)
             return nil

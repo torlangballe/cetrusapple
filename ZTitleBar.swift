@@ -20,7 +20,7 @@ class ZTitleBar : ZStackView {
     
     static var Color = ZColor(r:0.2, g:0.3, b:1)
     
-    init(text:String = "", closeType:CloseButtons = .cross, showDots:Bool = false, closeAlignX:ZAlignment = .Right) {
+    init(text:String = "", closeType:CloseButtons = .cross, showDots:Bool = false, closeAlignX:ZAlignment = .Left) {
         closeButton = ZImageView(namedImage:closeType.rawValue + ".png")
         title = ZLabel(text:text, maxWidth:ZScreen.Main.size.w, font:ZFont.Nice(25), align:.Left)
         title.Color = ZColor.White()

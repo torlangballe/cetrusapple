@@ -51,5 +51,12 @@ struct ZDebug {
     static func IsRelease() -> Bool {
         return !_isDebugAssertConfiguration()
     }
+    
+    static func IsMinIOS11() -> Bool {
+        if #available(iOS 11.0, *) {
+            return true
+        }
+        return false
+    }
 }
 

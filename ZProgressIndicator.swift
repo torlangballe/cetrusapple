@@ -10,6 +10,7 @@ import Foundation
 
 class ZProgressIndicator: ZCustomView {
     var strokeWidth: Int
+    var lightStroke = false
     fileprivate var value:Float = 0
     fileprivate var timer = ZRepeater()
     var Value:Float {
@@ -26,6 +27,7 @@ class ZProgressIndicator: ZCustomView {
         super.init(name:"progress")
         minSize = ZSize(size, size)
         isHidden = true
+        isOpaque = true
         //        backgroundColor = UIColor.greenColor()
     }
 
@@ -55,13 +57,15 @@ class ZProgressIndicator: ZCustomView {
         let path = ZPath()
         let radius = (Rect.size.w - Double(strokeWidth)) / 2 - 1
         let center = LocalRect.Center
+        
         path.ArcDegFromToFromCenter(center, radius:radius)
-        canvas.SetColor(ZColor.White(), opacity:0.6)
+        canvas.SetColor(ZColor(white:lightStroke ? 0.4 : 0.8), opacity:1)
         canvas.FillPath(path)
 
         path.Empty()
-        path.ArcDegFromToFromCenter(center, radius:radius, degStart:0, degEnd:Double(value) * 360)
-        canvas.SetColor(ZColor.Black(), opacity:0.7)
+        let a = max(5, Double(value) * 360)
+        path.ArcDegFromToFromCenter(center, radius:radius, degStart:0, degEnd:a)
+        canvas.SetColor(ZColor(white:lightStroke ? 0.8 : 0.2), opacity:1)
         canvas.StrokePath(path, width:Double(strokeWidth), type:.round)
     }
 }

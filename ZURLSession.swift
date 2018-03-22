@@ -10,7 +10,7 @@ import Foundation
 
 typealias ZUrlRequest = NSMutableURLRequest
 typealias ZUrlResponse = URLResponse
-typealias ZURLSessionDataTask = URLSessionDataTask
+typealias ZURLSessionTask = URLSessionTask
 
 extension ZUrlResponse {
     var StatusCode: Int? {
@@ -91,10 +91,11 @@ private func checkStatusCode(_ response:ZUrlResponse!, check:Bool, error:inout E
 }
 
 class ZUrlSession {
+    // transactions are debugging list for listing all transactions
     static var transactionMutex = ZMutex()
     static var transactions = [(String, Int, Bool)]() // url, length, upload
     
-    @discardableResult static func Send(_ request:ZUrlRequest, onMain:Bool = true, async:Bool = true, sessionCount:Int = -1, makeStatusCodeError:Bool = false, done:@escaping (_ response:ZUrlResponse?, _ data:ZData?, _ error:Error?, _ sessionCount:Int)->Void) -> ZURLSessionDataTask? {
+    @discardableResult static func Send(_ request:ZUrlRequest, onMain:Bool = true, async:Bool = true, sessionCount:Int = -1, makeStatusCodeError:Bool = false, done:@escaping (_ response:ZUrlResponse?, _ data:ZData?, _ error:Error?, _ sessionCount:Int)->Void) -> ZURLSessionTask? {
         if !async {
             SendSync(request, sessionCount:sessionCount, makeStatusCodeError:makeStatusCodeError, done:done)
             return nil
@@ -122,6 +123,20 @@ class ZUrlSession {
         }
         task.resume()
         
+        return task
+    }
+    
+    static func DownloadPersistantlyToFileInThread(_ request:ZUrlRequest, makeStatusCodeError:Bool = false, done:@escaping (_ response:ZUrlResponse?, _ file:ZFileUrl?, _ error:Error?)->Void) -> ZURLSessionTask? {
+        let task = URLSession.shared.downloadTask(with:(request as URLRequest)) { (furl, response, error) in
+            var verror = error
+            checkStatusCode(response, check:makeStatusCodeError, error:&verror)
+            if furl != nil {
+                done(response, ZFileUrl(nsUrl:furl!), verror)
+            } else {
+                done(response, nil, verror)
+            }
+        }
+        task.resume()
         return task
     }
     

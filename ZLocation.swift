@@ -109,7 +109,7 @@ class ZLocation: CLLocationManager, CLLocationManagerDelegate, ZTimerOwner {
         if pos != oldPos {
             oldPos = pos
             ZMainQue.async { () in
-                self.zdelegate!.HandleLocationUpdated(pos)
+                self.zdelegate?.HandleLocationUpdated(pos)
                 if self.getPlace {
                     ZLocation.ReverseGeocode(pos) { (error, place, pos) in
                         self.zdelegate?.HandleLocationPlaceUpdated(error, placeNames:place, pos:pos)

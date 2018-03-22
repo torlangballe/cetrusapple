@@ -356,7 +356,7 @@ struct ZLocale {
         return distance + " " + word
     }
     
-    static func MemorySizeAsString(_ b:Int, langCode:String = "") -> String {
+    static func MemorySizeAsString(_ b:Int, langCode:String = "", maxSignificant:Int = 3) -> String {
         let kiloByte  = 1024.0
         let megaByte  = kiloByte * 1024
         let gigaByte  = megaByte * 1024
@@ -381,7 +381,7 @@ struct ZLocale {
         default:
             break
         }
-        let str = ZStrUtil.NiceDouble(n, maxSig:3) + " " + word
+        let str = ZStrUtil.NiceDouble(n, maxSig:maxSignificant) + " " + word
         return str
     }
 

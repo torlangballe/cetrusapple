@@ -91,7 +91,7 @@ class ZSoundPlayer: NSObject, AVAudioPlayerDelegate {
             var songInfo = [String:AnyObject]()
             if image != nil {
                 let imageArtwork = MPMediaItemArtwork.init(boundsSize:image!.size) { (size) in
-                    return image!.GetScaledInSize(ZSize(size))!
+                    return image!.GetScaledInSize(ZSize(size)) ?? image!
                 }
                 songInfo[MPMediaItemPropertyArtwork] = imageArtwork
             }
