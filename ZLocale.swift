@@ -126,6 +126,15 @@ struct ZLocale {
         return ZTS("Today") // generic name for today
     }
 
+    static func GetYesterday() -> String {
+        return ZTS("Yesterday") // generic name for yesterday
+    }
+    
+    static func GetTomorrow() -> String {
+        return ZTS("Tomorrow") // generic name for tomorrow
+    }
+    
+
     // these three functions insert day/month/year symbol after date in picker, only needed for ja so far.
     static func GetDateInsertDaySymbol() -> String {
         if GetDeviceLanguageCode() == "ja" || ZKeyValueStore.StringForKey(ZTSOverrideKey) == "ja" {
@@ -215,6 +224,14 @@ struct ZLocale {
     static func GetDayOfMonth() -> String { return ZTS("Day") }   // generic name for the day of a month i.e 23rd of July
     static func GetMonth() -> String { return ZTS("Month") }      // generic name for month.
     static func GetYear() -> String { return ZTS("Year") }        // generic name for year.
+
+    static func GetDay(plural:Bool = false) -> String {
+        if plural {
+            return ZTS("Days") // generic name for the plural of a number of days since/until etc
+        }
+        return ZTS("Day") // generic name for a days since/until etc
+    }
+    
 
     static func GetSelected(_ on:Bool) -> String {
         if on {

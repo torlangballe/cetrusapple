@@ -126,8 +126,12 @@ class ZUrlSession {
         return task
     }
     
-    static func DownloadPersistantlyToFileInThread(_ request:ZUrlRequest, makeStatusCodeError:Bool = false, done:@escaping (_ response:ZUrlResponse?, _ file:ZFileUrl?, _ error:Error?)->Void) -> ZURLSessionTask? {
-        let task = URLSession.shared.downloadTask(with:(request as URLRequest)) { (furl, response, error) in
+    static func DownloadPersistantlyToFileInThread(_ request:ZUrlRequest, onCellular:Bool? = nil, makeStatusCodeError:Bool = false, done:@escaping (_ response:ZUrlResponse?, _ file:ZFileUrl?, _ error:Error?)->Void) -> ZURLSessionTask? {
+        let session = URLSession.shared
+        if onCellular != nil {
+            session.configuration.allowsCellularAccess = onCellular!
+        }
+        let task = session.downloadTask(with:(request as URLRequest)) { (furl, response, error) in
             var verror = error
             checkStatusCode(response, check:makeStatusCodeError, error:&verror)
             if furl != nil {

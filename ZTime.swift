@@ -176,15 +176,16 @@ extension ZTime {
         return (year!, Month(rawValue:month!)!, day!, weekday)
     }
 
-    func GetGregorianTimeDifferenceParts(_ toTime:ZTime, timezone:ZTimeZone? = nil) -> (Int,Int,Int) { // returns hour, minute, secs
+    func GetGregorianTimeDifferenceParts(_ toTime:ZTime, timezone:ZTimeZone? = nil) -> (Int, Int,Int,Int) { // returns day, hour, minute, secs
         let (myComps, cal) = getDateComponent(self, timezone:timezone)
         let (toComps, _) = getDateComponent(toTime, timezone:timezone)
-        let unit = NSCalendar.Unit(rawValue:NSCalendar.Unit.hour.rawValue | NSCalendar.Unit.minute.rawValue | NSCalendar.Unit.second.rawValue)
+        let unit = NSCalendar.Unit(rawValue:NSCalendar.Unit.day.rawValue | NSCalendar.Unit.hour.rawValue | NSCalendar.Unit.minute.rawValue | NSCalendar.Unit.second.rawValue)
         let comps = (cal as NSCalendar).components(unit, from:myComps, to:toComps, options:NSCalendar.Options())
+        let day = comps.day
         let hour = comps.hour
         let minute = comps.minute
         let second = comps.second
-        return (hour!, minute!, second!)
+        return (day!, hour!, minute!, second!)
     }
 
     static func IsAm(_ hour:inout Int) -> (Bool) {
@@ -223,6 +224,26 @@ extension ZTime {
         return GetString(format:ZTime.NiceFormat, locale:locale, timezone:timezone)
     }
 
+    func GetNiceDaysSince(locale:String = ZLocaleEngUsPosix, timezone: ZTimeZone? = nil) -> String {
+        let now = ZTime.Now
+        let isPast = (now > self)
+        let (day, _, _, _) = GetGregorianTimeDifferenceParts(now, timezone:timezone)
+        var preposition = ZTS("ago") // generic word for 5 days ago
+        if !isPast {
+            preposition = ZTS("until") // generic word for 5 days until
+        }
+        switch day {
+        case 0:
+            return ZLocale.GetToday()
+        case 1:
+            return isPast ? ZLocale.GetYesterday() : ZLocale.GetTomorrow()
+        case 2, 3, 4, 5, 6, 7:
+            return "\(day) " + ZLocale.GetDay(plural:true) + " " + preposition
+        default:
+            return GetString(format:"MMM dd", locale:locale, timezone:timezone)
+        }
+    }
+    
     func GetString(format:String = ZTime.IsoFormat, locale:String = ZLocaleEngUsPosix, timezone: ZTimeZone? = nil) -> String {
         let formatter = DateFormatter()
         formatter.dateFormat = format

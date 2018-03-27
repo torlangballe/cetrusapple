@@ -452,15 +452,17 @@ class ZStrUtil {
     class func NiceDouble(_ d:Double, maxSig:Int = 8) -> String {
         let format = "%.\(maxSig)lf"
         var str = String(format:format, d)
-        while true {
-            switch str.lastCharAsString {
-            case "0":
-                str.removeLast()
-            case ".":
-                str.removeLast()
-                return str
-            default:
-                return str
+        if d != 0 {
+            while true {
+                switch str.lastCharAsString {
+                case "0":
+                    str.removeLast()
+                case ".":
+                    str.removeLast()
+                    return str
+                default:
+                    return str
+                }
             }
         }
         return str

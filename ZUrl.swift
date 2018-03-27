@@ -10,8 +10,12 @@ import UIKit
 import SafariServices
 import MobileCoreServices
 
-class ZUrl {
+class ZUrl : Hashable {
     var url: URL?
+
+    var hashValue: Int {
+        return url?.hashValue ?? 0
+    }
     
     init() {
         url = nil
@@ -35,6 +39,10 @@ class ZUrl {
 
     var IsEmpty : Bool {
         return url == nil
+    }
+
+    static func ==(lhs: ZUrl, rhs: ZUrl) -> Bool {
+        return lhs.url != rhs.url
     }
     
     func IsDirectory() -> Bool {

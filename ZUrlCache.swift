@@ -12,6 +12,7 @@ class ZUrlCache {
     var folder: ZFileUrl
     var addingList = [String:ZURLSessionTask]()
     var persistent = false
+    var onCellular:Bool? = nil
     
     init(name:String, removeOldHours:Double = 0) {
         folder = ZFolders.GetFileInFolderType(.caches, addPath:name)
@@ -114,7 +115,7 @@ class ZUrlCache {
         req.SetUrl(url)
         req.SetType(.Get)
         if persistent {
-            addingList[url] = ZUrlSession.DownloadPersistantlyToFileInThread(req, makeStatusCodeError:true) { [weak self] (response, furl, error) in
+            addingList[url] = ZUrlSession.DownloadPersistantlyToFileInThread(req, onCellular:onCellular, makeStatusCodeError:true) { [weak self] (response, furl, error) in
                 self?.addingList[url] = nil
                 if error != nil || furl == nil {
                     ZDebug.Print("ZUrlCache.GetUrl persistent: error:", error!.localizedDescription, url)
@@ -177,6 +178,18 @@ class ZUrlCache {
                 file.Remove()
             }
             return true
+        }
+    }
+    
+    func RemoveAllExcept(keepUrls:[String]) {
+        let keepFiles = Set(keepUrls.map({ makeFile(url:$0) }))
+        var allFiles = Set<ZFileUrl>()
+        folder.Walk(options:.GetInfo) { (file, info) in
+            allFiles.insert(file)
+            return true
+        }
+        for f in allFiles.subtracting(keepFiles) {
+            f.Remove()
         }
     }
 }

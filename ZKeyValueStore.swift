@@ -41,8 +41,15 @@ struct ZKeyValueStore {
     static func DataForKey(_ key:String) -> Data?                               { return store().data(forKey: makeKey(key)) }
     static func IntForKey(_ key:String) -> Int                                  { return store().integer(forKey: makeKey(key)) }
     static func DoubleForKey(_ key:String) -> Double                            { return store().double(forKey: makeKey(key)) }
-    static func BoolForKey(_ key:String) -> Bool                                { return store().bool(forKey: makeKey(key)) }
     static func TimeForKey(_ key:String) -> ZTime?                              { return ObjectForKey(key) as? ZTime }
+
+    static func BoolForKey(_ key:String, def:Bool? = nil) -> Bool {
+        if def != nil && ObjectForKey(key) == nil {
+            return def!
+        }
+        return store().bool(forKey: makeKey(key))
+    }
+
     static func IncrementInt(_ key:String, sync:Bool = true, inc:Int = 1) -> Int {
         var val = IntForKey(key)
         val += inc
