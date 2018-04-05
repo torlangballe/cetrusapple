@@ -452,7 +452,7 @@ class ZStrUtil {
     class func NiceDouble(_ d:Double, maxSig:Int = 8) -> String {
         let format = "%.\(maxSig)lf"
         var str = String(format:format, d)
-        if d != 0 {
+        if str.contains(".") {
             while true {
                 switch str.lastCharAsString {
                 case "0":
@@ -508,5 +508,41 @@ class ZStrUtil {
             return -1
         }
     }
+
+    class func NumberToBase64String(_ num:Int) -> String {
+        if let scalar = NumberToBase64Char(num) {
+            return String(Character(UnicodeScalar(scalar)!))
+        }
+        return ""
+    }
+
+    class func NumberToBase64Char(_ num:Int) -> Int? {
+        let iA = Int(UnicodeScalar("A")!.value)
+        let ia = Int(UnicodeScalar("a")!.value)
+        let i0 = Int(UnicodeScalar("0")!.value)
+        let iPlus = Int(UnicodeScalar("+")!.value)
+        let iSlash = Int(UnicodeScalar("/")!.value)
+        
+        switch num {
+        case 0 ..< 26:
+            return iA + num
+            
+        case 26 ..< 52:
+            return ia + num - 26
+            
+        case 52 ..< 62:
+            return i0 + num - 26 - 26
+
+        case 62:
+            return iPlus
+            
+        case 63:
+            return iSlash
+            
+        default:
+            return nil
+        }
+    }
+
 }
 

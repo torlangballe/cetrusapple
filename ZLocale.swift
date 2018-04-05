@@ -44,7 +44,6 @@ struct ZLocale {
                 default:
                     ccode = langCode
             }
-            ccode = langCode
         }
         return langCode.lowercased() + "-" + ccode.uppercased()
     }

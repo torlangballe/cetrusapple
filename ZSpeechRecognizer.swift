@@ -16,6 +16,7 @@ import Accelerate
 class ZSpeechRecognizer : NSObject, SFSpeechRecognizerDelegate {
     enum TaskHint : Int { case unspecified = 0, dictation, search, confirmation }
     enum State: Int { case final, intermediate }
+    static let limiter = ZRateLimiter(max:1000, durationSecs:ZTime.hour)
     var recognizer: SFSpeechRecognizer? = nil
     var request: SFSpeechAudioBufferRecognitionRequest? = nil
     var task: SFSpeechRecognitionTask? = nil
@@ -43,7 +44,38 @@ class ZSpeechRecognizer : NSObject, SFSpeechRecognizerDelegate {
         return out
     }
     
+    func RecognizeFromFile(file:ZFileUrl, locale:String, done:@escaping (_ state:State, _ cues:[ZCue], _ error:Error?)->Void) {
+        if recognizer == nil {
+            recognizer = SFSpeechRecognizer(locale:Locale(identifier:locale))
+            recognizer?.delegate = self
+        }
+        let request = SFSpeechURLRecognitionRequest(url:file.url!)
+        request.shouldReportPartialResults = false
+        ZSpeechRecognizer.limiter.Add()
+        task = recognizer?.recognitionTask(with:request) { [weak self] (result, error) in
+            var cues = [ZCue]()
+            if error == nil {
+                for s in result!.bestTranscription.segments {
+                    var cue = ZCue()
+                    cue.type = ZCue.CueType.inlineSpeech.rawValue
+                    cue.start = s.timestamp
+                    cue.end = s.timestamp + s.duration
+                    cue.value = s.substring
+                    cues.append(cue)
+                    print("speach text:", cue.value ?? "", cue.start)
+                }
+            }
+            if error != nil || (result != nil && result!.isFinal) {
+                self?.Stop()
+                done(.final, cues, error)
+            } else if result != nil {
+                done(.intermediate, cues, nil)
+            }
+        }
+    }
+    
     func StartRecognizing(partial:Bool = true, locale:String, hint:TaskHint = .dictation, contextId:String = "", knownWords:[String] = [], done:@escaping (_ state:State, _ texts:[String], _ error:Error?)->Void) {
+        ZSpeechRecognizer.limiter.Add()
         do {
             let session = AVAudioSession.sharedInstance()
             try session.setCategory(AVAudioSessionCategoryPlayAndRecord)

@@ -30,8 +30,12 @@ struct ZSize
         }
     }
     
-    func MaxSide() -> Double {
+    func Max() -> Double {
         return max(w, h)
+    }
+
+    func Min() -> Double {
+        return min(w, h)
     }
 
     func EqualSided() -> ZSize {

@@ -1,6 +1,6 @@
 //
 //  zmath.swift
-//  Zed
+//  Cetrus
 //
 //  Created by Tor Langballe on /23/9/14.
 //  Copyright (c) 2014 Capsule.fm. All rights reserved.
@@ -18,22 +18,16 @@ struct ZMath {
     static func DegToRad(_ deg:Double) -> Double     { return deg * π / 180 }
     static func AngleDegToPos(_ deg:Double) -> ZPos  { return ZPos(sin(DegToRad(deg)), -cos(DegToRad(deg))) }
     static func PosToAngleDeg(_ pos:ZPos) -> Double  { return RadToDeg(ArcTanXYToRad(pos)) }
-
-    static func Random1() -> Double   { return Double(arc4random_uniform(10000)) / Double(10000) }
-    static func RandomN(_ n:Int) -> Int { return Int(arc4random_uniform(UInt32(n))) }
-    //static func RandomN(_ n:Int) -> Int { return 5 }
     
-    static func Sign(_ a: Double) -> Int {        
-        if a > 0.0 {
-            return 1
-        }
-        if a < 0.0 {
-            return -1
-        }
-        return 0
-    }
-    
-    
+//    static func Sign(_ a: Double) -> Int {
+//        if a > 0.0 {
+//            return 1
+//        }
+//        if a < 0.0 {
+//            return -1
+//        }
+//        return 0
+//    }
 
     static func GetDistanceFromLongLatInMeters(_ pos1:ZPos, pos2:ZPos) -> Double {
         let R = 6371.0 // Radius of the earth in km
@@ -72,43 +66,18 @@ struct ZMath {
     static func MixedArrayValueAtT(_ array:[Double], t:Double) -> Double {
         return MixedArrayValueAtIndex(array, index:(Double(array.count) - 1) * t)
     }
-    
+}
+
+// ios:
+extension ZMath {
+    static func Random1() -> Double   { return Double(arc4random_uniform(10000)) / Double(10000) }
+    static func RandomN(_ n:Int) -> Int { return Int(arc4random_uniform(UInt32(n))) }
+
     static func NanCheck(_ d:Double, set:Double = -1) -> Double {
         if d.isNaN {
             return set
         }
         return d
     }
-}
-
-/*
- func sign<T: SignedNumberType>(a: T) -> Int {
- 
- let zero: T = 0;
- 
- if a > zero {
- return 1
- }
- if a < zero {
- return -1
- }
- return 0
- }
- */
-
-@discardableResult func minimize<T: SignedNumeric & Comparable>(_ me: inout T, _ a: T) -> Bool {
-    if a < me {
-        me = a
-        return true
-    }
-    return false
-}
-
-@discardableResult func maximize<T: SignedNumeric & Comparable>(_ me: inout T, _ a: T) -> Bool {
-    if a > me {
-        me = a
-        return true
-    }
-    return false
 }
 

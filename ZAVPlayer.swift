@@ -71,10 +71,6 @@ class ZAVPlayer : AVQueuePlayer, DZRPlayerDelegate, SPTAudioStreamingPlaybackDel
 
     
     required init(useObserver:Bool = true, streaming:Bool = false) {
-        
-        AVMetadataIdentifier.commonIdentifierArtist
-        
-        
         service = PService()
         super.init()
         self.automaticallyWaitsToMinimizeStalling = false

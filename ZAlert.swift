@@ -96,27 +96,6 @@ class ZAlert {
         }
         ZGetTopViewController()!.present(view, animated:true, completion:nil)
     }
-/*
-    static func ShowShareView(_ objects:[AnyObject], openInSafari:Bool) {
-        var activities = [UIActivity]()
-        if openInSafari {
-            activities.append(TUSafariActivity())
-        }
-        var newObjects = [AnyObject]()
-        for c in objects {
-            if let u = c as? ZUrl {
-                newObjects.append(u.url! as AnyObject)
-            } else {
-                newObjects.append(c)
-            }
-        }
-        //        activities.append(UIActivityTypeAddToReadingList) // newObjects
-        let activityVC = UIActivityViewController(activityItems:newObjects, applicationActivities:activities)
-        
-        activityVC.excludedActivityTypes = [UIActivityType.airDrop]
-        ZGetTopViewController()!.present(activityVC, animated:true, completion:nil)
-    }
-    */
     
     static func ShowError(_ text:String, error:Error) {
         ZAlert.Say(text, subText:error.GetMessage())

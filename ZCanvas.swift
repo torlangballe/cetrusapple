@@ -126,14 +126,22 @@ struct ZCanvas {
         context.drawPath(using: eofill ? CGPathDrawingMode.eoFillStroke : CGPathDrawingMode.fillStroke);
     }
     
-    @discardableResult func DrawImage(_ image: ZImage, destRect: ZRect, align:ZAlignment = ZAlignment.None, opacity:Float32 = 1.0, blendMode:CGBlendMode = .normal, margin:ZSize = ZSize()) -> ZRect {
+    @discardableResult func DrawImage(_ image: ZImage, destRect: ZRect, align:ZAlignment = ZAlignment.None, opacity:Float32 = 1.0, blendMode:CGBlendMode = .normal, corner:Double? = nil, margin:ZSize = ZSize()) -> ZRect {
         var vdestRect = destRect
         if align != ZAlignment.None {
             vdestRect = vdestRect.Align(ZSize(image.size), align:align, marg:margin)
         } else {
             vdestRect = vdestRect.Expanded(-margin)
         }
+        if corner != nil {
+            PushState()
+            let path = ZPath(rect:vdestRect, corner:ZSize(corner!, corner!))
+            ClipPath(path)
+        }
         image.draw(in: vdestRect.GetCGRect(), blendMode:blendMode, alpha:CGFloat(opacity))
+        if corner != nil {
+            PopState()
+        }
         return vdestRect
     }
         

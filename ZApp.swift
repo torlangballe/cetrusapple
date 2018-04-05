@@ -72,7 +72,7 @@ class ZApp : ZObject {
     }
 
     func HandleAppNotification(_ notification:ZNotification, action:String) { }
-    func HandlePushNotificationWithDictionary(_ dict:[String:AnyObject], fromStartup:Bool, whileActive:Bool) { }
+    func HandlePushNotificationWithDictionary(_ dict:[String:ZAnyObject], fromStartup:Bool, whileActive:Bool) { }
     func HandleLocationRegionCross(regionId:String, enter:Bool, fromAdd:Bool) { }
     func HandleMemoryNearFull() { }
     func HandleAudioInterrupted() { }

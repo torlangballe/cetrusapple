@@ -27,7 +27,7 @@ extension ZTime {
     
     static let CompactFormat = "yyyy-MM-dd' 'HH:mm:ss"
     static let NiceFormat = "yy-MMM-dd' 'HH:mm"
-
+    static let HTTPHeaderDateFormat = "EEEE, dd LLL yyyy HH:mm:ss zzz"
 
     static let minute = 60.0
     static let hour = 3600.0

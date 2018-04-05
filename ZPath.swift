@@ -14,12 +14,14 @@ class ZPath {
 
     var path: CGMutablePath
 
-    init()                 { path = CGMutablePath()            }
-    init(p: ZPath)         { path = p.path.mutableCopy()! }
+    init() {
+        path = CGMutablePath()
+    }
     
-    func Copy(_ p: ZPath)    { path = p.path.mutableCopy()! }
-    func Empty()           { path = CGMutablePath()            }
-    func IsEmpty() -> Bool { return path.isEmpty              }
+    init(p: ZPath) {
+        path = p.path.mutableCopy()!
+    }
+    
     init(rect:ZRect, corner:ZSize = ZSize(), oval:Bool = false) {
         path = CGMutablePath()
         if oval {
@@ -28,7 +30,20 @@ class ZPath {
             AddRect(rect, corner:corner)
         }
     }
+
+    func Copy(_ p: ZPath) {
+        path = p.path.mutableCopy()!
+    }
     
+    func Empty() {
+        path = CGMutablePath()
+    }
+    
+    func IsEmpty() -> Bool {
+        return path.isEmpty
+        
+    }
+
     func GetRect() -> ZRect {
         if IsEmpty() {
             return ZRect()
@@ -62,10 +77,10 @@ class ZPath {
         } else {
             e = end
         }
-        //        path.addCurve(to:c1.GetCGPoint(), control1:c2.GetCGPoint(), control2:e.GetCGPoint())
-        LineTo(c1)
-        LineTo(c2)
-        LineTo(e)
+        path.addCurve(to:c1.GetCGPoint(), control1:c2.GetCGPoint(), control2:e.GetCGPoint())
+//        LineTo(c1)
+//        LineTo(c2)
+//        LineTo(e)
     }
     
     func ArcTo(_ rect: ZRect, radstart:Double = 0, radDelta:Double = π*2, clockwise:Bool = true) { // this d
@@ -74,34 +89,8 @@ class ZPath {
         path.addArc(center:rect.Center.GetCGPoint(), radius:CGFloat(rect.size.w / 2), startAngle:start, endAngle:start + CGFloat(radDelta), clockwise:!clockwise) // , transform:tranform)
     }
 
-    func ArcDegFromToFromCenter(_ center: ZPos, radius:Double, degStart:Double = 0, degEnd:Double = 360, radiusy:Double = 0.0) {
-        let start = ZMath.DegToRad(degStart)
-        let end   = ZMath.DegToRad(degEnd)
-        var vradiusy = radiusy
-        if vradiusy == 0 {
-            vradiusy = radius
-        }
-        let clockwise = !(start > end)
-        let rect = ZRect(size:ZSize(radius * 2, vradiusy * 2)).Centered(center)
-        ArcTo(rect, radstart:start, radDelta:end-start, clockwise:clockwise)
-    }
-    
     func Close() {
         path.closeSubpath()
-    }
-    
-    func AddRect(_ rect: ZRect, corner: ZSize = ZSize()) {
-        if rect.size.w != 0 && rect.size.h != 0 {
-            if corner.IsNull() || rect.size.w == 0 || rect.size.h == 0 {
-                path.addRect(rect.GetCGRect())
-            } else {
-                var c = corner
-                let m = min(rect.size.w, rect.size.h) / 2
-                minimize(&c.w, m)
-                minimize(&c.h, m)
-                path.addRoundedRect(in:rect.GetCGRect(), cornerWidth:CGFloat(c.w), cornerHeight:CGFloat(c.h))
-            }
-        }
     }
     
     func AddPath(_ p: ZPath, join: Bool, m: ZMatrix?) {
@@ -131,18 +120,6 @@ class ZPath {
         return path
     }
     
-    /*
-    func forEach(_ body: @convention(block) (CGPathElement) -> Void) {
-        typealias Body = @convention(block) (CGPathElement) -> Void
-        func callback(_ info: UnsafeMutableRawPointer, element: UnsafePointer<CGPathElement>) {
-            let body = unsafeBitCast(info, to: Body.self)
-            body(element.pointee)
-        }
-        let unsafeBody = unsafeBitCast(body, to: UnsafeMutableRawPointer.self)
-        path.apply(info: unsafeBody, function: callback as! CGPathApplierFunction)
-    }
- */
-    
     func forEach(_ handle: @convention(block) (CGPathElement) -> Void) {
         typealias Handle = @convention(block) (CGPathElement) -> Void
         let unsafeHandle = unsafeBitCast(handle, to:UnsafeMutableRawPointer.self)
@@ -170,13 +147,29 @@ class ZPath {
             }
         }
     }
+}
+
+extension ZPath {
+    func AddRect(_ rect: ZRect, corner: ZSize = ZSize()) {
+        if rect.size.w != 0 && rect.size.h != 0 {
+            if corner.IsNull() || rect.size.w == 0 || rect.size.h == 0 {
+                path.addRect(rect.GetCGRect())
+            } else {
+                var c = corner
+                let m = min(rect.size.w, rect.size.h) / 2
+                minimize(&c.w, m)
+                minimize(&c.h, m)
+                path.addRoundedRect(in:rect.GetCGRect(), cornerWidth:CGFloat(c.w), cornerHeight:CGFloat(c.h))
+            }
+        }
+    }
     
     func AddStar(rect:ZRect, points:Int, inRatio:Double = 0.3) {
         let c = rect.Center
         let delta = (rect.size.w / 2) - 1
         let inAmount = (1 - inRatio)
         for i in 0 ..< points * 2 {
-            let deg = Double(360 * i + 720) / Double(points * 2) 
+            let deg = Double(360 * i + 720) / Double(points * 2)
             var d = ZMath.AngleDegToPos(deg) * delta
             if (i & 1) != 0 {
                 d *= inAmount
@@ -190,5 +183,16 @@ class ZPath {
         }
         Close()
     }
-
+    
+    func ArcDegFromToFromCenter(_ center: ZPos, radius:Double, degStart:Double = 0, degEnd:Double = 360, radiusy:Double = 0.0) {
+        let start = ZMath.DegToRad(degStart)
+        let end   = ZMath.DegToRad(degEnd)
+        var vradiusy = radiusy
+        if vradiusy == 0 {
+            vradiusy = radius
+        }
+        let clockwise = !(start > end)
+        let rect = ZRect(size:ZSize(radius * 2, vradiusy * 2)).Centered(center)
+        ArcTo(rect, radstart:start, radDelta:end-start, clockwise:clockwise)
+    }
 }

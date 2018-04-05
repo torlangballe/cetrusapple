@@ -13,6 +13,7 @@ class ZUrlCache {
     var addingList = [String:ZURLSessionTask]()
     var persistent = false
     var onCellular:Bool? = nil
+    var addExtensionAtEnd = true
     
     init(name:String, removeOldHours:Double = 0) {
         folder = ZFolders.GetFileInFolderType(.caches, addPath:name)
@@ -38,13 +39,20 @@ class ZUrlCache {
             }
         }
     }
-    
-    func IsGettingOrGotten(url:String) -> Bool {
+
+    func IsGetting(_ url:String) -> Bool {
         if addingList[url] != nil {
             return true
         }
-        var file = ZFileUrl()
-        if HasUrl(url, file:&file) {
+        return false
+    }
+    
+
+    func IsGettingOrGotten(_ url:String) -> Bool {
+        if IsGetting(url) {
+            return true
+        }
+        if HasUrl(url) {
             return true
         }
         return false
@@ -54,12 +62,22 @@ class ZUrlCache {
         //        let (base, _, stub, ext) = ZFileUrl.GetPathParts(url)
         //        let str = ZFileUrl.AbsString
         //        let str = ZStrUtil.TruncateMiddle(base + stub, maxChars:100, separator:"…")
+        let ext = ZUrl(string:url).Extension
         let path = ZFileUrl.GetLegalFilename(url) // leave enough for a big path in file to get to here too
         let file = folder.AppendedPath(path)
+        let fext = file.Extension
+        if (fext.isEmpty || fext.contains("?")) && !ext.isEmpty && addExtensionAtEnd {
+            file.Extension = ext
+        }
         return file
     }
 
-    func HasUrl(_ url:String, file:inout ZFileUrl) -> Bool {
+    func HasUrl(_ url:String) -> Bool {
+        var file = ZFileUrl()
+        return HasFile(url, file:&file)
+    }
+
+    func HasFile(_ url:String, file:inout ZFileUrl) -> Bool {
         if url.isEmpty {
             return false
         }
@@ -69,16 +87,13 @@ class ZUrlCache {
         }
         return false
     }
-
+    
     func FractionCompleted(_ url:String) -> Float? {
-        var file = ZFileUrl()
-        if HasUrl(url, file:&file) {
+        if HasUrl(url) {
             return 1
         }
         if let task = addingList[url] {
-            if #available(iOS 11.0, *) {
-                return Float(task.progress.fractionCompleted)
-            }
+            return Float(task.FractionCompleted())
         }
         return nil
     }
@@ -104,7 +119,7 @@ class ZUrlCache {
             print("bad url:", url)
         }
         var file = ZFileUrl()
-        if HasUrl(url, file:&file) {
+        if HasFile(url, file:&file) {
             file.Modified = ZTime.Now
             return file
         }
@@ -120,9 +135,11 @@ class ZUrlCache {
                 if error != nil || furl == nil {
                     ZDebug.Print("ZUrlCache.GetUrl persistent: error:", error!.localizedDescription, url)
                 } else {
+                    file.Remove()
                     if let ferr = furl!.CopyTo(file) {
                         ZDebug.Print("ZUrlCache.GetUrl persistent copy: error:", ferr.localizedDescription, url)
                     }
+                    furl!.Remove()
                 }
             }
         } else {
@@ -188,7 +205,8 @@ class ZUrlCache {
             allFiles.insert(file)
             return true
         }
-        for f in allFiles.subtracting(keepFiles) {
+        let del = allFiles.subtracting(keepFiles)
+        for f in del {
             f.Remove()
         }
     }

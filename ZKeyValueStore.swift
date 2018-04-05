@@ -9,25 +9,25 @@
 import Foundation
 
 struct ZKeyValueStoreCloud {
-    static func store() -> NSUbiquitousKeyValueStore                          { return NSUbiquitousKeyValueStore.default }
+    static func store() -> NSUbiquitousKeyValueStore                            { return NSUbiquitousKeyValueStore.default }
     static func ObjectForKey(_ key:String) -> AnyObject?                        { return store().object(forKey: key) as AnyObject? }
     static func SetObject(_ anObject: AnyObject?, key:String)                   { store().set(anObject, forKey:key)}
     static func RemoveObjectForKey(_ key:String)                                { store().removeObject(forKey: key) }
     static func StringForKey(_ key:String) -> String?                           { return store().string(forKey: key) }
     static func ArrayForKey(_ key:String) -> [AnyObject]?                       { return store().array(forKey: key) as [AnyObject]? }
     static func DictionaryForKey(_ key:String) -> [String : AnyObject]?         { return store().dictionary(forKey: key) as [String : AnyObject]? }
-    static func DataForKey(_ key:String) -> Data?                             { return store().data(forKey: key) }
+    static func DataForKey(_ key:String) -> Data?                               { return store().data(forKey: key) }
     static func Int64ForKey(_ key:String) -> Int64                              { return store().longLong(forKey: key) }
     static func DoubleForKey(_ key:String) -> Double                            { return store().double(forKey: key) }
     static func BoolForKey(_ key:String) -> Bool                                { return store().bool(forKey: key) }
     static func SetString(_ string: String?, key:String)                        { store().set(string,  forKey:key) }
-    static func SetData(_ data: Data?, key:String)                            { store().set(data,  forKey:key) }
+    static func SetData(_ data: Data?, key:String)                              { store().set(data,  forKey:key) }
     static func SetArray(_ anArray: [AnyObject]?, key:String)                   { store().set(anArray, forKey:key) }
     static func SetDictionary(_ aDictionary: [String : AnyObject]?, key:String) { store().set(aDictionary,  forKey:key) }
     static func SetLongLong(_ value: Int64, key:String)                         { store().set(value,  forKey:key) }
     static func SetDouble(_ value: Double, key:String)                          { store().set(value,  forKey:key) }
     static func SetBool(_ value: Bool, key:String)                              { store().set(value,  forKey:key) }
-    static func Synch() -> Bool                                               { return store().synchronize() }
+    static func Synch() -> Bool                                                 { return store().synchronize() }
 }
 
 struct ZKeyValueStore {

@@ -148,6 +148,10 @@ extension ZTimeZone {
         return ZTimeZone(identifier:"UTC")!
     }
 
+    static var GTM: ZTimeZone {
+        return ZTimeZone(identifier:"GMT")!
+    }
+
     static var DeviceZone: ZTimeZone {
         return TimeZone.autoupdatingCurrent
         //        snew = oldZones->GetValue(szone);

@@ -292,7 +292,7 @@ extension ZImage {
             if var image = ZImage(data:data!, scale:scale) {
                 if maxSize != nil && (image.Size.w > maxSize!.w || image.Size.h > maxSize!.h) {
                     if let small = image.GetScaledInSize(maxSize!) {
-                        ZDebug.Print("ZImage.Download: Scaling too big image:", image.Size, "max:", maxSize!, url)
+//                        ZDebug.Print("ZImage.Download: Scaling too big image:", image.Size, "max:", maxSize!, url)
                         image = small
                     } else {
                         ZDebug.Print("ZImage.Download: Failing too big image not scaleable:", image.Size, "max:", maxSize!, url)
@@ -507,7 +507,7 @@ class ZImageCache : ZTimerOwner {
         }
         if var c = cache[url] {
             if c.getting {
-                if c.stamp.Since() > 60 {
+                if c.stamp.Since() > 60  {
                     cache.removeValue(forKey:url)
                     done?(nil)
                     return nil
@@ -556,7 +556,7 @@ class ZImageCache : ZTimerOwner {
     
     private func imageSize(_ image:ZImage?) -> Int64 {
         if image != nil {
-            return Int64(ZSize(image!.size).Area() * 3)
+            return Int64(ZSize(image!.size).Area() * 3) / 5
         }
         return 0
     }

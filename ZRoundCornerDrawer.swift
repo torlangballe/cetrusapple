@@ -12,16 +12,12 @@ private func isDef(_ p: ZPos) -> Bool {
     return p.x != 0xFFFFFF
 }
 
-private func getSign(_ p: ZPos) -> ZPos {
-    return ZPos(Double(ZMath.Sign(Double(p.x))), Double(ZMath.Sign(Double(p.y))))
-}
-
 class ZRoundCornerDrawer {
     let Undefined = Double(MAXFLOAT)
     
-    fileprivate var s1, s2, p1, p2: ZPos
-    fileprivate var startRound: Bool
-    fileprivate var first, isClose: Bool
+    private var s1, s2, p1, p2: ZPos
+    private var startRound: Bool
+    private var first, isClose: Bool
     
     var radius: Double
     var path: ZPath

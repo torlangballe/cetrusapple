@@ -12,6 +12,14 @@ typealias ZUrlRequest = NSMutableURLRequest
 typealias ZUrlResponse = URLResponse
 typealias ZURLSessionTask = URLSessionTask
 
+extension ZURLSessionTask {
+    func FractionCompleted() -> Double {
+        if #available(iOS 11.0, *) {
+            return progress.fractionCompleted
+        }
+        return 0
+    }
+}
 extension ZUrlResponse {
     var StatusCode: Int? {
         if let httpResponse = self as? HTTPURLResponse {
@@ -106,6 +114,10 @@ class ZUrlSession {
             transactionMutex.Unlock()
         }
         let task = URLSession.shared.dataTask(with:(request as URLRequest)) { (data, response, error) in
+//            ZDebug.Print("ZUrlSession.Sent", data?.count, error?.localizedDescription, request.url?.absoluteString)
+            if error != nil {
+                ZDebug.Print("ZUrlSession.Send dataTask err:", error!.localizedDescription, request.url?.absoluteString)
+            }
             var verror = error
             checkStatusCode(response, check:makeStatusCodeError, error:&verror)
             if data != nil {
@@ -127,10 +139,14 @@ class ZUrlSession {
     }
     
     static func DownloadPersistantlyToFileInThread(_ request:ZUrlRequest, onCellular:Bool? = nil, makeStatusCodeError:Bool = false, done:@escaping (_ response:ZUrlResponse?, _ file:ZFileUrl?, _ error:Error?)->Void) -> ZURLSessionTask? {
-        let session = URLSession.shared
-        if onCellular != nil {
-            session.configuration.allowsCellularAccess = onCellular!
-        }
+        let config = URLSessionConfiguration.default
+        config.isDiscretionary = true
+        let session = URLSession(configuration:config)
+
+//        let session = URLSession.shared
+//        if onCellular != nil {
+//            session.configuration.allowsCellularAccess = onCellular!
+//        }
         let task = session.downloadTask(with:(request as URLRequest)) { (furl, response, error) in
             var verror = error
             checkStatusCode(response, check:makeStatusCodeError, error:&verror)
@@ -189,8 +205,23 @@ class ZUrlSession {
     }
 }
 
-//args in body:
-// http://stackoverflow.com/questions/27723912/swift-get-request-with-parameters
-// misc:
-// https://grokswift.com/simple-rest-with-swift/
+class ZRateLimiter {
+    let max:Int
+    let durationSecs:Double
+    
+    var timeStamps = [ZTime]()
+    init(max:Int, durationSecs:Double) {
+        self.max = max
+        self.durationSecs = durationSecs
+    }
+    
+    func Add() {
+        timeStamps.append(ZTime.Now)
+    }
+    
+    func IsExceded() -> Bool {
+        timeStamps.removeIf { $0.Since() > durationSecs  }
+        return timeStamps.count >= max
+    }
+}
 

@@ -236,7 +236,7 @@ extension ZFileUrl {
                         continue
                     }
                 }
-                if !foreach(file, info) {
+                if !foreach(file.ResolveSimlinkOrSelf(), info) {
                     break
                 }
             }
@@ -278,6 +278,17 @@ extension ZFileUrl {
         return nil
     }
     
+    func ResolveSimlinkOrSelf() -> ZFileUrl {
+        if url == nil {
+            return self
+        }
+        let resolved = url?.resolvingSymlinksInPath() ?? nil
+        if resolved == nil {
+            return self
+        }
+        return ZFileUrl(nsUrl:resolved!)
+    }
+
     @discardableResult func Remove() -> Error? {
         do {
             try dm().removeItem(at: url! as URL)

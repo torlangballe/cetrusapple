@@ -42,7 +42,7 @@ class ZUrl : Hashable {
     }
 
     static func ==(lhs: ZUrl, rhs: ZUrl) -> Bool {
-        return lhs.url != rhs.url
+        return lhs.url == rhs.url
     }
     
     func IsDirectory() -> Bool {
@@ -108,7 +108,12 @@ class ZUrl : Hashable {
     }
 
     var Extension : String {
-        return url?.pathExtension ?? ""
+        get { return url?.pathExtension ?? "" }
+        set {
+            if url != nil {
+                url = url!.appendingPathExtension(newValue)
+            }
+        }
     }
     
     var Anchor : String { // called fragment really

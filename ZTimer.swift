@@ -101,18 +101,15 @@ var ZMainQue: DispatchQueue {
     return DispatchQueue.main
 }
 
-var ZBackgroundParallellQue: DispatchQueue {
-    return DispatchQueue(label:"ZBackgroundParallellQue") 
-}
-
 var queues = [String:DispatchQueue]()
-func ZGetBackgroundSerialQueue(_ name:String) -> DispatchQueue {
-    if let que = queues[name] {
+func ZGetBackgroundQue(name:String? = nil, serial:Bool = false) -> DispatchQueue {
+    let n = (name == nil) ? ZCrypto.MakeUuid() : name!
+    if let que = queues[n] {
         return que
     }
     let (ver, _, _) = ZApp.Version
-    let que = DispatchQueue(label: ver + "." + name, attributes: [])
-    queues[name] = que
+    let que = DispatchQueue(label: ver + "." + n, attributes:serial ? [] : .concurrent)
+    queues[n] = que
     return que
 }
 

@@ -72,7 +72,7 @@ struct ZCrypto {
     
     static func MD5(data:ZData) -> [UInt8] {
         var digest = [UInt8](repeating: 0, count: Int(CC_MD5_DIGEST_LENGTH))
-        data.withUnsafeBytes { bytes in
+        _ = data.withUnsafeBytes { bytes in
             CC_MD5(bytes, CC_LONG(data.count), &digest)
         }
         return digest

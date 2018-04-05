@@ -9,7 +9,7 @@
 import Foundation
 
 typealias ZObject = NSObject
-
+typealias ZAnyObject = AnyObject
 extension Dictionary where Value : Equatable {
     func oneKeyForValue(_ val : Value) -> Key? {
         for (k, v) in self {
@@ -235,7 +235,7 @@ private let falseNumber = NSNumber(value: false)
 private let trueObjCType = String(cString: trueNumber.objCType)
 private let falseObjCType = String(cString: falseNumber.objCType)
 
-func ZIsAnyObjectBool(_ a:AnyObject) -> Bool {
+func ZIsAnyObjectBool(_ a:ZAnyObject) -> Bool {
     if a is NSNumber {
         let objCType = String(cString: a.objCType)
         if (a.compare(trueNumber) == ComparisonResult.orderedSame && objCType == trueObjCType)
@@ -246,7 +246,7 @@ func ZIsAnyObjectBool(_ a:AnyObject) -> Bool {
     return false
 }
 
-func ZIsAnyObjectReal(_ a:AnyObject) -> Bool {
+func ZIsAnyObjectReal(_ a:ZAnyObject) -> Bool {
     if let f = a as? Float64 {
         if let i = a as? Int64 {
             return Int64(f) == i
@@ -254,4 +254,21 @@ func ZIsAnyObjectReal(_ a:AnyObject) -> Bool {
     }
     return false
 }
+
+@discardableResult func minimize<T: SignedNumeric & Comparable>(_ me: inout T, _ a: T) -> Bool {
+    if a < me {
+        me = a
+        return true
+    }
+    return false
+}
+
+@discardableResult func maximize<T: SignedNumeric & Comparable>(_ me: inout T, _ a: T) -> Bool {
+    if a > me {
+        me = a
+        return true
+    }
+    return false
+}
+
 

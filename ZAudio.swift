@@ -182,3 +182,115 @@ struct ZSoundRange { // this is NOT part of ZMediaItem
     }
 }
 
+func ZAudioFileGetInfo(file:ZFileUrl) -> (Double, Int, Error?) {
+    var audioFile = AVAudioFile()
+    do {
+        audioFile = try AVAudioFile(forReading:file.url!)
+    } catch let error as NSError {
+        return (0, 0, error)
+    }
+    let duration = Double(audioFile.length) / Double(audioFile.fileFormat.sampleRate)
+    let sampleRate = Int(audioFile.fileFormat.sampleRate)
+    
+    return (duration, sampleRate, nil)
+}
+
+func ZReadAudioFileMonoSecondChunks(file:ZFileUrl, secs:Double, got:(_ samples:[Float], _ pos:Double)->Void) -> Error? {
+    var audioFile = AVAudioFile()
+    do {
+        audioFile = try AVAudioFile(forReading:file.url!)
+    } catch let error as NSError {
+        return error
+    }
+
+    let chunkSize = Int(Double(audioFile.fileFormat.sampleRate) * secs)
+    let chans = audioFile.processingFormat.channelCount
+    if let format = AVAudioFormat(commonFormat:.pcmFormatFloat32, sampleRate:audioFile.fileFormat.sampleRate, channels:chans, interleaved:false) {
+        if let buf = AVAudioPCMBuffer(pcmFormat:format, frameCapacity:AVAudioFrameCount(chunkSize)) {
+            var pos = 0.0
+            while audioFile.framePosition < audioFile.length {
+                buf.frameLength = 0
+                do {
+                    try audioFile.read(into:buf)
+                } catch let error as NSError {
+                    return error
+                }
+                var arrays = [[Float]]()
+                let frames = Int(buf.frameLength)
+                for i in 0 ..< chans {
+                    arrays.append(Array(UnsafeBufferPointer(start: buf.floatChannelData?[Int(i)], count:frames)))
+                }
+//              if chans > 1 && mono {
+//                  for j in 0 ..< frames {
+//                      arrays[0][j] = (arrays[0][j] + arrays[1][j]) / 2
+//                  }
+//              }
+                got(arrays[0], pos)
+                pos += secs
+            }
+            return nil
+        }
+    }
+    return ZError(message:"bad format")
+}
+
+func ZReadAudioFileSampled(file:ZFileUrl, sampleRate:Int) -> ([Float], Double, Error?) {
+    var audioFile = AVAudioFile()
+    do {
+        audioFile = try AVAudioFile(forReading:file.url!)
+    } catch let error as NSError {
+        return ([], 0, error)
+    }
+
+    var array = [Float]()
+    let frames = Int(audioFile.fileFormat.sampleRate) / sampleRate
+    let chans = Int(audioFile.processingFormat.channelCount)
+    let duration = Double(audioFile.length) / Double(audioFile.fileFormat.sampleRate)
+    if let format = AVAudioFormat(commonFormat:.pcmFormatFloat32, sampleRate:audioFile.fileFormat.sampleRate, channels:AVAudioChannelCount(chans), interleaved:false) { // mono ? 1 : 2
+        if let buf = AVAudioPCMBuffer(pcmFormat:format, frameCapacity: AVAudioFrameCount(frames)) {
+            while audioFile.framePosition < audioFile.length {
+                do {
+                    try audioFile.read(into:buf)
+                    let v = UnsafeBufferPointer(start: buf.floatChannelData?[0], count:frames).baseAddress![0]
+                    array.append(v)
+                } catch let error as NSError {
+                    return ([], duration, error)
+                }
+            }
+            return (array, duration, nil)
+        }
+    }
+    return ([], 0, ZError(message:"bad format"))
+}
+
+
+@available(iOS 11.0, *)
+func ZWriteAudioSamplesToAiffFile(toFile:ZFileUrl, samples:[Float], sampleRate:Int, channels:Int) -> Error? {
+    let outputFormatSettings = [
+        AVAudioFileTypeKey:kAudioFileAIFFType,
+        AVFormatIDKey:kAudioFormatLinearPCM,
+        AVLinearPCMBitDepthKey:32,
+        AVLinearPCMIsFloatKey: true,
+        //  AVLinearPCMIsBigEndianKey: false,
+        AVSampleRateKey: sampleRate,
+        AVNumberOfChannelsKey: channels
+    ] as [String : Any]
+    
+    let audioFile = try? AVAudioFile(forWriting:toFile.url!, settings:outputFormatSettings, commonFormat:AVAudioCommonFormat.pcmFormatFloat32, interleaved:true)
+    let bufferFormat = AVAudioFormat(settings:outputFormatSettings)
+    if let outputBuffer = AVAudioPCMBuffer(pcmFormat: bufferFormat!, frameCapacity: AVAudioFrameCount(samples.count)) {
+        for i in 0 ..< samples.count {
+            outputBuffer.floatChannelData!.pointee[i] = samples[i]
+        }
+        outputBuffer.frameLength = AVAudioFrameCount( samples.count )
+        
+        do {
+            try audioFile?.write(from:outputBuffer)
+        } catch let error as NSError {
+            print("error:", error.localizedDescription)
+            return error
+        }
+    }
+    return nil
+}
+

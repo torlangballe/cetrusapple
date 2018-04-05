@@ -101,7 +101,7 @@ class ZAnimation {
 
     static func RotateView(_ view:ZView, degreesClockwise:Float = 360, secs:Float, repeatCount:Float = .infinity) {
          let spinAnimation = CABasicAnimation(keyPath:"transform.rotation")
-        spinAnimation.toValue = ZMath.DegToRad(Double(degreesClockwise) * Double(ZMath.Sign(Double(secs))))
+        spinAnimation.toValue = ZMath.DegToRad(Double(degreesClockwise) * Double(sign(Double(secs))))
         spinAnimation.duration = CFTimeInterval(abs(secs))
         spinAnimation.repeatCount = repeatCount
         view.View().layer.add(spinAnimation, forKey:"spinAnimation")
@@ -202,13 +202,7 @@ private func animateView(_ view:UIView, from:Float, to:Float, duration:Float, ty
     animation.fillMode = kCAFillModeForwards;
     animation.timingFunction = CAMediaTimingFunction(name:kCAMediaTimingFunctionEaseInEaseOut)
     let key = "ani." + type
-    if false { //view.window == nil {
-        view.PerformAfterDelay(2.5) { () in
-            view.layer.add(animation, forKey:key)
-        }
-    } else {
-        view.layer.add(animation, forKey:key)
-    }
+    view.layer.add(animation, forKey:key)
 }
 
 /*

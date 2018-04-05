@@ -36,12 +36,12 @@ struct ZPos : Equatable, Codable
     func IsNull() -> Bool                         { return x == 0 && y == 0; }
     func GetNormalized() -> ZPos                  { return self / Length(); }
     func GetCGPoint() -> CGPoint                  { return CGPoint(x: CGFloat(x), y: CGFloat(y)); }
-    
+    func Sign() -> ZPos                           { return ZPos(sign(x), sign(y)) }
     func IsSameDirection(_ p: ZPos) -> Bool {
         if self == p {
             return true;
         }
-        if ZMath.Sign(Double(p.x)) != ZMath.Sign(Double(x)) || ZMath.Sign(Double(p.y)) != ZMath.Sign(Double(y)) {
+        if sign(Double(p.x)) != sign(Double(x)) || sign(Double(p.y)) != sign(Double(y)) {
             return false;
         }
         if p.y == 0.0 {

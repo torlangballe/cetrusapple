@@ -183,7 +183,7 @@ class ZTableView : UITableView, ZView, UITableViewDelegate, UITableViewDataSourc
     
     func DeleteChildRow(index:Int, animation:ZTableViewRowAnimation = .fade) { // call this after removing data
         let ipath = makeIndexPathFromIndex(Index(row:index, section:0))
-        self.deleteRows(at:[ipath], with: .fade)
+        self.deleteRows(at:[ipath], with: .left)
     }
 
     func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {

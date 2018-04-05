@@ -33,7 +33,7 @@ class ZStackView: ZContainerView {
     @discardableResult override func CalculateSize(_ total: ZSize) -> ZSize { // can force size calc without needed result
         var s = ZSize(0, 0)
         for c1 in cells where !c1.collapsed && !c1.free {
-            var tot = getCellFitSizeInTotal(total:total, cell:c1)
+            let tot = getCellFitSizeInTotal(total:total, cell:c1)
             var fs = ZSize(c1.view.sizeThatFits(tot))
             var m = c1.margin
             if (c1.alignment & .MarginIsOffset) {

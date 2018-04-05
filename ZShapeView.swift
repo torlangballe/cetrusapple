@@ -24,6 +24,7 @@ class ZShapeView: ZContainerView, ZImageLoader {
     var maxWidth:Double = 0
     var imageAlign = ZAlignment.Center
     var fillBox = false
+    var roundImage = false
     
     init(type t: ShapeType, minSize: ZSize) {
         text = ZText()
@@ -125,7 +126,15 @@ class ZShapeView: ZContainerView, ZImageLoader {
                 if fillBox {
                    a = .None
                 }
-                canvas.DrawImage(drawImage!, destRect:r, align:a, opacity:o, margin:imageMargin)
+                var corner:Double? = nil
+                if roundImage {
+                    if type == .roundRect {
+                        corner = min(15, min(r.size.w, r.size.h) * ratio) - imageMargin.Min()
+                    } else if type == .circle {
+                        corner = image!.Size.Max()
+                    }
+                }
+                canvas.DrawImage(drawImage!, destRect:r, align:a, opacity:o, corner:corner, margin:imageMargin)
             }
         }
         if(text.text != "") {

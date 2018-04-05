@@ -123,9 +123,9 @@ class ZCustomView: UIControl, ZView, UIGestureRecognizerDelegate, ZTimerOwner {
     }
     
     internal override func beginTracking(_ touch: UITouch, with event: UIEvent?) -> Bool {
-        isHighlighted = true
-        Expose()
         if tapTarget != nil || HandlePressedInPosFunc != nil {
+            isHighlighted = true
+            Expose()
             tapTarget?.HandleTouched(self, state:.began, pos:ZPos(touch.location(in: self)), inside:true)
             if touchDownRepeatSecs != 0 {
                 touchDownRepeatTimer.Set(touchDownRepeatSecs, owner:self) { [weak self] () in
