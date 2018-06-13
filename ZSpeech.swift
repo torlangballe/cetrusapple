@@ -72,7 +72,7 @@ class ZSpeech: ZObject, AVSpeechSynthesizerDelegate {
         }
         rendering = true;
         lock.lock()
-        acaTTS.startSpeakingStringSync(text, to:file.url! as URL!)
+        acaTTS.startSpeakingStringSync(text, to:file.url! as URL?)
         // returns false even when ok, so ignoring, check file exists instead.
         lock.unlock()
         rendering = false;
@@ -90,6 +90,7 @@ class ZSpeech: ZObject, AVSpeechSynthesizerDelegate {
         var folds = [String]()
         for f in folders {
             #if (arch(i386) || arch(x86_64)) && os(iOS) // hack to make SHORTER path names for simulator, was just over 255, test in iPhone too!
+//            #if targetEnvironment(simulator) // hack to make SHORTER path names for simulator, was just over 255, test in iPhone too!
                 let store = ZFolders.GetFileInFolderType(.preferences, addPath:"voicelinks")
                 store.CreateFolder()
                 let name = f.GetName()
@@ -279,4 +280,43 @@ class ZSpeech: ZObject, AVSpeechSynthesizerDelegate {
 
 var mainSpeech: ZSpeech? = nil
 
+/*
+ ar-SA, Name: Maged
+ cs-CZ, Name: Zuzana
+ da-DK, Name: Sara
+ de-DE, Name: Anna
+ el-GR, Name: Melina
+ en-AU, Name: Karen
+ en-GB, Name: Daniel
+ en-IE, Name: Moira
+ en-US, Name: Samantha
+ en-ZA, Name: Tessa
+ es-ES, Name: Monica
+ es-MX, Name: Paulina
+ fi-FI, Name: Satu
+ fr-CA, Name: Amelie
+ fr-FR, Name: Thomas
+ he-IL, Name: Carmit
+ hi-IN, Name: Lekha
+ hu-HU, Name: Mariska
+ id-ID, Name: Damayanti
+ it-IT, Name: Alice
+ ja-JP, Name: Kyoko
+ ko-KR, Name: Yuna
+ nl-BE, Name: Ellen
+ nl-NL, Name: Xander
+ no-NO, Name: Nora
+ pl-PL, Name: Zosia
+ pt-BR, Name: Luciana
+ pt-PT, Name: Joana
+ ro-RO, Name: Ioana
+ ru-RU, Name: Milena
+ sk-SK, Name: Laura
+ sv-SE, Name: Alva
+ th-TH, Name: Kanya
+ tr-TR, Name: Yelda
+ zh-CN, Name: Ting-Ting, Quality
+ zh-HK, Name: Sin-Ji, Quality
+ zh-TW, Name: Mei-Jia, Quality
+*/
 

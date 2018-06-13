@@ -306,6 +306,10 @@ class ZAppController : UIResponder, UIApplicationDelegate, UNUserNotificationCen
     static func RunApp(delegateClass:Swift.AnyClass) {
         UIApplicationMain(CommandLine.argc, convertArgs(CommandLine.unsafeArgv), nil, NSStringFromClass(delegateClass.self))
     }
+    
+    func applicationDidReceiveMemoryWarning(_ application: UIApplication) {
+        mainZApp?.HandleMemoryNearFull()
+    }
 }
 
 private func convertArgs(_ args:UnsafeMutablePointer<UnsafeMutablePointer<Int8>?>) -> UnsafeMutablePointer<UnsafeMutablePointer<Int8>>! {

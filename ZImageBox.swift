@@ -133,7 +133,7 @@ class ZImageBox : ZContainerView {
                     if result == .ok {
                         self?.imageUrl = text
                         self?.imageActivity.Start()
-                        self?.imageView.DownloadFromUrl(text) { [weak self] (success) in
+                        self?.imageView.DownloadFromUrl(text) { (success) in
                             self?.imageActivity.Start(false)
                         }
                     }

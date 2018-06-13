@@ -76,8 +76,8 @@ class ZContainerView: ZCustomView {
     }
     
     func ArrangeChildrenAnimated(onlyChild:ZView? = nil) {
-        ZAnimation.Do(duration:0.6, animations: { () in
-            self.ArrangeChildren(onlyChild:onlyChild)
+        ZAnimation.Do(duration:0.6, animations: { [weak self] () in
+            self?.ArrangeChildren(onlyChild:onlyChild)
         })
     }
     

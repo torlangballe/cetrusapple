@@ -77,8 +77,8 @@ class ZBallSwitch: ZContainerView {
         }
         //        self.sendActionsForControlEvents(UIControlEvents.ValueChanged)
         Expose()
-        PerformAfterDelay(0.1) { () in
-            self.valueTarget?.handleValueChanged(self)
+        PerformAfterDelay(0.1) { [weak self] () in
+            self?.valueTarget?.handleValueChanged(self)
         }
     }
     

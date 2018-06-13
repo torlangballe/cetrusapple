@@ -40,12 +40,12 @@ class ZResource: NSBundleResourceRequest, ZTimerOwner {
             } else {
                 ZDebug.Print("ZResource.BeginAccessing. NOT ready conditionally.", self!.sid, self!.tags)
             }
-            self!.timer.Set(5, owner:self) { [weak self] () in
+            self!.timer.Set(5, owner:self) { () in
                 if self != nil {
                     ZDebug.Print("ZResource still getting:", self!.progress.fractionCompleted, self!.sid, self!.tags)
                 }
             }
-            self!.beginAccessingResources() { [weak self] (error) in
+            self!.beginAccessingResources() { (error) in
                 if error != nil {
                     self!.endAccessingResources()
                 }
@@ -53,7 +53,7 @@ class ZResource: NSBundleResourceRequest, ZTimerOwner {
                     self!.addToList(self!)
                 }
                 ZDebug.Print("ZResource.Done BeginAccessing.", error?.localizedDescription ?? "", self!.sid, self!.tags)
-                ZMainQue.async { [weak self] () in
+                ZMainQue.async { () in
                     self?.timer.Stop()
                     self?.done = true
                     got(error)
@@ -63,9 +63,7 @@ class ZResource: NSBundleResourceRequest, ZTimerOwner {
     }
     
     func addToList(_ r:ZResource) {
-        ZDebug.Print("addToList:", sid)
         if list.index(where: { $0.sid == r.sid }) == nil {
-            ZDebug.Print("addToList added:", sid)
             list.append(r)
         }
     }

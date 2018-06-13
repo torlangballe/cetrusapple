@@ -63,7 +63,8 @@ class ZProgressIndicator: ZCustomView {
         canvas.FillPath(path)
 
         path.Empty()
-        let a = max(5, Double(value) * 360)
+//        let a = max(5, Double(value) * 360)
+        let a = Double(value) * 360
         path.ArcDegFromToFromCenter(center, radius:radius, degStart:0, degEnd:a)
         canvas.SetColor(ZColor(white:lightStroke ? 0.8 : 0.2), opacity:1)
         canvas.StrokePath(path, width:Double(strokeWidth), type:.round)

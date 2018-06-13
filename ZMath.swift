@@ -19,16 +19,6 @@ struct ZMath {
     static func AngleDegToPos(_ deg:Double) -> ZPos  { return ZPos(sin(DegToRad(deg)), -cos(DegToRad(deg))) }
     static func PosToAngleDeg(_ pos:ZPos) -> Double  { return RadToDeg(ArcTanXYToRad(pos)) }
     
-//    static func Sign(_ a: Double) -> Int {
-//        if a > 0.0 {
-//            return 1
-//        }
-//        if a < 0.0 {
-//            return -1
-//        }
-//        return 0
-//    }
-
     static func GetDistanceFromLongLatInMeters(_ pos1:ZPos, pos2:ZPos) -> Double {
         let R = 6371.0 // Radius of the earth in km
         let dLat = DegToRad(pos2.y - pos1.y)
@@ -79,5 +69,15 @@ extension ZMath {
         }
         return d
     }
+}
+
+func sign<T: FloatingPoint>(_ a:T) -> Int {
+    if a > 0 {
+        return 1
+    }
+    if a < 0 {
+        return -1
+    }
+    return 0
 }
 

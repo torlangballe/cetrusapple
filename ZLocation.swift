@@ -35,29 +35,32 @@ class ZLocation: CLLocationManager, CLLocationManagerDelegate, ZTimerOwner {
         fakePoints = points
         fakeDurationSecs = durationSecs
         fakeStart = ZTime.Now
-        fakeTimer.Set(10, owner: self, now:true) { () in
-            let t = self.fakeStart.Since() / self.fakeDurationSecs
+        fakeTimer.Set(10, owner: self, now:true) { [weak self] () in
+            if self == nil {
+                return false
+            }
+            let t = self!.fakeStart.Since() / self!.fakeDurationSecs
             if t > 1 {
-                self.StopFakePoints()
-                if let (pos, _, _) = self.GetCurrentLocation() {
-                    self.handleNewLocation(pos)
+                self!.StopFakePoints()
+                if let (pos, _, _) = self!.GetCurrentLocation() {
+                    self!.handleNewLocation(pos)
                 }
                 return false
             }
-            let pos = ZGetTPositionInPosPath(path:self.fakePoints, t:t)
+            let pos = ZGetTPositionInPosPath(path:self!.fakePoints, t:t)
             ZDebug.Print("FakePos:", pos, "t:", t)
-            for case let region as CLCircularRegion in self.monitoredRegions {
+            for case let region as CLCircularRegion in self!.monitoredRegions {
                 let cpos = ZLocation.CLLocationCoordinate2DToZPos(region.center)
-                if self.enteredRegions.index(of:cpos) == nil {
+                if self!.enteredRegions.index(of:cpos) == nil {
                     let loc = ZLocation.ZPosToCLLocationCoordinate2D(pos)
                     if region.contains(loc) {
                         cApp.HandleLocationRegionCross(regionId:region.identifier, enter:true, fromAdd:true)
-                        self.enteredRegions.append(cpos)
+                        self!.enteredRegions.append(cpos)
                     }
                     break
                 }
             }
-            self.handleNewLocation(pos)
+            self!.handleNewLocation(pos)
             return true
         }
     }

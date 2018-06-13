@@ -25,6 +25,7 @@ class ZShapeView: ZContainerView, ZImageLoader {
     var imageAlign = ZAlignment.Center
     var fillBox = false
     var roundImage = false
+    var value:Float = 0
     
     init(type t: ShapeType, minSize: ZSize) {
         text = ZText()

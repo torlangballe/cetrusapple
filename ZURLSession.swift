@@ -57,6 +57,12 @@ enum ZUrlRequestType: String {
     case Delete = "DELETE"
 }
 
+struct ZUrlRequestReturnMessage : Codable {
+    var messages:[String]? = nil
+    var message:String? = nil
+    var code:Int? = nil
+}
+
 extension ZUrlRequest {
     func SetUrl(_ url: String) {
         self.url = URL(string:url)
@@ -109,9 +115,11 @@ class ZUrlSession {
             return nil
         }
         if request.httpBody != nil {
-            transactionMutex.Lock()
-            transactions.append((request.url!.absoluteString, request.httpBody!.count, true))
-            transactionMutex.Unlock()
+            if request.url != nil && request.httpBody != nil {
+                transactionMutex.Lock()
+                transactions.append((request.url!.absoluteString, request.httpBody!.count, true))
+                transactionMutex.Unlock()
+            }
         }
         let task = URLSession.shared.dataTask(with:(request as URLRequest)) { (data, response, error) in
 //            ZDebug.Print("ZUrlSession.Sent", data?.count, error?.localizedDescription, request.url?.absoluteString)
@@ -202,6 +210,19 @@ class ZUrlSession {
             }
         }
         UserDefaults.standard.synchronize()
+    }
+    
+    static func CheckError(data:ZJSONData) -> (Error?, Int?) {
+        var m = ZUrlRequestReturnMessage()
+        if data.Decode(&m) == nil {
+            if m.messages != nil && m.messages!.count != 0 {
+                return (ZError(message:m.messages!.first!), nil)
+            }
+            if m.message != nil {
+                return (ZError(message:m.message!), m.code)
+            }
+        }
+        return (nil, nil)
     }
 }
 

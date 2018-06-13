@@ -7,6 +7,12 @@
 
 import UIKit
 
+class zUITableViewCell : UITableViewCell {
+//    deinit {
+//        print("UITableViewCell deinit")
+//    }
+}
+
 protocol ZTableViewDelegate : class {
     func TableViewGetNumberOfRowsInSection(_ section:Int) -> Int
     func TableViewGetNumberOfSections() -> Int
@@ -222,7 +228,7 @@ class ZTableView : UITableView, ZView, UITableViewDelegate, UITableViewDataSourc
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         //        let cell : UITableViewCell = self.dequeueReusableCellWithIdentifier("ZTableView", forIndexPath:indexPath) as UITableViewCell
-        let cell = UITableViewCell()
+        let cell = zUITableViewCell()
         cell.isEditing = true
         let index = ZTableView.Index(path:indexPath)
         var r = ZRect(size:ZSize(Rect.size.w, owner!.TableViewGetHeightOfItem(index)))

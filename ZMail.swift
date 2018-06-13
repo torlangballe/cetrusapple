@@ -52,7 +52,7 @@ class ZMailComposer : MFMailComposeViewController, MFMailComposeViewControllerDe
             do {
                 let data = try ZData(contentsOf:f.url! as URL)
                 let mime = f.GetMimeTypeFromExtension()
-                addAttachmentData(data as Data, mimeType:mime, fileName:(f.url?.path)!)
+                addAttachmentData(data as Data, mimeType:mime, fileName:f.GetDisplayName())
             } catch let error {
                 ZDebug.Print("popDraft:", error)
             }

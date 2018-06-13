@@ -10,7 +10,7 @@ import UIKit
 
 class ZDictPickerField : ZShapeView {
     var dict: [String:AnyObject]
-    var value: AnyObject? = nil
+    var currentValue: AnyObject? = nil
     var edited = false
     var handleValueChanged:((_ key:String)->Void)? = nil
     var selectedKey = ""
@@ -22,8 +22,8 @@ class ZDictPickerField : ZShapeView {
         self.selectedKey = selectedKey
         super.init(type:.roundRect, minSize: ZSize(40, 38))
       
-        value = dict[selectedKey]
-        text.text = value as? String ?? selectedKey
+        currentValue = dict[selectedKey]
+        text.text = currentValue as? String ?? selectedKey
         text.font = ZFont.Nice(22, style:.bold)
         text.color = ZColor.White()
         
@@ -36,7 +36,7 @@ class ZDictPickerField : ZShapeView {
                 if key != nil {
                     self!.selectedKey = key!
                     self!.edited = true
-                    self!.value = val!
+                    self!.currentValue = val!
                     self!.valueTarget?.HandleValueChanged(self!)
                     self!.text.text = self!.selectedKey
                     self!.handleValueChanged?(self!.selectedKey)

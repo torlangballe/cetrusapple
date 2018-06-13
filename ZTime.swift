@@ -118,7 +118,7 @@ extension ZTime {
             formatter.locale = Locale(identifier:locale)
         }
         if timezone != nil {
-            formatter.timeZone = timezone as TimeZone!
+            formatter.timeZone = timezone as TimeZone?
         }
         if let date = formatter.date(from: dateString) {
             self.init(timeIntervalSinceReferenceDate:date.timeIntervalSinceReferenceDate)
@@ -248,7 +248,7 @@ extension ZTime {
         let formatter = DateFormatter()
         formatter.dateFormat = format
         if timezone != nil {
-            formatter.timeZone = timezone as TimeZone!
+            formatter.timeZone = timezone as TimeZone?
         }
         if locale == "" {
             formatter.locale = Locale.current

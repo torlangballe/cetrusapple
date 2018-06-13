@@ -412,9 +412,9 @@ class ZAVPlayer : AVQueuePlayer, DZRPlayerDelegate, SPTAudioStreamingPlaybackDel
       
         ZDebug.Print("*********** ZAVPLayer.Play:", getPlayerType(type))
         if type != .file {
-            checkTimer.Set(0.5, owner:self) { () in
-                if self.currentItem != nil && self.currentItem!.status == AVPlayerItemStatus.failed {
-                    self.handler!.HandleAVPlayerError(self)
+            checkTimer.Set(0.5, owner:self) { [weak self] () in
+                if self != nil && self!.currentItem != nil && self!.currentItem!.status == AVPlayerItemStatus.failed {
+                    self!.handler!.HandleAVPlayerError(self!)
                     return false
                 }
                 return true
@@ -882,16 +882,19 @@ class ZAVPlayer : AVQueuePlayer, DZRPlayerDelegate, SPTAudioStreamingPlaybackDel
         fadeEnd.time = fadeStart.time + durationSecs
         fadeStart.volume = Double(GetVolume())
         fadeEnd.volume = volume
-        fadeTimer.Set(0.05, owner:self) { () in
-            let c = ZTime.Now
-            if c > self.fadeEnd.time {
-                self.SetVolume(self.fadeEnd.volume);
+        fadeTimer.Set(0.05, owner:self) { [weak self] () in
+            if self == nil {
                 return false
             }
-            let diff = (c - self.fadeStart.time)
-            let ratio = diff / Double(self.fadeEnd.time - self.fadeStart.time)
-            let fvolume = self.fadeStart.volume + ratio * (self.fadeEnd.volume - self.fadeStart.volume);
-            self.SetVolume(fvolume);
+            let c = ZTime.Now
+            if c > self!.fadeEnd.time {
+                self!.SetVolume(self!.fadeEnd.volume);
+                return false
+            }
+            let diff = (c - self!.fadeStart.time)
+            let ratio = diff / Double(self!.fadeEnd.time - self!.fadeStart.time)
+            let fvolume = self!.fadeStart.volume + ratio * (self!.fadeEnd.volume - self!.fadeStart.volume);
+            self!.SetVolume(fvolume);
             return true
         }
     }

@@ -13,7 +13,7 @@ protocol ZCustomViewDelegate {
 
 class ZCustomView: UIControl, ZView, UIGestureRecognizerDelegate, ZTimerOwner {
     var objectName: String
-    var stringValue = ""
+//    @objc var stringValue = ""
     var minSize: ZSize
     var drawHandler:((_ rect: ZRect, _ canvas: ZCanvas, _ view:ZCustomView)->Void)!
     var foregroundColor: ZColor

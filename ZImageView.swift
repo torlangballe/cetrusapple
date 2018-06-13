@@ -125,7 +125,7 @@ class ZImageView: UIImageView, ZView, ZImageLoader, ZTimerOwner {
                 tapTarget?.HandleTouched(self, state:.began, pos:pos, inside:true)
                 if touchDownRepeatSecs != 0 {
                     touchDownRepeats = 0
-                    self.touchDownRepeatTimer.Set(self.touchDownRepeatSecs, owner:self) { [weak self] () in
+                    touchDownRepeatTimer.Set(touchDownRepeatSecs, owner:self) { [weak self] () in
                         if self?.touchDownRepeats > 2 {
                             self?.tapTarget!.HandlePressed(self!, pos:pos)
                         }
@@ -143,7 +143,7 @@ class ZImageView: UIImageView, ZView, ZImageLoader, ZTimerOwner {
         if isUserInteractionEnabled {
             var handled = false
             isHighlighted = false
-            self.PerformAfterDelay(0.05) { [weak self] () in
+            PerformAfterDelay(0.05) { [weak self] () in
                 self?.Expose()
             }
             if tapTarget != nil || handlePressedInPosFunc != nil {
@@ -161,8 +161,8 @@ class ZImageView: UIImageView, ZView, ZImageLoader, ZTimerOwner {
                 }
                 touchDownRepeatTimer.Stop()
             }
-            if self.animationImages != nil {
-                self.startAnimating()
+            if animationImages != nil {
+                startAnimating()
             }
         }
     }
@@ -175,8 +175,8 @@ class ZImageView: UIImageView, ZView, ZImageLoader, ZTimerOwner {
             isHighlighted = false
             Expose()
             touchDownRepeatTimer.Stop()
-            if self.animationImages != nil {
-                self.startAnimating()
+            if animationImages != nil {
+                startAnimating()
             }
         }
     }
@@ -212,7 +212,7 @@ class ZImageView: UIImageView, ZView, ZImageLoader, ZTimerOwner {
     
     func SetAnimatedImages(_ images:[ZImage], durationForAll:Float32, start:Bool = true) {
         animationImages = images
-        self.animationDuration = TimeInterval(durationForAll)
+        animationDuration = TimeInterval(durationForAll)
         if start {
         startAnimating()
             startAnimating()
@@ -243,10 +243,10 @@ protocol ZImageLoader: class {
 
 extension ZImageLoader {
     func DownloadFromUrl(_ url:String, cache:Bool = true, done:((_ success:Bool)->Void)?=nil) { // , contentMode mode: UIViewContentMode
-        
-        ZImage.DownloadFromUrl(url, cache:cache) { [weak self] (image) in
+        let s = self
+        ZImage.DownloadFromUrl(url, cache:cache) { (image) in
             if image != nil {
-                self?.SetImage(image, downloadUrl:url)
+                s.SetImage(image, downloadUrl:url)
                 done?(true)
             } else {
                 done?(false)

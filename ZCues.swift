@@ -48,9 +48,11 @@ struct ZCue : Codable, Equatable {
     }
 }
 
-class ZCues {
+class ZCues : Encodable {
+    private enum CodingKeys: String, CodingKey { case langCode, list }
     var downloadedAt = ZTime()
     var langCode = ""
+    var file = ZFileUrl()
     var list = [ZCue]()
     
     func AddFromAudioFile(file:ZFileUrl, langCode:String, got:@escaping (_ error:Error?)->Void) {
@@ -79,17 +81,49 @@ class ZCues {
         return nil
     }
     
-    func Merge(_ cues:[ZCue], save:Bool) {
+    func appendCue(c:ZCue, add:ZCue) -> ZCue {
+        var n = c
+        if add.start > c.start {
+            n.end = add.end
+            n.value = (c.value ?? "") + " " + (add.value ?? "")
+        } else {
+            n.start = add.start
+            n.value = (add.value ?? "") + " " + (c.value ?? "")
+        }
+        return n
+    }
+    
+    func Merge(_ cues:[ZCue]) {
         if !cues.isEmpty {
             var merged = list
             merged.removeIf { cues.contains($0) }
             for c in cues {
                 merged.removeIf { c.IsSuperior(cue:$0)}
             }
-            merged += cues
+            let separate = cues.filter {
+                for (i, m) in merged.enumerated() {
+                    if m.type == $0.type && $0.start < m.end && $0.end > m.start {
+                        merged[i] = appendCue(c:m, add:$0)
+                        return false
+                    }
+                }
+                return true
+            }
+            merged += separate
             merged.sort { $0.start < $1.start }
             list = merged
+            let err = save()
+            if err != nil {
+                ZDebug.Print("ZCues.Merge save")
+            }
         }
+    }
+    
+    private func save() -> Error? {
+//        let data = ZJSONData(object:self)
+//        let err = data.SaveToFile(file)
+//        return err
+        return nil
     }
     
     private func addChaptersFromAudioFile(file:ZFileUrl, langCode:String) -> Error? {
@@ -128,7 +162,7 @@ class ZCues {
                 cues.append(cue)
             }
         }
-        Merge(cues, save:true)
+        Merge(cues)
         return nil
     }
     
@@ -184,7 +218,7 @@ class ZCues {
                 pos += lineSecs
             }
         }
-        Merge(cues, save:true)
+        Merge(cues)
         
         return nil
     }
@@ -220,13 +254,9 @@ class ZCues {
                 add.value = c.value
             } else {
                 if c.end >= threshold {
-                    if c.end > threshold + 0.3 {
-                        addCue(&concated, pos:chunk.pos, add:&add, threshold:&threshold)
-                        appendOneCue(add:&add, c:c)
-                    } else {
-                        appendOneCue(add:&add, c:c)
-                        addCue(&concated, pos:chunk.pos, add:&add, threshold:&threshold)
-                    }
+                    addCue(&concated, pos:chunk.pos, add:&add, threshold:&threshold)
+                    add.start = c.start
+                    appendOneCue(add:&add, c:c)
                 } else {
                     appendOneCue(add:&add, c:c)
                 }
@@ -235,16 +265,63 @@ class ZCues {
         if add.start > 0 {
             addCue(&concated, pos:chunk.pos, add:&add, threshold:&threshold)
         }
+        for c in concated {
+            print("cat:", chunk.index, chunk.pos, ":", c.start, c.value ?? "", c.end)
+        }
         return concated
     }
+
+    private func adjustReturnRemoved(_ cues:inout [ZCue], j:Int, i:Int, removed:inout Bool) -> Bool {
+        if cues[j].value != nil && cues[i].value != nil {
+            let vj = cues[j].value!
+            let vi = cues[i].value!
+            if vi.count < 30 && vj.count > vi.count * 3 / 2 {
+                let word = (j < i) ? ZStrUtil.PopTailWord(&cues[j].value!) : ZStrUtil.PopHeadWord(&cues[j].value!)
+                cues[i].value = (j < i) ? word + " " + vi : vi + " " + word
+                if cues[j].value!.isEmpty {
+                    cues.remove(at:j)
+                    removed = true
+                }
+                return true
+            }
+        }
+        return false
+    }
     
+    private func adjustLengthOfSpeechCues() -> Bool {
+        var changed = false
+        var cues = list
+        var pi:Int? = nil
+        for (i, c) in cues.enumerated() {
+            if c.type == ZCue.CueType.inlineSpeech.rawValue {
+                if pi != nil {
+                    var removed = false
+                    if adjustReturnRemoved(&cues, j:pi!, i:i, removed:&removed) || adjustReturnRemoved(&cues, j:i, i:pi!, removed:&removed) {
+                        changed = true
+                    }
+                    if removed {
+                        list = cues
+                        return true
+                    }
+                }
+                pi = i
+            }
+        }
+        list = cues
+        return changed
+    }
+
     private func setNewSpeechCues(cues:[ZCue], chunk:Chunk, originalUrl:String) {
         var truncated =  cues
         if chunk.index != 0 {
-            truncated.removeIf { $0.end < chunk.pos + 1 }
+            truncated.removeIf { $0.end < 1 }
         }
-        let concated = concatSpeech(cues:cues, chunk:chunk)
-        Merge(concated, save:true)
+        let concated = concatSpeech(cues:truncated, chunk:chunk)
+        Merge(concated)
+        var count = 0
+        while count < 3 && adjustLengthOfSpeechCues() {
+            count += 1
+        }
         PodcastPlayView.current?.SetNewCues(list, mediaUrl:originalUrl)
         mainSync.AppendStoryCues(audioUrl:originalUrl, cues:concated) { error in
             if error != nil {
@@ -276,7 +353,7 @@ class ZCues {
         var index = -1
         mainSync.GetStoryCues(audioUrl:originalUrl) { [weak self] (cloudCues, modified, error) in
             if self != nil {
-                self!.Merge(cloudCues, save:true)
+                self!.Merge(cloudCues)
                 let cues = self!.list
                 useChunks.removeIf {
                     for c in cues where c.type == ZCue.CueType.inlineSpeech.rawValue {
@@ -289,7 +366,11 @@ class ZCues {
                 if PodcastPlayView.current?.mediaUrl == originalUrl {
                     let pos = PodcastPlayView.current!.currentSecs + 10
                     for (i, c) in useChunks.enumerated() {
-                        if abs(c.pos - pos) < abs(best.pos - pos) {
+                        var cdiff = c.pos - pos
+                        if cdiff < 0 {
+                            cdiff += 5000 // if it's in past make it sort AFTER all ahead
+                        }
+                        if abs(cdiff) < abs(best.pos - pos) {
                             best = c
                             index = i
                         }
@@ -311,7 +392,7 @@ class ZCues {
         }
     }
     
-    func addSpeechFromAudioFileInBackground(file:ZFileUrl, originalUrl:String) {
+    func addSpeechFromAudioFileInBackground(audioFile:ZFileUrl, originalUrl:String) {
         if #available(iOS 11.0, *) {
             ZSpeechRecognizer.RequestToUse() { (accepted) in
                 if !accepted {
@@ -325,11 +406,11 @@ class ZCues {
                     let name = ZFileUrl.GetLegalFilename(originalUrl)
                     let folder = ZFolders.GetFileInFolderType(.temporary, addPath:name)
                     folder.CreateFolder()
-                    var (_, sampleRate, err) = ZAudioFileGetInfo(file:file)
+                    var (_, sampleRate, err) = ZAudioFileGetInfo(file:audioFile)
                     if err == nil {
                         var chunks = [Chunk]()
                         var tailSecond = [Float]()
-                        err = ZReadAudioFileMonoSecondChunks(file:file, secs:speechBlock) { samples, pos in
+                        err = ZReadAudioFileMonoSecondChunks(file:audioFile, secs:speechBlock) { samples, pos in
                             var chunk = Chunk()
                             chunk.pos = pos
                             chunk.file = folder.AppendedPath("\(pos).aiff")
@@ -363,20 +444,18 @@ class ZCues {
     }
 }
 
-class ZAllCues : ZUrlCache {
+class ZAllCues {
     var map = [String:ZCues]()
     let initMutex = ZMutex()
-    
-    init(folderName:String = "zcues") {
-        super.init(name:folderName)
-    }
+    let cache = ZUrlCache(name:"zcues")
     
     func LoadFromFolder() {
         initMutex.Lock()
         ZGetBackgroundQue().async { [weak self] () in
-            self?.folder.Walk { [weak self] file, info in
+            self?.cache.folder.Walk { file, info in
                 if let data = ZJSONData(fileUrl:file) {
                     let cs = ZCues()
+                    cs.file = file
                     let err = data.Decode(&cs.list)
                     if err != nil {
                         ZDebug.Print("ZCues.LoadFromFolder err:", err!.localizedDescription, file.AbsString)
@@ -398,11 +477,29 @@ class ZAllCues : ZUrlCache {
         }
     }
     
-    func getCapsuleCueUrlForMediaUrl(mediaUrl:String) -> (String, Error?) {
+    private func getCapsuleCueUrlForMediaUrl(mediaUrl:String) -> (String, Error?) {
         return ("", nil)
     }
     
-    func GetForSequence(_ seq:Sequence, got:@escaping (_ cues:ZCues, _ mediaUrl:String, _ error:Error?)->Void) {
+    private func getLangCodeFromSequence(_ seq:Sequence) -> String {
+        var lang = seq.langCode
+        var host = ""
+        for s in seq.stories {
+            if s.externalLink.isEmpty {
+                host = ZUrl(string:s.externalLink).Host
+            }
+        }
+        if lang == "en" {
+            lang = "us"
+            if host.hasSuffix("co.uk") {
+                lang = "uk"
+            }
+        }
+        return lang
+    }
+
+func GetForSequence(_ seq:Sequence, got:@escaping (_ cues:ZCues, _ mediaUrl:String, _ error:Error?)->Void) {        
+
         var cues = ZCues()
         guard let url = seq.GetMediaUrl() else {
             got(cues, "", ZError(message:"no media url"))
@@ -413,18 +510,23 @@ class ZAllCues : ZUrlCache {
             got(cues, url, nil)
             return
         }
+        var onFile = false
         if let c = map[url] {
+            onFile = true
             cues = c
-            cues.addSpeechFromAudioFileInBackground(file:cachedUrlFile, originalUrl:url)
-            got(cues, url, nil)
         } else {
-            mainSync.GetStoryCues(audioUrl:url) { [weak self] cloudCues, modified, error in
-                cues.list = cloudCues
-                cues.langCode = seq.langCode
-                self?.map[url] = cues // maybe we need to anchor it here, so it doesn't deinit
-                cues.AddFromAudioFile(file:cachedUrlFile, langCode:cues.langCode) { [weak self] err in
-                    self?.map[url] = cues
-                    cues.addSpeechFromAudioFileInBackground(file:cachedUrlFile, originalUrl:url)
+            cues.file = cache.MakeFile(url:url)
+        }
+        mainSync.GetStoryCues(audioUrl:url) { [weak self] cloudCues, modified, error in
+            cues.Merge(cloudCues)
+            cues.langCode = self?.getLangCodeFromSequence(seq) ?? "en"
+            self?.map[url] = cues // maybe we need to anchor it here, so it doesn't deinit
+            if onFile {
+                cues.addSpeechFromAudioFileInBackground(audioFile:cachedUrlFile, originalUrl:url)
+                got(cues, url, nil)
+            } else {
+                cues.AddFromAudioFile(file:cachedUrlFile, langCode:cues.langCode) { err in
+                    cues.addSpeechFromAudioFileInBackground(audioFile:cachedUrlFile, originalUrl:url)
                     got(cues, url, err)
                 }
             }

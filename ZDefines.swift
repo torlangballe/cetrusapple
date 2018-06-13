@@ -80,16 +80,10 @@ extension ZRange {
 }
 
 extension Array {
-    @discardableResult mutating func removeIf(_ check:(_ object:Element)-> Bool) -> Bool {
-        var i = 0
-        while i < count {
-            if check(self[i]) {
-                remove(at: i)
-            } else {
-                i += 1
-            }
-        }
-        return false
+    @discardableResult mutating func removeIf(_ check:(_ object:Element)-> Bool) -> Int {
+        let c = count
+        self = filter { return !check($0) }
+        return c - count
     }
     
     mutating func shuffle () {

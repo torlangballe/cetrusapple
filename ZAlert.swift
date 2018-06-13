@@ -79,6 +79,7 @@ class ZAlert {
         }
         view.addTextField { (textField) in
             textField.placeholder = placeholder
+            textField.text = content
             if keyboardInfo != nil {
                 if keyboardInfo!.keyboardType != nil {
                     textField.keyboardType = keyboardInfo!.keyboardType!

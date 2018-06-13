@@ -44,7 +44,7 @@ class ZDatePartsField : ZShapeView {
             self!.picker!.Setup()
             self!.picker!.SetValues(self!.year, m:self!.month, d:self!.day)
             
-            let confirm = ZConfirmStack() { [weak self] (result) in
+            let confirm = ZConfirmStack() { (result) in
                 if result {
                     self!.edited = true
                     self!.year = self!.picker!.year

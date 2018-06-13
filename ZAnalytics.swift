@@ -73,7 +73,7 @@ class ZAnalytics {
     }
     
     func SendEvent(_ category:String, action:String, label:String = "", value:Double? = nil) {
-        let builder = GAIDictionaryBuilder.createEvent(withCategory: category, action:action, label:label, value:value as NSNumber!)
+        let builder = GAIDictionaryBuilder.createEvent(withCategory: category, action:action, label:label, value:value as NSNumber?)
         if let dict = (builder!.build() as NSDictionary) as? [AnyHashable: Any] {
             for t in trackers {
                 t.send(dict)

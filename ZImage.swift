@@ -366,15 +366,14 @@ func ZImageFromSampleBuffer(_ sampleBuffer: CMSampleBuffer) -> UIImage? {
 }
 
 func ZMakeImageFromDrawFunction(_ size:ZSize, scale:Float = 0, draw:(_ size:ZSize, _ canvas:ZCanvas)->Void) -> ZImage {
-    UIGraphicsBeginImageContextWithOptions(size.GetCGSize(), false, CGFloat(scale))
-    let context = UIGraphicsGetCurrentContext()
-    
-    let canvas = ZCanvas(context:context!)
-    draw(size, canvas)
-    
-    let image = UIGraphicsGetImageFromCurrentImageContext()
-    UIGraphicsEndImageContext()
-    return image!
+    let format = UIGraphicsImageRendererFormat()
+    format.scale = CGFloat(scale)
+    let renderer = UIGraphicsImageRenderer(size:size.GetCGSize(), format:format)
+    let image = renderer.image { ctx in
+        let canvas = ZCanvas(context:ctx.cgContext)
+        draw(size, canvas)
+    }
+    return image
 }
 
 extension ZImage {

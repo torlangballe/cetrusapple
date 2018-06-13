@@ -32,10 +32,10 @@ struct ZDevice {
         return UIDevice.current.userInterfaceIdiom == UIUserInterfaceIdiom.phone
     }
 
-    static func SetDisableIdleSleep(_ disable:Bool) {
-        UIApplication.shared.isIdleTimerDisabled = disable
-    }
-
+//    static func SetDisableIdleSleep(_ disable:Bool) { this is done in ZScreen
+//        UIApplication.shared.isIdleTimerDisabled = disable
+//    }
+//
     static var DeviceName: String {
         return UIDevice.current.name
         //mac:    nsstr = [(NSString *)SCDynamicStoreCopyComputerName(NULL, NULL) autorelease];  //  NSString *localHostname = [(NSString *)SCDynamicStoreCopyLocalHostName(NULL) autorelease];
@@ -63,15 +63,16 @@ struct ZDevice {
         }
     }
     
-    static var IdleSleepEnabled: Bool {
-        get {
-            return !UIApplication.shared.isIdleTimerDisabled
-        }
-        set {
-            UIApplication.shared.isIdleTimerDisabled = !newValue
-        }
-    }
-
+//    static var IdleSleepEnabled: Bool { // done in screen
+//        get {
+//            return !UIApplication.shared.isIdleTimerDisabled
+//        }
+//        set {
+//            UIApplication.shared.isIdleTimerDisabled = !newValue
+//        }
+//    }
+//
+    
     static var FreeAndUsedDiskSpace: (Int, Int) {
         return (1024 * 1024 * 300, 1024 * 1024 * 32)
     }

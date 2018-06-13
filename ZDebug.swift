@@ -58,5 +58,34 @@ struct ZDebug {
         }
         return false
     }
+
+    static func LoadSavedLog(prefix:String) {
+        let file = ZFolders.GetFileInFolderType(.temporary, addPath:prefix + "/zdebuglog.txt")
+        let (str, _) = ZStrUtil.LoadFromFile(file)
+        storedLines = ZStrUtil.Split(str, sep:"\n")
+    }
+
+    static func AppendToFileAndClearLog(prefix:String) {
+        let file = ZFolders.GetFileInFolderType(.temporary, addPath:prefix + "/zdebuglog.txt")
+        
+        if file.DataSizeInBytes > 5 * 1024 * 1024 {
+            file.Remove()
+            ZDebug.storedLines.insert("--- ZDebug.Cleared early part of large stored log.", at:0)
+        }
+        let (stream, err) = file.OpenOutput(append:true)
+        if err != nil || stream == nil {
+            print("ZDebug.AppendToFileAndClearLog open err:", err?.localizedDescription ?? "")
+            return
+        }
+        for s in ZDebug.storedLines {
+            let a = [UInt8](s.utf8)
+            if stream!.write(a, maxLength: a.count) != a.count {
+                print("ZDebug.AppendToFileAndClearLog error writing.")
+                return
+            }
+            stream!.write([UInt8]("\n".utf8), maxLength:1)
+        }
+        ZDebug.storedLines.removeAll()
+    }
 }
 

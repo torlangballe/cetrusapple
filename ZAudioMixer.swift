@@ -58,7 +58,7 @@ import AVFoundation
     
     let newRange = CMTimeRange(start:secsToCMTime(0), duration:secsToCMTime(item.calculatedDuration))
     do {
-        if !ZFileUrl(string:item.url).Exists() {
+        if item.url.hasPrefix("file:") && !ZFileUrl(string:item.url).Exists() {
             ZDebug.Print("Doesn't exist!:", item.url)
         }
         

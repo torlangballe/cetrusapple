@@ -10,7 +10,9 @@ import UIKit
 import SafariServices
 import MobileCoreServices
 
-class ZUrl : Hashable {
+class ZUrl : Hashable  { // , Decodable, Encodable {
+//    enum CodingKeys: String, CodingKey { case url = "url" }
+    
     var url: URL?
 
     var hashValue: Int {
@@ -21,6 +23,11 @@ class ZUrl : Hashable {
         url = nil
     }
     
+//    required init(from decoder: Decoder) throws {
+//        let values = try decoder.container(keyedBy: CodingKeys.self)
+//        url = try values.decode(URL.self, forKey: .url)
+//    }
+
     init(string:String) {
         if let u = URL(string:string) {
             url = u
@@ -36,6 +43,11 @@ class ZUrl : Hashable {
     init(url:ZUrl) {
         self.url = url.url
     }
+
+//    func encode(to encoder: Encoder) throws {
+//        var container = encoder.container(keyedBy: CodingKeys.self)
+//        try container.encode(url, forKey: .url)
+//    }
 
     var IsEmpty : Bool {
         return url == nil

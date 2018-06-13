@@ -29,7 +29,7 @@ class ZTimeField : ZShapeView {
             self!.picker = ZDatePicker(time:time, useTime:self!.showTime, useDate:self!.showDate, minuteInterval:5)
             self!.picker!.TextColor = self!.text.color
             self!.picker!.ValueChangedTarget = self            
-            let confirm = ZConfirmStack() { [weak self] (result) in
+            let confirm = ZConfirmStack() { (result) in
                 if result {
                     self!.edited = true
                     self!.time = self!.picker!.date as ZTime

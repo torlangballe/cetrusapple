@@ -170,11 +170,29 @@ class ZStrUtil {
     }
 
     class func TailUntil(_ str: String, sep:String, options: ZStringCompareOptions = .literal) -> String {
-        let voptions = options.union(ZStringCompareOptions.backwards)
-        if let foundRange = str.range(of: sep, options:voptions) {// range searchRange: Range<Index>? = default, locale: NSLocale? = default) -> Range<Index>?
-            let range = foundRange.upperBound ..< str.endIndex
+        if let range = rangeOfWordAtEnd(str, sep:sep, options:options) {
             let tail = str[range]
             return String(tail)
+        }
+        return str
+    }
+
+    class func PopTailWord(_ str:inout String, sep:String = " ", options:ZStringCompareOptions = .literal) -> String {
+        if let range = rangeOfWordAtEnd(str, sep:sep, options:options) {
+            let tail = str[range]
+            str.removeSubrange(range)
+            str = ZStrUtil.Trim(str)
+            return String(tail)
+        }
+        return str
+    }
+
+    class func PopHeadWord(_ str:inout String, sep:String = " ", options:ZStringCompareOptions = .literal) -> String {
+        if let range = rangeOfWordAtStart(str, sep:sep, options:options) {
+            let head = str[range]
+            str.removeSubrange(range)
+            str = ZStrUtil.Trim(str)
+            return String(head)
         }
         return str
     }
@@ -546,3 +564,19 @@ class ZStrUtil {
 
 }
 
+private func rangeOfWordAtEnd(_ str: String, sep:String, options:ZStringCompareOptions) -> Range<String.Index>? {
+    let voptions = options.union(ZStringCompareOptions.backwards)
+    if let foundRange = str.range(of: sep, options:voptions) {
+        let range = foundRange.upperBound ..< str.endIndex
+        return range
+    }
+    return nil
+}
+
+private func rangeOfWordAtStart(_ str: String, sep:String, options:ZStringCompareOptions) -> Range<String.Index>? {
+    if let foundRange = str.range(of:sep, options:options) {
+        let range = str.startIndex ..< foundRange.lowerBound
+        return range
+    }
+    return nil
+}

@@ -10,8 +10,11 @@ import Foundation
 
 typealias ZOutputStream = OutputStream
 
-private func dm() -> FileManager {
-    return FileManager.default
+struct ZFileInfo
+{
+    var dataSize = 0
+    var created = ZTime.Null, modified = ZTime.Null, accessed = ZTime.Null
+    var isLocked = false, isHidden = false, isFolder = false, isLink = false
 }
 
 class ZFileUrl : ZUrl {
@@ -41,6 +44,10 @@ class ZFileUrl : ZUrl {
         super.init(nsUrl:nsUrl)
     }
     
+//    required init(from decoder: Decoder) throws {
+//        try super.init(from:decoder)
+//    }
+//    
     var FilePath : String {
         get {
             let str = url?.path ?? ""
@@ -51,10 +58,10 @@ class ZFileUrl : ZUrl {
         }
     }
 
-    func OpenOutput(append:Bool = false) -> (ZOutputStream?, ZError?) {
+    func OpenOutput(append:Bool = false) -> (ZOutputStream?, Error?) {
         if let stream = OutputStream(url:url!, append:append) {
             stream.open()
-            return (stream, stream.streamError as! ZError?)
+            return (stream, stream.streamError)
         }
         return (nil, ZError(message:"couldm't make stream"))
     }
@@ -91,11 +98,6 @@ class ZFileUrl : ZUrl {
         return ""
     }
     
-    func AppendedPath(_ path:String, isDir:Bool = false) -> ZFileUrl{
-        return ZFileUrl(nsUrl:url!.appendingPathComponent(path, isDirectory:isDir))
-        //        return path.stringByAppendingPathComponent("thisShouldBeTheNameOfTheFile")
-    }
-    
     static func GetLegalFilename(_ filename:String) -> String {
         var str = ZStrUtil.UrlEncode(filename)!
         if str.count > 200 {
@@ -117,16 +119,7 @@ class ZFileUrl : ZUrl {
         }
         return ("", "", "", "")
     }
-}
 
-struct ZFileInfo
-{
-    var dataSize = 0
-    var created = ZTime.Null, modified = ZTime.Null, accessed = ZTime.Null
-    var isLocked = false, isHidden = false, isFolder = false, isLink = false
-}
-
-extension ZFileUrl {
     func GetInfo( ) -> (ZFileInfo, Error?) {
         var info = ZFileInfo()
         if url == nil {
@@ -187,9 +180,7 @@ extension ZFileUrl {
         }
         return -1
     }
-}
 
-extension ZFileUrl {
     struct WalkOptions : OptionSet {
         let rawValue: Int
         init(rawValue: Int) { self.rawValue = rawValue }
@@ -246,11 +237,7 @@ extension ZFileUrl {
         
         return nil
     }
-}
-func |(a:ZFileUrl.WalkOptions, b:ZFileUrl.WalkOptions) -> ZFileUrl.WalkOptions { return ZFileUrl.WalkOptions(rawValue: a.rawValue | b.rawValue) }
-func &(a:ZFileUrl.WalkOptions, b:ZFileUrl.WalkOptions) -> Bool       { return (a.rawValue & b.rawValue) != 0                  }
 
-extension ZFileUrl {
     @discardableResult func CopyTo(_ to: ZFileUrl) -> Error? {
         do {
             try dm().copyItem(at: self.url! as URL, to:to.url! as URL)
@@ -318,4 +305,17 @@ extension ZFileUrl {
         }
         return (nil, errors)
     }
+
+    func AppendedPath(_ path:String, isDir:Bool = false) -> ZFileUrl{
+        return ZFileUrl(nsUrl:url!.appendingPathComponent(path, isDirectory:isDir))
+    }
 }
+
+private func dm() -> FileManager {
+    return FileManager.default
+}
+
+func |(a:ZFileUrl.WalkOptions, b:ZFileUrl.WalkOptions) -> ZFileUrl.WalkOptions { return ZFileUrl.WalkOptions(rawValue: a.rawValue | b.rawValue) }
+func &(a:ZFileUrl.WalkOptions, b:ZFileUrl.WalkOptions) -> Bool       { return (a.rawValue & b.rawValue) != 0                  }
+
+

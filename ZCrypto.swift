@@ -54,7 +54,7 @@ struct ZCrypto {
         let data = Data(bytes: UnsafePointer<UInt8>(result), count:digestLen)
         
         let base64 = data.base64EncodedString(options: NSData.Base64EncodingOptions())
-        result.deinitialize()
+        result.deinitialize(count:digestLen)
         
         return String(base64)
     }

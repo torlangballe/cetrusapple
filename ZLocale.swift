@@ -27,25 +27,30 @@ struct ZLocale {
     }
 
     static func GetBCPFromLanguageAndCountryCode(langCode: String, countryCode:String) -> String {
+        var lang = langCode
         var ccode = countryCode
         if ccode == "uk" {
             ccode = "gb"
         }
         if ccode == "" {
-            switch langCode {
+            switch lang {
+                case "us":
+                    lang = "en"
+                    ccode = "us"
                 case "ja":
                     ccode = "jp"
                 case "sw":
                     ccode = "se"
                 case "da":
                     ccode = "dk"
-                case "en":
+                case "en", "uk":
+                    lang = "en"
                     ccode = "gb"
                 default:
-                    ccode = langCode
+                    ccode = lang
             }
         }
-        return langCode.lowercased() + "-" + ccode.uppercased()
+        return lang.lowercased() + "-" + ccode.uppercased()
     }
     
     static func GetDeviceLanguageCode(forceNo:Bool = true) -> String {
@@ -372,7 +377,7 @@ struct ZLocale {
         return distance + " " + word
     }
     
-    static func MemorySizeAsString(_ b:Int, langCode:String = "", maxSignificant:Int = 3) -> String {
+    static func MemorySizeAsString(_ b:Int64, langCode:String = "", maxSignificant:Int = 3) -> String {
         let kiloByte  = 1024.0
         let megaByte  = kiloByte * 1024
         let gigaByte  = megaByte * 1024

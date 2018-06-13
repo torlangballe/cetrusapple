@@ -22,6 +22,7 @@ class ZSpeechRecognizer : NSObject, SFSpeechRecognizerDelegate {
     var task: SFSpeechRecognitionTask? = nil
     let audioEngine = AVAudioEngine()
     var sampleConsumerFunction: ((_ sample:Float32)->Void)? = nil
+    var splitIntoWords = false
     
     static func RequestToUse(done:@escaping (_ accepted:Bool)->Void) {
         SFSpeechRecognizer.requestAuthorization() { (status) in
@@ -45,24 +46,33 @@ class ZSpeechRecognizer : NSObject, SFSpeechRecognizerDelegate {
     }
     
     func RecognizeFromFile(file:ZFileUrl, locale:String, done:@escaping (_ state:State, _ cues:[ZCue], _ error:Error?)->Void) {
+        var loc = locale
+        if loc == "no-NO" {
+            loc = "nb-NO"
+        }
         if recognizer == nil {
-            recognizer = SFSpeechRecognizer(locale:Locale(identifier:locale))
+            recognizer = SFSpeechRecognizer(locale:Locale(identifier:loc))
             recognizer?.delegate = self
         }
         let request = SFSpeechURLRecognitionRequest(url:file.url!)
         request.shouldReportPartialResults = false
+        request.taskHint = .unspecified
         ZSpeechRecognizer.limiter.Add()
+        let split = splitIntoWords // we need to store this, as self is actually nil when closure completes
         task = recognizer?.recognitionTask(with:request) { [weak self] (result, error) in
             var cues = [ZCue]()
             if error == nil {
                 for s in result!.bestTranscription.segments {
-                    var cue = ZCue()
-                    cue.type = ZCue.CueType.inlineSpeech.rawValue
-                    cue.start = s.timestamp
-                    cue.end = s.timestamp + s.duration
-                    cue.value = s.substring
-                    cues.append(cue)
-                    print("speach text:", cue.value ?? "", cue.start)
+                    if split {
+                        cues += splitSegment(s)
+                    } else {
+                        var cue = ZCue()
+                        cue.type = ZCue.CueType.inlineSpeech.rawValue
+                        cue.start = s.timestamp
+                        cue.end = s.timestamp + s.duration
+                        cue.value = s.substring
+                        cues.append(cue)
+                    }
                 }
             }
             if error != nil || (result != nil && result!.isFinal) {
@@ -172,4 +182,21 @@ class ZSpeechRecognizer : NSObject, SFSpeechRecognizerDelegate {
         }
     }
 }
+
+private func splitSegment(_ segment:SFTranscriptionSegment) -> [ZCue] {
+    var cues = [ZCue]()
+    let parts = segment.substring.split(separator:" ")
+    let len = Double(parts.count)
+    for (i, p) in parts.enumerated() {
+        var cue = ZCue()
+        cue.type = ZCue.CueType.inlineSpeech.rawValue
+        cue.start = segment.timestamp + segment.duration * Double(i) / len
+        cue.end = segment.timestamp + segment.duration * Double(i+1) / len
+        cue.value = String(p)
+        cues.append(cue)
+        print("speech text:", cue.start, cue.value ?? "", cue.end)
+    }
+    return cues
+}
+
 

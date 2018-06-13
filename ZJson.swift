@@ -20,9 +20,28 @@ typealias ZJSON = JSON
 extension ZJSON {
     static func FromString(_ rawUtf8String:String) ->ZJSON? {
         if let data = ZData(utfString:rawUtf8String) {
-            return ZJSON(data:data)
+            var error:Error? = nil
+            return ZJSON(zdata:data, error:&error)
         }
         return nil
+    }
+    
+    init?(zdata:Data, error:inout Error?) {
+        do {
+            try self = ZJSON(data:zdata)
+        } catch let err {
+            ZDebug.Print("ZJSON.init(zdata) error:", err.localizedDescription, "data:", zdata.GetString().prefix(400))
+            error = err
+            return nil
+        }
+    }
+    
+    init?(zdata:Data) {
+        do {
+            try self = ZJSON(data:zdata)
+        } catch _ {
+            return nil
+        }
     }
     
     init(time:ZTime) {

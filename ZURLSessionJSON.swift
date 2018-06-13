@@ -11,11 +11,13 @@ import Foundation
 extension ZUrlSession {
     static func SendGetJson(_ req:ZUrlRequest, onMain:Bool = true, async:Bool = true, sessionCount:Int = -1, debug:Bool = false, done:@escaping (_ response:ZUrlResponse?, _ json:ZJSON, _ error:Error?)->Void) {
         ZUrlSession.Send(req, onMain:onMain, async:async, sessionCount:sessionCount, makeStatusCodeError:true) { (response, data, error, sessionCount) in
-            var json = JSON.JDict()
             if error == nil && data != nil {
-                json = JSON(data:data!)
+                var err:Error? = nil
+                let json = ZJSON(zdata:data!, error:&err)
+                done(response, json ?? ZJSON(), err)
+                return
             }
-            done(response, json, error)
+            done(response, ZJSON(), error)
         }
     }
 }
