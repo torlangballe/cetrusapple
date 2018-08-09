@@ -26,7 +26,7 @@ typealias ZNotification = UNNotificationRequest
 struct ZNotificationInfo {
     var sendInSecs:Float = 0
     var repeats:Bool = false
-    var triggerTime:ZTime = ZTime.Null
+    var triggerTime:ZTime = ZTimeNull
     var soundName = ""
     var title = ""
     var body = ""

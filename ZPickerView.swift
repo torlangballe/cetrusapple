@@ -112,7 +112,7 @@ class ZLabelPickerView : ZPickerView {
             var s = ZSize()
             for str in c.titles {
                 t.text = str
-                s |= t.GetBounds().size
+                s.Maximize(t.GetBounds().size)
                 maximize(&rowHeight, s.h)
             }
             columns[i].width = s.w * 1.05

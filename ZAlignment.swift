@@ -122,7 +122,7 @@ struct ZAlignment : OptionSet, CustomDebugStringConvertible, CustomStringConvert
         if self & ZAlignment.VertOut { parts.append("vertout") }
         if self & ZAlignment.NonProp { parts.append("nonprop") }
         if self & ZAlignment.HorJustify { parts.append("horjustify") }
-        return ZStrUtil.Join(parts, sep:" ")
+        return ZStr.Join(parts, sep:" ")
     }
     
     var debugDescription: String { //

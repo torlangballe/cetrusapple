@@ -1,5 +1,4 @@
-//  zUIContainerView.swift
-//  Zed
+//  ZContainerView.swift
 //  Created by Tor Langballe on /23/9/14.
 
 import UIKit

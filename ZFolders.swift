@@ -67,7 +67,7 @@ struct ZFolders {
                         return ZFileUrl(nsUrl:Bundle.main.bundleURL)
                     }
                     var (base, _, stub, ext) = ZFileUrl.GetPathParts(addPath)
-                    ext = ZStrUtil.Body(ext, pos:1)
+                    ext = ZStr.Body(ext, pos:1)
                     if let respath = Bundle.main.path(forResource: stub, ofType:ext, inDirectory:base) {
                         return ZFileUrl(filePath:respath)
                     }

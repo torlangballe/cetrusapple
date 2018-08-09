@@ -1,24 +1,24 @@
 //
-//  ZView.swift
-//  Zed
+//  ZViewIOS.swift
+//  capsule.fm
 //
-//  Created by Tor Langballe on /23/9/14.
-//  Copyright (c) 2014 Capsule.fm. All rights reserved.
+//  Created by Tor Langballe on /13/7/18.
 //
+
+// #package com.github.torlangballe.zetrus
 
 import UIKit
 
 enum ZGestureType:Int { case tap = 1, longpress = 2, pan = 4, pinch = 8, swipe = 16, rotation = 32 }
 enum ZGestureState:Int { case began = 1, ended = 2, changed = 4, possible = 8, canceled = 16, failed = 32 }
+typealias ZViewContentMode = UIViewContentMode
+
+var collapsedViews = [UIView:ZContainerView]()
 
 protocol ZView {
     var objectName: String { get set }
-    
-    var Usable: Bool { get set }
+    var  Usable: Bool { get set }
     func View() -> UIView
-    //    func Push(over:ZView?, duration:Float, transition:ZTransitionType, oldTransition:ZTransitionType, makeFull:Bool, useableArea:Bool, deleteOld:Bool, done:(()->Void)?)
-    var  Rect: ZRect { get set }
-    var  LocalRect: ZRect { get }
     func Child(_ path: String) -> UIView?
     func DumpTree()
     func Pop(animated:Bool, done:(()->Void)?)
@@ -32,19 +32,13 @@ protocol ZView {
     func SetCornerRadius(_ radius:Double)
     func SetStroke(width:Double, color:ZColor)
     func Expose(_ fadeIn:Float)
-    //    func ExposeWithFadeIn(fadeIn:Float)
     func Scale(_ scale:Double)
     func GetContainer() -> ZContainerView?
     func CollapseInParent(collapse:Bool, arrange:Bool)
     func GetContainerAndCellIndex() -> (ZContainerView, Int)?
 }
 
-typealias ZViewContentMode = UIViewContentMode
-
-var collapsedViews = [UIView:ZContainerView]()
-
 extension ZView {
-
     var Rect: ZRect {
         get { return ZRect(View().frame) }
         set { View().frame = newValue.GetCGRect() }
@@ -52,27 +46,8 @@ extension ZView {
     var LocalRect: ZRect {
         return ZRect(size:Rect.size)
     }
-    /*
-    func Push(over:ZView? = nil, duration:Float = 0.5, transition:ZTransitionType = .none, oldTransition:ZTransitionType = .reverse, makeFull:Bool = true, useableArea:Bool = true, deleteOld:Bool = false, done:(()->Void)? = nil) {
-        ZPresentView(self, duration:duration, transition:transition, oldTransition:oldTransition, makeFull:makeFull, useableArea:useableArea, deleteOld:deleteOld, done:done)
-    }
-    */
-    
-    /*
-    func Push(duration duration:Float = 0.5, transition:ZTransitionType = .None, fadeSubView: UIView? = nil, makeFull:Bool = true, removeOld:Bool = false, done:(()->Void)? = nil) {
-        // http://stackoverflow.com/questions/12741224/ios-modal-viewcontroller-with-transparent-background
-        if makeFull {
-            if let v = View() as? ZContainerView {
-                v.SetAsFullView(useableArea:true)
-                v.ArrangeChildren()
-            }
-        }
-        ZPresentView(self, duration:duration, transition:transition, fadeSubView:fadeSubView, removeOld:removeOld, done:done)
-    }
-    */
     func Pop(animated:Bool = true, done:(()->Void)? = nil) {
         ZPopTopView(animated:animated, done:done)
-        //        ZGetViewControllerForView(self)!.dismissViewControllerAnimated(animated, completion:done)
     }
     func Show(_ show:Bool = true) {
         View().isHidden = !show
@@ -142,7 +117,7 @@ extension ZView {
     func Expose(_ fadeIn:Float = 0) {
         View().setNeedsDisplay()
     }
-
+    
     func Scale(_ scale:Double) {
         View().transform = CGAffineTransform.identity.scaledBy(x: CGFloat(scale), y: CGFloat(scale))
     }
@@ -156,7 +131,7 @@ extension ZView {
         }
         return nil
     }
-
+    
     func CollapseInParent(collapse:Bool = true, arrange:Bool = false) {
         if let c = GetContainer() {
             if collapse {
@@ -167,7 +142,7 @@ extension ZView {
             c.CollapseChild(self, collapse:collapse, arrange:arrange)
         }
     }
-
+    
     func GetContainerAndCellIndex() -> (ZContainerView, Int)? {
         if let container = GetContainer() {
             for (i, c) in container.cells.enumerated() {
@@ -178,23 +153,23 @@ extension ZView {
         }
         return nil
     }
-
+    
     func GetViewRenderedAsImage() -> ZImage? {
         UIGraphicsBeginImageContextWithOptions(View().bounds.size, View().isOpaque, 0.0);
         View().layer.render(in: UIGraphicsGetCurrentContext()!)
         let image = UIGraphicsGetImageFromCurrentImageContext()
         UIGraphicsEndImageContext();
-    
+        
         return image
     }
-
+    
 }
 
 func dumpUIViewTree(_ view: UIView, padding: String) {
     if let v = view as? ZView {
         ZDebug.Print(padding + v.objectName)
     } else {
-        ZDebug.Print(padding + swift.GetClassName(view))
+        ZDebug.Print(padding, "\(view)")
     }
     for c in view.subviews as [UIView] {
         dumpUIViewTree(c, padding: padding + "  ")
@@ -205,11 +180,11 @@ func getUIViewChild(_ view: UIView, path: String) -> UIView? {
     var part = ""
     var vpath = path
     func popPath() -> Bool {
-        var parts = ZStrUtil.Split(path, sep: "/")
+        var parts = ZStr.Split(path, sep: "/")
         if let p = parts.first {
             part = p
             parts.removeLast()
-            vpath = ZStrUtil.Join(parts, sep: "/")
+            vpath = ZStr.Join(parts, sep: "/")
             return true
         }
         return false
@@ -232,7 +207,8 @@ func getUIViewChild(_ view: UIView, path: String) -> UIView? {
                 }
                 return nil
             } else if upper {
-                if part ==  swift.GetClassName(c) {
+                let name = "\(c)"
+                if part == name {
                     if !vpath.isEmpty {
                         return getUIViewChild(c, path:vpath)
                     }
@@ -244,13 +220,12 @@ func getUIViewChild(_ view: UIView, path: String) -> UIView? {
                 }
             }
         }
-    }
-    
+    }    
     return nil
 }
 
-
-protocol ZViewHandler: class {
+protocol ZViewHandler : class {
     func HandleClose(sender:ZView)
 }
+
 

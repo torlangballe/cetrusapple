@@ -288,7 +288,7 @@ class ZTextView : UITextView, UITextViewDelegate, ZTextBase, ZView {
     
     func ReplaceSelectedText(_ replaceText:String, positionAfter:Bool = false) {
         let (s, e) = Selection
-        text = ZStrUtil.Head(text, chars:s) + replaceText + ZStrUtil.Body(text, pos:e)
+        text = ZStr.Head(text, chars:s) + replaceText + ZStr.Body(text, pos:e)
         let end = s + replaceText.count
         if positionAfter {
             Selection = (end, e:end)

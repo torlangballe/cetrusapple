@@ -201,7 +201,7 @@ class ZUrlSession {
     
     static func DeleteAllCookiesForDomain(_ domain: String) {
         var vdomain = domain
-        let hasSuffix = ZStrUtil.HasPrefix(vdomain, prefix:"*", rest:&vdomain);
+        let hasSuffix = ZStr.HasPrefix(vdomain, prefix:"*", rest:&vdomain);
         if let store = HTTPCookieStorage.shared.cookies {
             for c in store {
                 if (hasSuffix && String(c.domain).hasSuffix(vdomain)) || (!hasSuffix && String(c.domain) == vdomain) {
@@ -237,7 +237,7 @@ class ZRateLimiter {
     }
     
     func Add() {
-        timeStamps.append(ZTime.Now)
+        timeStamps.append(ZTimeNow)
     }
     
     func IsExceded() -> Bool {

@@ -124,7 +124,7 @@ extension ZJSON {
             if let str = self.string {
                 var t = ZTime(iso8601Z:str)
                 if t == nil {
-                    t = ZTime(format:ZTime.IsoFormatWithZone, dateString:str)
+                    t = ZTime(format:ZTimeIsoFormatWithZone, dateString:str)
                 }
                 return t
             }

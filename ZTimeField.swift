@@ -32,7 +32,7 @@ class ZTimeField : ZShapeView {
             let confirm = ZConfirmStack() { (result) in
                 if result {
                     self!.edited = true
-                    self!.time = self!.picker!.date as ZTime
+                    self!.time = ZTime(date:self!.picker!.date)
                     self!.setTextFromTime()
                     self!.Expose()
                 }
@@ -60,7 +60,7 @@ class ZTimeField : ZShapeView {
         if showSeconds {
             stime += "::ss"
         }
-        let format = ZStrUtil.ConcatNonEmpty(separator:" ", items:sdate, stime)
+        let format = ZStr.ConcatNonEmpty(separator:" ", items:sdate, stime)
         text.text = time.GetString(format:format)
     }
     

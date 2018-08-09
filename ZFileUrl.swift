@@ -13,7 +13,7 @@ typealias ZOutputStream = OutputStream
 struct ZFileInfo
 {
     var dataSize = 0
-    var created = ZTime.Null, modified = ZTime.Null, accessed = ZTime.Null
+    var created = ZTimeNull, modified = ZTimeNull, accessed = ZTimeNull
     var isLocked = false, isHidden = false, isFolder = false, isLink = false
 }
 
@@ -99,9 +99,9 @@ class ZFileUrl : ZUrl {
     }
     
     static func GetLegalFilename(_ filename:String) -> String {
-        var str = ZStrUtil.UrlEncode(filename)!
+        var str = ZStr.UrlEncode(filename)!
         if str.count > 200 {
-            str = String(abs(filename.hashValue)) + "_" + ZStrUtil.Tail(str, chars:200)
+            str = String(abs(filename.hashValue)) + "_" + ZStr.Tail(str, chars:200)
         }
         return str
     }
@@ -128,8 +128,8 @@ class ZFileUrl : ZUrl {
         do {
             let dict = try dm().attributesOfItem(atPath: url!.path)
             info.dataSize = 0;
-            info.created = dict[FileAttributeKey.creationDate] as? ZTime ?? ZTime.Null
-            info.modified = dict[FileAttributeKey.modificationDate] as? ZTime ?? ZTime.Null
+            info.created = dict[FileAttributeKey.creationDate] as? ZTime ?? ZTimeNull
+            info.modified = dict[FileAttributeKey.modificationDate] as? ZTime ?? ZTimeNull
             info.isLocked = dict[FileAttributeKey.immutable] as? Bool ?? false
             //            info.isHidden = dict[FileAttributeKey URLResourceKey.isHiddenKey] as? Bool ?? false // extensionHidden ??
             
@@ -158,7 +158,7 @@ class ZFileUrl : ZUrl {
         }
         set {
             do {
-                try dm().setAttributes([FileAttributeKey.modificationDate:newValue], ofItemAtPath:url!.path)
+                try dm().setAttributes([FileAttributeKey.modificationDate:newValue.date], ofItemAtPath:url!.path)
             } catch let error as NSError {
                 ZDebug.Print("ZFileUrl set modified error:", error.description)
             }
@@ -223,7 +223,7 @@ class ZFileUrl : ZUrl {
                     }
                 }
                 if wildcard != nil {
-                    if !ZStrUtil.StrMatchsWildcard(name, wild:wildcard!) {
+                    if !ZStr.StrMatchsWildcard(name, wild:wildcard!) {
                         continue
                     }
                 }

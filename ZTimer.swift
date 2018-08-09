@@ -101,9 +101,17 @@ var ZMainQue: DispatchQueue {
     return DispatchQueue.main
 }
 
+var queCount = 1
+
 var queues = [String:DispatchQueue]()
 func ZGetBackgroundQue(name:String? = nil, serial:Bool = false) -> DispatchQueue {
-    let n = (name == nil) ? ZCrypto.MakeUuid() : name!
+    var n = ""
+    if name == nil {
+        n = "Que.\(queCount)"
+        queCount += 1
+    } else {
+        n = name!
+    }
     if let que = queues[n] {
         return que
     }

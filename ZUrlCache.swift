@@ -28,7 +28,7 @@ class ZUrlCache {
         if preCachedFolder.Exists() {
             preCachedFolder.Walk() { (furl, finfo) in
                 let name = furl.GetName()
-                if let url = ZStrUtil.UrlDecode(name) {
+                if let url = ZStr.UrlDecode(name) {
                     let file = MakeFile(url:url)
                     if !file.Exists() {
                         let err = furl.CopyTo(file)
@@ -63,7 +63,7 @@ class ZUrlCache {
     func MakeFile(url:String) -> ZFileUrl {
         //        let (base, _, stub, ext) = ZFileUrl.GetPathParts(url)
         //        let str = ZFileUrl.AbsString
-        //        let str = ZStrUtil.TruncateMiddle(base + stub, maxChars:100, separator:"…")
+        //        let str = ZStr.TruncateMiddle(base + stub, maxChars:100, separator:"…")
         var ext = ZUrl(string:url).Extension
         if ext.isEmpty {
             ext = defaultExtension
@@ -127,12 +127,12 @@ class ZUrlCache {
     }
 
     @discardableResult func GetUrl(_ url:String) -> ZFileUrl? { // discardable since sometimes we want to just force-cache something
-        if url == "http://capsuleaudio.s3.amazonaws.com/" {
-            print("bad url:", url)
+        if url.hasPrefix("https://polly.us-east-1.amazonaws.com") {
+            print("polly url:", url)
         }
         var file = ZFileUrl()
         if HasFile(url, file:&file) {
-            file.Modified = ZTime.Now
+            file.Modified = ZTimeNow
             return file
         }
         listMutex.Lock()
@@ -190,7 +190,7 @@ class ZUrlCache {
     }
     
     func RemoveOld(_ hours:Double) {
-        let time = ZTime.Now - hours * ZTime.hour
+        let time = ZTimeNow - hours * ZTimeHour
         folder.Walk(options:.GetInfo) { (file, info) in
             if info.modified < time {
                 if persistent {

@@ -12,8 +12,6 @@ class ZTitleBar : ZStackView {
     enum CloseButtons: String { case left = "arrow.left", down = "arrow.down", cross = "cross", none = "" }
     var closeButton: ZImageView
     let notchInc = 16
-    var dots: ZCountDots? = nil
-    //    let horStack = ZHStackView(space:16)
     let title: ZLabel
     var sizeCalculated = false
     weak var closeHandler:ZViewHandler? = nil
@@ -32,13 +30,6 @@ class ZTitleBar : ZStackView {
         space = 0
         margin = ZRect(0, 0, 0, -4)
         accessibilityLabel = text
-        if showDots {
-            dots = ZCountDots()
-            dots?.circleWidth = 12
-            dots?.circleAlign = .Left
-            dots?.space = 1
-            Add(dots!, align:.Right | .Bottom, marg:ZSize(2, 8))
-        }
         minSize = ZSize(100, 60)
 //        if ZScreen.HasNotch() {
 //            minSize.h += 88
@@ -54,8 +45,6 @@ class ZTitleBar : ZStackView {
     required init?(coder aDecoder: NSCoder) { fatalError("init(coder:) has not been implemented") }
 
     func SetDotCount(_ count:Int, level:Int, arrange:Bool = false) {
-        dots?.Count = count
-        dots?.Level = level
         if arrange {
             ArrangeChildrenAnimated()
         }

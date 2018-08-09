@@ -87,7 +87,7 @@ class ZAppController : UIResponder, UIApplicationDelegate, UNUserNotificationCen
         var tokenString = ""
         
         for i in 0 ..< deviceToken.count {
-            tokenString += String(format: "%02.2hhx", arguments: [tokenChars[i]])
+            tokenString += ZStr.Format( "%02.2hhx", [tokenChars[i]])
         }
         mainZApp?.HandleGotPushToken(tokenString)
     }
@@ -229,20 +229,20 @@ class ZAppController : UIResponder, UIApplicationDelegate, UNUserNotificationCen
     }
     
     func applicationDidEnterBackground(_ application:UIApplication) {
-        mainZApp?.backgroundTime = ZTime.Now
-        mainZApp?.activationTime = ZTime.Null
+        mainZApp?.backgroundTime = ZTimeNow
+        mainZApp?.activationTime = ZTimeNull
         mainZApp?.HandleBackgrounded(true)
     }
     
     func applicationWillEnterForeground(_ application:UIApplication) {
-        mainZApp?.activationTime = ZTime.Now
-        mainZApp?.backgroundTime = ZTime.Null
+        mainZApp?.activationTime = ZTimeNow
+        mainZApp?.backgroundTime = ZTimeNull
         mainZApp?.HandleBackgrounded(false)
     }
     
     func applicationWillResignActive(_ application:UIApplication) {
         mainZApp?.HandleActivated(false)
-        mainZApp?.activationTime = ZTime.Null
+        mainZApp?.activationTime = ZTimeNull
         ZRecusivelyHandleActivation(activated:false)
     }
     
@@ -253,7 +253,7 @@ class ZAppController : UIResponder, UIApplicationDelegate, UNUserNotificationCen
     
     func applicationDidBecomeActive(_ application:UIApplication) {
 //!        FBSDKAppEvents.activateApp()
-        mainZApp?.activationTime = ZTime.Now
+        mainZApp?.activationTime = ZTimeNow
         mainZApp?.HandleActivated(true)
         ZRecusivelyHandleActivation(activated:true)
     }

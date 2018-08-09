@@ -11,9 +11,9 @@ import MediaPlayer
 
 class ZApp : ZObject {
     static var appFile: ZFileUrl? = nil
-    var activationTime = ZTime.Null
-    var backgroundTime = ZTime.Null // -1 if not in background
-    var startTime = ZTime.Now
+    var activationTime = ZTimeNull
+    var backgroundTime = ZTimeNull // -1 if not in background
+    var startTime = ZTimeNow
     var startedCount = 0
     var oldVersion = 0.0
 
@@ -29,7 +29,7 @@ class ZApp : ZObject {
         let bundle = Bundle.main
         if let sbuild = bundle.infoDictionary?["CFBundleVersion"] as? String,
             var sver = bundle.infoDictionary?["CFBundleShortVersionString"] as? String {
-                sver = ZStrUtil.HeadUntil(sver, sep:"abc")
+                sver = ZStr.HeadUntil(sver, sep:"abc")
                 if let build = Int(sbuild), let ver = Float(sver) {
                     return (sver, ver, build)
                 }
@@ -38,15 +38,15 @@ class ZApp : ZObject {
     }
 
     func GetRuntimeSecs() -> Double {
-        return ZTime.Now - activationTime
+        return ZTimeNow - activationTime
     }
     
     func GetbackgroundTimeSecs() -> Double {
-        return ZTime.Now - backgroundTime
+        return ZTimeNow - backgroundTime
     }
     
     override init() {
-        activationTime = ZTime.Now
+        activationTime = ZTimeNow
         super.init()
         mainZApp = self
     }

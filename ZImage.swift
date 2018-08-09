@@ -265,7 +265,7 @@ extension ZImage {
         if cache {
             return MainCache.DownloadFromUrl(url, done:done)
         }
-        //        let start = ZTime.Now
+        //        let start = ZTimeNow
         let req = ZUrlRequest.Make(.Get, url:url)
         return ZUrlSession.Send(req, onMain:false, makeStatusCodeError:true) { (resp, data, err, code) in
             if err != nil {
@@ -516,7 +516,7 @@ class ZImageCache : ZTimerOwner {
                 }
                 return nil
             }
-            c.stamp = ZTime.Now
+            c.stamp = ZTimeNow
             cache[url] = c
             done?(c.image)
             return nil
@@ -537,7 +537,7 @@ class ZImageCache : ZTimerOwner {
             cache.removeValue(forKey:oldestTupple.0)
         }
         var c2 = Cache()
-        c2.stamp = ZTime.Now
+        c2.stamp = ZTimeNow
         c2.getting = true
         self.cache[url] = c2
         return ZImage.DownloadFromUrl(url, cache:false, maxSize:maxSize) { (image) in

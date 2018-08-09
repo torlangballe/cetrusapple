@@ -21,6 +21,12 @@ extension Dictionary where Value : Equatable {
     }
 }
 
+extension String {
+    func Utf8() -> String.UTF8View {
+        return self.utf8
+    }
+}
+
 extension Dictionary where Value : Comparable {
     func keysSortedByValue() -> [Key] {
         return self.sorted{$0.1 > $1.1}.map{$0.0}
@@ -42,8 +48,8 @@ extension Dictionary where Key : Comparable {
         let sorted = self.keys.sorted(by: {$0 < $1})
         let params = sorted.map { (k)->String in
             if escape {
-                let percentEscapedKey = ZStrUtil.UrlQuote((k as! String))
-                let percentEscapedValue = ZStrUtil.UrlQuote((self[k] as! String))
+                let percentEscapedKey = ZStr.UrlQuote((k as! String))
+                let percentEscapedValue = ZStr.UrlQuote((self[k] as! String))
                 return "\(percentEscapedKey)=\(percentEscapedValue)"
             } else {
                 return "\(k)=\(String(describing: self[k]))"
@@ -80,6 +86,10 @@ extension ZRange {
 }
 
 extension Array {
+    mutating func removeAt(_ index:Int) {
+        self.remove(at:index)
+    }
+
     @discardableResult mutating func removeIf(_ check:(_ object:Element)-> Bool) -> Int {
         let c = count
         self = filter { return !check($0) }
@@ -248,21 +258,3 @@ func ZIsAnyObjectReal(_ a:ZAnyObject) -> Bool {
     }
     return false
 }
-
-@discardableResult func minimize<T: SignedNumeric & Comparable>(_ me: inout T, _ a: T) -> Bool {
-    if a < me {
-        me = a
-        return true
-    }
-    return false
-}
-
-@discardableResult func maximize<T: SignedNumeric & Comparable>(_ me: inout T, _ a: T) -> Bool {
-    if a > me {
-        me = a
-        return true
-    }
-    return false
-}
-
-

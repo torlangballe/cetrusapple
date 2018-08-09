@@ -75,7 +75,7 @@ class ZDatePartsField : ZShapeView {
         if useYear && year != nil {
             syear = "\(year!)" + ZLocale.GetDateInsertYearSymbol()
         }
-        let str = ZStrUtil.ConcatNonEmpty(separator:" ", items:sday, smonth, syear)
+        let str = ZStr.ConcatNonEmpty(separator:" ", items:sday, smonth, syear)
         text.text = str
         Expose()
     }

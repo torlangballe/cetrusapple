@@ -17,7 +17,7 @@ private var mainLoaded = false;
 func ZTS(_ str:String, langCode:String = "", filePath:String = #file, args:CVarArg...) -> String {
     var trans: Translations
     if langCode == "en" {
-        return str
+        return ZStr.Format(str, args)
     }
     if langCode != "" {
         trans = Translations()
@@ -28,9 +28,9 @@ func ZTS(_ str:String, langCode:String = "", filePath:String = #file, args:CVarA
         }
         trans = translations
     }
-    let fileName = ZStrUtil.TailUntil(filePath, sep:"/")
+    let fileName = ZStr.TailUntil(filePath, sep:"/")
     var r = trans.Find(str, fileName:fileName)
-    r = String(format:r, arguments:args)
+    r = ZStr.Format(r, args)
     return r
 }
 
@@ -48,9 +48,8 @@ class Translations {
             return trans
         }
         for (k, v) in dict {
-            var f = ""
-            var s = ""
-            if ZStrUtil.SplitInTwo(k, sep:":", first:&f, rest:&s) {
+            let (_, s) = ZStr.SplitInTwo(k, sep:":")
+            if s != "" {                
                 if s == str {
                     return v
                 }
@@ -92,14 +91,14 @@ class Translations {
             var trans = ""
             var isTrans = false
             var fileName = ""
-            let (sfile, _) = ZStrUtil.LoadFromFile(file)
-            ZStrUtil.ForEachLine(sfile) { (str) in
+            let (sfile, _) = ZStr.LoadFromFile(file)
+            ZStr.ForEachLine(sfile) { (str) in
                 var line = ""
                 var extra = ""
-                let label = ZStrUtil.HeadUntil(str, sep:" ", rest:&line)
+                let label = ZStr.HeadUntil(str, sep:" ", rest:&line)
                 switch label {
                 case "#:":
-                    fileName = ZStrUtil.TailUntil(ZStrUtil.Trim(line), sep:"/")
+                    fileName = ZStr.TailUntil(ZStr.Trim(line), sep:"/")
                     
                 case "msgid":
                     isTrans = false
@@ -135,11 +134,11 @@ class Translations {
 }
 
 @discardableResult private func getQuoted(_ str:String, dest: inout String) -> Bool {
-    var vstr = ZStrUtil.Trim(str, chars:" \t\r\n")
+    var vstr = ZStr.Trim(str, chars:" \t\r\n")
     if !vstr.isEmpty {
         if vstr.firstCharAsString == "\"" && vstr.lastCharAsString == "\"" {
-            vstr = ZStrUtil.Body(vstr, pos:1, size:vstr.count - 2)
-            dest += ZStrUtil.Unescape(vstr)
+            vstr = ZStr.Body(vstr, pos:1, size:vstr.count - 2)
+            dest += ZStr.Unescape(vstr)
             return true
         }
     }

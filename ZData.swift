@@ -44,7 +44,7 @@ extension ZData {
         
         var hex = ""
         for i in 0..<self.count {
-            hex += String(format: "%02x", buffer[i])
+            hex += ZStr.Format( "%02x", buffer[i])
         }
         return hex
     }
@@ -91,3 +91,4 @@ extension ZData {
         self.init(referencing:d as NSData)
     }
 }
+

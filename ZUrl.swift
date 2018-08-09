@@ -137,7 +137,7 @@ class ZUrl : Hashable  { // , Decodable, Encodable {
             if let q = url?.query {
                 return ZUrl.ParametersFromString(q)
             }
-            let tail = ZStrUtil.TailUntil((url?.absoluteString) ?? "", sep:"?")
+            let tail = ZStr.TailUntil((url?.absoluteString) ?? "", sep:"?")
             if !tail.isEmpty {
                 return ZUrl.ParametersFromString(tail)
             }

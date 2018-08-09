@@ -1,28 +1,31 @@
 //
-//  zrect.swift
-//  Zed
+//  ZRect.swift
 //
 //  Created by Tor Langballe on /23/9/14.
-//  Copyright (c) 2014 Capsule.fm. All rights reserved.
 //
+
+// #package com.github.torlangballe.zetrus
+
+/* #kotlin-raw:
+ import kotlin.math.*
+ */
 
 import UIKit
 
-struct ZRect
-{
-    var pos: ZPos
-    var size: ZSize
+struct ZRect {
+    var pos: ZPos = ZPos()
+    var size: ZSize = ZSize()
     
-    var IsNull: Bool { return pos.x == 0 && pos.y == 0 && size.w == 0 && size.h == 0 }
+    var IsNull: Bool { return pos.x == 0.0 && pos.y == 0.0 && size.w == 0.0 && size.h == 0.0 }
     var TopLeft: ZPos      { return Min }
     var TopRight: ZPos     { return ZPos(Max.x, Min.y) }
     var BottomLeft: ZPos   { return ZPos(Min.x, Max.y) }
     var BottomRight: ZPos  { return Max }
-    static var Null: ZRect { get { return ZRect(0, 0, 0, 0) } }
+    static var Null: ZRect { get { return ZRect(0.0, 0.0, 0.0, 0.0) } }
     
     var MaxPos : ZPos {
         get { return Max }
-        set { pos += (newValue - Max) }
+        set { pos.operator_plusAssign(newValue - Max) }
     }
     var Max: ZPos {
         get { return ZPos(pos.x + size.w, pos.y + size.h) }
@@ -34,35 +37,39 @@ struct ZRect
     var Min: ZPos {
         get { return pos }
         set {
-            size += (pos - newValue).Size
+            size += newValue.Size
             pos = newValue
         }
     }
     var Center : ZPos {
         get { return pos + size / 2 }
-        set { pos = newValue - size.GetPos() / 2 }
+        set { pos = newValue - size.GetPos() / 2.0 }
     }
 
-    init()                                                       { pos = ZPos(); size = ZSize() }
-    init(_ x0:Float64, _ y0:Float64, _ x1:Float64, _ y1:Float64) { pos = ZPos(x0, y0); size = ZSize(x1 - x0 , y1 - y0) }
-    init(_ r: CGRect)                                            { pos = ZPos(r.origin); size = ZSize(r.size) }
-    init(min: ZPos, max: ZPos)                                   { pos = min; size = ZSize(max.x - pos.x, max.y - pos.y) }
-    init(pos: ZPos = ZPos(0, 0), size: ZSize = ZSize(0, 0))      { self.pos = pos; self.size = size  }
-    init(center:ZPos, radiusSize:ZSize)                          { pos = center - radiusSize.GetPos(); size = radiusSize * Float64(2) }
-    init(center:ZPos, radius:Double)                             { self.init(center:center, radiusSize:ZSize(radius, radius)) }
-    
-    func GetCGRect() -> CGRect                                   { return CGRect(origin: pos.GetCGPoint(), size:size.GetCGSize())  }
+    init(_ x0:Float64, _ y0:Float64, _ x1:Float64, _ y1:Float64) { self.init(pos:ZPos(x0, y0), size:ZSize(x1 - x0, y1 - y0)) }
+    init(min: ZPos, max: ZPos)                                   { self.init(pos:min, size:ZSize(max.x - min.x, max.y - min.y)) }
+
+    init(center:ZPos, radius:Double, radiusy:Double? = nil) {
+        var s = ZSize(radius, radius)
+        if radiusy != nil {
+            s = ZSize(radius, radiusy!)
+        }
+        self.init(pos:center - s.GetPos(), size:s * 2)
+    }
+
     func Expanded(_ e: ZSize) -> ZRect                           { return ZRect(pos: pos - e.GetPos(), size:size + e * Float64(2.0)); }
     func Expanded(_ n: Float64) -> ZRect                         { return Expanded(ZSize(n, n)) }
     func Centered(_ center:ZPos) -> ZRect                        { return ZRect(pos:center-size.GetPos()/2, size:size) }
     func Overlaps(_ rect:ZRect) -> Bool                          { return rect.Min.x < Max.x && rect.Min.y < Max.y && rect.Max.x > Min.x && rect.Max.y > Min.y }
     func Contains(_ pos:ZPos) -> Bool                            { return pos.x >= Min.x && pos.x <= Max.x && pos.y >= Min.y && pos.y <= Max.y }
     func Align(_ s:ZSize, align:ZAlignment, marg:ZSize = ZSize(), maxSize:ZSize = ZSize()) -> ZRect {
-        var wa, wf, ha, hf, x, y: Double;
-        var scalex, scaley: Double;
+        var x: Double
+        var y: Double
+        var scalex:Double
+        var scaley:Double
         
-        wa = Double(s.w)
-        wf = Double(size.w)
+        var wa = Double(s.w)
+        var wf = Double(size.w)
         //        if (align & (ZAlignment.HorShrink|ZAlignment.HorExpand)) {
         if !(align & .MarginIsOffset) {
             wf -= Double(marg.w)
@@ -71,8 +78,8 @@ struct ZRect
             }
         }
         //        }
-        ha = Double(s.h)
-        hf = Double(size.h)
+        var ha = Double(s.h)
+        var hf = Double(size.h)
         //        if (align & (ZAlignment.VertShrink|ZAlignment.VertExpand)) {
         if !(align & .MarginIsOffset) {
             hf -= Double(marg.h * 2)
@@ -186,7 +193,7 @@ struct ZRect
                 }
                 x = x + (wf - wa) / 2
                 if align & .MarginIsOffset {
-                    x += Double(marg.w)
+                    x  += Double(marg.w)
                 }
             }
         }
@@ -210,7 +217,7 @@ struct ZRect
             } else {
                 y = Double(pos.y)
                 if !(align & .MarginIsOffset) {
-                    y += Double(marg.h)
+                    y  += Double(marg.h)
                 }
                 y = y + max(0.0, hf - ha) / 2.0;
                 if align & .MarginIsOffset {
@@ -221,63 +228,88 @@ struct ZRect
         return ZRect(pos:ZPos(x, y), size:ZSize(wa, ha));
     }
     
-    static func MergeAll(_ rects:inout [ZRect]) {
-        var merged:Bool
-        repeat {
+    static func MergeAll(_ rects:[ZRect]) -> [ZRect] {
+        var merged = true
+        var rold = rects
+        while merged {
+            var rnew:[ZRect] = []
             merged = false;
-            for (i, r) in rects.enumerated() {
-                for j in i + 1 ..< rects.count {
-                    if r.Overlaps(rects[j].Expanded(4)) {
-                        rects[i] |= rects[j]
-                        rects.remove(at: j)
+            for (i, r) in rold.enumerated() {
+                var used = false
+                for j in i + 1 ..< rold.count {
+                    if r.Overlaps(rold[j].Expanded(4.0)) {
+                        var n = rects[i]
+                        n.UnionWith(rect:rold[j])
+                        rnew.append(n)
                         merged = true
+                        used = true
                     }
                 }
+                if !used {
+                    rnew.append(r)
+                }
             }
-        } while merged
+            rold = rnew
+        }
+        return rold
     }
     
     mutating func MoveInto(_ rect:ZRect) {
-        maximize(&pos.x, rect.pos.x)
-        maximize(&pos.y, rect.pos.y)
-        minimize(&MaxPos.x, rect.MaxPos.x)
-        minimize(&MaxPos.y, rect.MaxPos.y)
+        pos.x = max(pos.x, rect.pos.x)
+        pos.y = max(pos.y, rect.pos.y)
+        MaxPos.x = min(MaxPos.x, rect.MaxPos.x)
+        MaxPos.y = min(MaxPos.y, rect.MaxPos.y)
     }
-}
-
-func +(me:ZRect, a:ZRect) -> ZRect      { return ZRect(min:me.pos + a.pos, max:me.Max + a.Max) }
-func -(me:ZRect, a:ZRect) -> ZRect      { return ZRect(min:me.pos - a.pos, max:me.Max - a.Max) }
-func +=(me:inout ZRect, a:ZRect)        { me = me + a }
-func -=(me:inout ZRect, a:ZRect)        { me = me - a }
-func +=(me:inout ZRect, a:ZPos)         { me.pos += a }
-func -=(me:inout ZRect, a:ZPos)         { me.pos -= a }
-func /(me:ZRect, a:ZSize) -> ZRect      { return ZRect(min:me.Min / a.GetPos(), max:me.Max / a.GetPos()) }
-
-func |=(me:inout ZRect, r:ZRect) {
-    if !r.IsNull {
-        if me.IsNull {
-            me = r
-        } else {
-            if r.Min.x < me.Min.x { me.Min.x = r.Min.x }
-            if r.Min.y < me.Min.y { me.Min.y = r.Min.y }
-            if r.Max.x > me.Max.x { me.Max.x = r.Max.x }
-            if r.Max.y > me.Max.y { me.Max.y = r.Max.y }
+    
+    mutating func UnionWith(rect:ZRect) {
+        if !rect.IsNull {
+            if IsNull {
+                self = rect
+            } else {
+                if rect.Min.x < Min.x { Min.x = rect.Min.x }
+                if rect.Min.y < Min.y { Min.y = rect.Min.y }
+                if rect.Max.x > Max.x { Max.x = rect.Max.x }
+                if rect.Max.y > Max.y { Max.y = rect.Max.y }
+            }
         }
     }
+    
+    mutating func UnionWith(pos:ZPos) {
+        if pos.x > Max.x { Max.x = pos.x }
+        if pos.y > Max.y { Max.y = pos.y }
+        if pos.x < Min.x { Min.x = pos.x }
+        if pos.y < Min.y { Min.y = pos.y }
+    }
+    
+    func operator_plus(_ a:ZRect) -> ZRect     { return ZRect(min:pos + a.pos, max:Max + a.Max) }
+    func operator_minus(_ a:ZRect) -> ZRect    { return ZRect(min:pos - a.pos, max:Max - a.Max) }
+    func operator_div(_ a:ZSize) -> ZRect      { return ZRect(min:Min / a.GetPos(), max:Max / a.GetPos()) }
+    mutating func operator_plusAssign(_ a:ZRect)        { pos += (a.pos); Max += (a.Max) }
+    mutating func operator_minusAssign(_ a:ZRect)       { pos -= (a.pos); Max -= (a.Max) }
+    mutating func operator_plusAssign(_ a:ZPos)         { pos += a }
+    mutating func vminusAssign(_ a:ZPos)        { pos -= a }
+
+    // #swift-only:
+    init(pos:ZPos = ZPos(), size:ZSize = ZSize()) { self.pos = pos; self.size = size }
+    init(_ r: CGRect)                             { pos = ZPos(r.origin); size = ZSize(r.size) }
+    func GetCGRect() -> CGRect                    { return CGRect(origin: pos.GetCGPoint(), size:size.GetCGSize())  }
+    // #end
 }
 
-func |=(me:inout ZRect, pos:ZPos) {
-    if pos.x > me.Max.x { me.Max.x = pos.x }
-    if pos.y > me.Max.y { me.Max.y = pos.y }
-    if pos.x < me.Min.x { me.Min.x = pos.x }
-    if pos.y < me.Min.y { me.Min.y = pos.y }
-}
-
+// #swift-only:
+func +(me:ZRect, a:ZRect) -> ZRect      { return me.operator_plus(a)  }
+func -(me:ZRect, a:ZRect) -> ZRect      { return me.operator_minus(a) }
+func +=(me:inout ZRect, a:ZRect)        { me.operator_plusAssign(a)   }
+func -=(me:inout ZRect, a:ZRect)        { me.operator_minusAssign(a)  }
+func +=(me:inout ZRect, a:ZPos)         { me.operator_plusAssign(a)   }
+//func -=(me:inout ZRect, a:ZPos)         { me.operator_minusAssign(a)  }
+func /(me:ZRect, a:ZSize) -> ZRect      { return me.operator_div(a)   }
 extension ZRect: CustomStringConvertible {
     var description: String {
         return "[\(Min.x),\(Min.y) \(size.w)x\(size.h)]"
     }
 }
+// #end
 
 
 

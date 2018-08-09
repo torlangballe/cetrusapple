@@ -60,12 +60,11 @@ struct ZLocale {
     }
     
     static func GetLangCodeAndCountryFromLocaleId(_ bcp:String, forceNo:Bool = true) -> (String, String) { // lang, country-code
-        var lang = ""
-        var ccode = ""
-        
-        if !ZStrUtil.SplitToArgs(bcp, sep:"-", a:&lang, b:&ccode) {
-            if !ZStrUtil.SplitToArgs(bcp, sep:"_", a:&lang, b:&ccode) {
-                let parts = ZStrUtil.Split(bcp, sep:"-")
+        var (lang, ccode) = ZStr.SplitInTwo(bcp, sep:"-")
+        if ccode.isEmpty {
+            let (_, ccode) = ZStr.SplitInTwo(bcp, sep:"_")
+            if ccode.isEmpty {
+                let parts = ZStr.Split(bcp, sep:"-")
                 if parts.count > 2 {
                     return (parts.first!, parts.last!)
                 }
@@ -276,7 +275,7 @@ struct ZLocale {
                 break
         }
         if chars != -1 {
-            str = ZStrUtil.Head(str, chars:chars)
+            str = ZStr.Head(str, chars:chars)
         }
         return str
     }        // generic name for year.
@@ -346,7 +345,7 @@ struct ZLocale {
             if d >= 1760 {
                 type = .mile
                 d /= 1760
-                distance = String(format:"%.1lf", d)
+                distance = ZStr.Format("%.1lf", d)
             } else {
                 type = .yard
                 d = floor(d)
@@ -370,9 +369,9 @@ struct ZLocale {
             d = ceil(((ceil(d) + 9) / 10) * 10)
             distance = ("\(Int(d))")
         } else if round && d > 50 {
-            distance = String(format:"%d", Int(d))
+            distance = ZStr.Format("%d", Int(d))
         } else {
-            distance = String(format:"%.1lf", d)
+            distance = ZStr.Format("%.1lf", d)
         }
         return distance + " " + word
     }
@@ -402,7 +401,7 @@ struct ZLocale {
         default:
             break
         }
-        let str = ZStrUtil.NiceDouble(n, maxSig:maxSignificant) + " " + word
+        let str = ZStr.NiceDouble(n, maxSig:maxSignificant) + " " + word
         return str
     }
 
@@ -412,13 +411,13 @@ struct ZLocale {
             str = ZTS("North", langCode:langCode) // General name for north as in north-east wind etc
         }
         if alignment & .Bottom {
-            str = ZStrUtil.ConcatNonEmpty(separator:separator, items:str, ZTS("South", langCode:langCode)) // General name for south as in south-east wind etc
+            str = ZStr.ConcatNonEmpty(separator:separator, items:str, ZTS("South", langCode:langCode)) // General name for south as in south-east wind etc
         }
         if alignment & .Left {
-            str = ZStrUtil.ConcatNonEmpty(separator:separator, items:str, ZTS("West", langCode:langCode)) // General name for west as in north-west wind etc
+            str = ZStr.ConcatNonEmpty(separator:separator, items:str, ZTS("West", langCode:langCode)) // General name for west as in north-west wind etc
         }
         if alignment & .Right {
-            str = ZStrUtil.ConcatNonEmpty(separator:separator, items:str, ZTS("East", langCode:langCode)) // General name for north as in north-east wind etc
+            str = ZStr.ConcatNonEmpty(separator:separator, items:str, ZTS("East", langCode:langCode)) // General name for north as in north-east wind etc
         }
         return str
     }

@@ -83,8 +83,8 @@ class ZPath {
 //        LineTo(e)
     }
     
-    func ArcTo(_ rect: ZRect, radstart:Double = 0, radDelta:Double = π*2, clockwise:Bool = true) { // this d
-        let start = CGFloat(-π/2) + CGFloat(radstart)
+    func ArcTo(_ rect: ZRect, radstart:Double = 0, radDelta:Double = ZMath.PI*2, clockwise:Bool = true) { // this d
+        let start = CGFloat(-ZMath.PI/2) + CGFloat(radstart)
         //        let tranform = CGAffineTransform(a: CGFloat(rect.size.w / 2), b: 0, c: 0, d: CGFloat(rect.size.h / 2), tx: CGFloat(center.x), ty: CGFloat(center.y))
         path.addArc(center:rect.Center.GetCGPoint(), radius:CGFloat(rect.size.w / 2), startAngle:start, endAngle:start + CGFloat(radDelta), clockwise:!clockwise) // , transform:tranform)
     }

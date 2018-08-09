@@ -11,9 +11,9 @@ import UIKit
 
 func getFormatedHours(_ h:Int, use24:Bool) -> String {
     if(use24) {
-        return String(format:"%02d", h);
+        return ZStr.Format("%02d", h);
     } else {
-        return String(format:"%d", h);
+        return ZStr.Format("%d", h);
     }
 }
 
@@ -57,7 +57,7 @@ class ZTimePickerView : ZLabelPickerView {
         }
         var i = 0
         while i < 60 {
-            columns[Part.min.rawValue].titles.append(String(format:"%02d", i))
+            columns[Part.min.rawValue].titles.append(ZStr.Format("%02d", i))
             i += inc
         }
         //        columns[Part.Dots.rawValue].titles.append(":")
@@ -112,12 +112,12 @@ class ZTimePickerView : ZLabelPickerView {
             minute = (minute / 5) * 5
         }
         if uses24hour {
-            shour = String(format:"%02d", hour)
+            shour = ZStr.Format("%02d", hour)
         } else {
-            am = ZTime.IsAm(&hour)
-            shour = String(format:"%d", hour)
+            (am, hour) = ZTime.IsAm(hour:hour)
+            shour = ZStr.Format("%d", hour)
         }
-        let smin = String(format:"%02d", minute)
+        let smin = ZStr.Format("%02d", minute)
         Set(Part.hour.rawValue, row:columns[Part.hour.rawValue].titles.index(of: shour)!, animated:animate)
         Set(Part.min.rawValue, row:columns[Part.min.rawValue].titles.index(of: smin)!, animated:animate)
         if !uses24hour {
@@ -152,7 +152,7 @@ class ZDatePicker : UIDatePicker, ZView {
         } else  {
             datePickerMode = .date
         }
-        date = time as Date
+        date = time.date
         self.minuteInterval = minuteInterval
         self.addTarget(self, action:#selector(dateIsChanged(_:)), for:UIControlEvents.valueChanged)
     }

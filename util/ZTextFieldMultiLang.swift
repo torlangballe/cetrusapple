@@ -8,7 +8,7 @@
 
 import Foundation
 
-class ZLangTextsField : ZStackView, ZTextEditDelegate {
+class ZTextFieldMultiLang : ZStackView, ZTextEditDelegate {
     let textView: ZTextView
     var leftButton = ZImageView(namedImage:"arrow.left.small.png")
     var rightButton = ZImageView(namedImage:"arrow.right.small.png")

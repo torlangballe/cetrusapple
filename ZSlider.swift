@@ -33,7 +33,7 @@ class ZSlider: UISlider, ZView, ZControl {
             contentMode = ZViewContentMode.bottom
         }
         if vertical {
-            transform = CGAffineTransform(rotationAngle: CGFloat(-π))
+            transform = CGAffineTransform(rotationAngle: CGFloat(-ZMath.PI))
         }
         addTarget(self, action:#selector(ZSlider.valueChanged(_:)), for:UIControlEvents.valueChanged)
     }

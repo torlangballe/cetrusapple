@@ -50,7 +50,7 @@ class ZShapeView: ZContainerView, ZImageLoader {
         if !text.text.isEmpty {
             var ts = (text.GetBounds().size + ZSize(16, 6))
             ts.w *= 1.1
-            s |= ts
+            s.Maximize(ts)
         }
         if maxWidth != 0 {
             minimize(&s.w, maxWidth)

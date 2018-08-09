@@ -122,13 +122,12 @@ struct ZDevice {
         default:                                        knownAs = identifier
         }
         var version = 0
-        var name = ""
-        var sv2 = ""
-        if ZStrUtil.SplitToArgs(identifier, sep:",", a:&name, b:&sv2) {
-            let i = ZStrUtil.FindFirstOfChars(name, charset:"0123456789")
+        var (name, sv2) = ZStr.SplitInTwo(identifier, sep:",")
+        if sv2 != "" {
+            let i = ZStr.FindFirstOfChars(name, charset:"0123456789")
             if i != -1 {
-                let v1 = Int(ZStrUtil.Body(name, pos:i)) ?? 0
-                name = ZStrUtil.Head(name, chars:i)
+                let v1 = Int(ZStr.Body(name, pos:i)) ?? 0
+                name = ZStr.Head(name, chars:i)
                 version = Int(sv2) ?? 0
                 version += v1 * 10
             }

@@ -6,14 +6,18 @@
 //  Copyright © 2015 Capsule.fm. All rights reserved.
 //
 
+// #package com.github.torlangballe.zetrus
+
 import Foundation
 
-struct ZDebug {
+typealias StringFunc = (String)->() // we need to define this outside for now, translation fails
+
+extension ZDebug {
     static let mutex = ZMutex()
     static var storePrintLines = 0
     static var storedLines = [String]()
-    static var lastStampTime = ZTime.Null
-    static var printHooks = [(String)->()]()
+    static var lastStampTime = ZTimeNull
+    static var printHooks = [StringFunc]()
 
     static func Print(_ items: Any?..., separator: String = " ", terminator: String = "\n") {
         var str = ""
@@ -24,20 +28,20 @@ struct ZDebug {
             if i != 0 {
                 str += separator
             }
-            str += String(describing: item ?? "<nil>")
+            str += "\(item ?? "<nil>")"
         }
         mutex.Lock()
-        if ZDebug.storePrintLines != 0 {
-            if ZDebug.storedLines.count > ZDebug.storePrintLines {
-                ZDebug.storedLines.removeFirst()
+        if storePrintLines != 0 {
+            if storedLines.count > storePrintLines {
+                storedLines.removeFirst()
             }
-            ZDebug.storedLines.append(str)
+            storedLines.append(str)
         }
         for h in printHooks {
             h(str)
         }
         mutex.Unlock()
-        print(str, terminator:terminator)
+        basePrint(str, terminator:terminator)
     }
 
     static func ErrorOnRelease() {
@@ -47,22 +51,11 @@ struct ZDebug {
             }
         }
     }
-    
-    static func IsRelease() -> Bool {
-        return !_isDebugAssertConfiguration()
-    }
-    
-    static func IsMinIOS11() -> Bool {
-        if #available(iOS 11.0, *) {
-            return true
-        }
-        return false
-    }
 
     static func LoadSavedLog(prefix:String) {
         let file = ZFolders.GetFileInFolderType(.temporary, addPath:prefix + "/zdebuglog.txt")
-        let (str, _) = ZStrUtil.LoadFromFile(file)
-        storedLines = ZStrUtil.Split(str, sep:"\n")
+        let (str, _) = ZStr.LoadFromFile(file)
+        storedLines = ZStr.Split(str, sep:"\n")
     }
 
     static func AppendToFileAndClearLog(prefix:String) {
@@ -70,22 +63,22 @@ struct ZDebug {
         
         if file.DataSizeInBytes > 5 * 1024 * 1024 {
             file.Remove()
-            ZDebug.storedLines.insert("--- ZDebug.Cleared early part of large stored log.", at:0)
+            storedLines.insert("--- ZDebug.Cleared early part of large stored log.", at:0)
         }
         let (stream, err) = file.OpenOutput(append:true)
         if err != nil || stream == nil {
             print("ZDebug.AppendToFileAndClearLog open err:", err?.localizedDescription ?? "")
             return
         }
-        for s in ZDebug.storedLines {
-            let a = [UInt8](s.utf8)
+        for s in storedLines {
+            let a = [UInt8](s.Utf8())
             if stream!.write(a, maxLength: a.count) != a.count {
                 print("ZDebug.AppendToFileAndClearLog error writing.")
                 return
             }
-            stream!.write([UInt8]("\n".utf8), maxLength:1)
+            stream!.write([UInt8]("\n".Utf8()), maxLength:1)
         }
-        ZDebug.storedLines.removeAll()
+        storedLines.removeAll()
     }
 }
 

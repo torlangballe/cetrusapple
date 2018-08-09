@@ -29,7 +29,7 @@ class ZDatePartsPicker : ZLabelPickerView {
     weak var datePickDelegate: ZDatePartsPickerDelegate? = nil
     
     init(useYear:Bool = false, monthChars:Int) {
-        (endYear, _, _, _) = ZTime.Now.GetGregorianDateParts()
+        endYear = ZTimeNow.GetGregorianDateParts().year
         self.useYear = useYear
         self.monthChars = monthChars
         super.init(frame: ZRect(0, 0, 200, 216))

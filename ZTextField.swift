@@ -35,7 +35,7 @@ extension ZTextBase {
             if s == e {
                 return TextString
             }
-            return ZStrUtil.Body(TextString, pos:s, size:e - s)
+            return ZStr.Body(TextString, pos:s, size:e - s)
         }
     }
     var KeyboardLangCode : String {
@@ -98,7 +98,7 @@ class ZTextField : UITextField, UITextFieldDelegate, ZTextBase, ZView {
         get { return text != nil ? Float64(text!) : nil }
         set {
             if newValue != nil {
-                text = String(format:"%lg", newValue!)
+                text = ZStr.Format("%lg", newValue!)
             } else {
                 text = nil
             }
@@ -349,9 +349,9 @@ class ZNumberField : ZTextField {
         self.real = real
         var t = ""
         if real {
-            t = String(format:"%g", value)
+            t = ZStr.Format("%g", value)
         } else {
-            t = String(format:"%lld", Int64(value))
+            t = ZStr.Format("%lld", Int64(value))
         }
         self.init(text:t, font:font, alignment:alignment, margin:margin)
         minWidth = calcWidth(minChars)
