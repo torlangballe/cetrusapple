@@ -134,19 +134,19 @@ class ZTextField : UITextField, UITextFieldDelegate, ZTextBase, ZView {
         box.h = 1000;
         var gs = super.sizeThatFits(box.GetCGSize())
         if minWidth != 0.0 {
-            maximize(&gs.width, CGFloat(minWidth))
+            gs.width = max(gs.width, CGFloat(minWidth))
         }
         if maxWidth != 0.0 {
-            minimize(&gs.width, CGFloat(maxWidth))
+            gs.width = min(gs.width, CGFloat(maxWidth))
         }
-        maximize(&gs.height, 14)
+        gs.height = max(gs.height, 14)
         gs.height += CGFloat(2 * marginY)
         
         return gs
     }
 
     func SetAlignment(_ a: ZAlignment) {
-        self.textAlignment = ZText.GetTextAdjustment(a)
+        self.textAlignment = ZTextDraw.GetTextAdjustment(a)
     }
     
     func Unfocus() {
@@ -359,7 +359,7 @@ class ZNumberField : ZTextField {
     }
     
     private func calcWidth(decimals:Int) -> Float {
-        var text = ZText()
+        var text = ZTextDraw()
         text.text = String(count:decimals, repeatedValue:Character("8"))
         if real {
             text.text += "."

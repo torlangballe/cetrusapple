@@ -133,7 +133,7 @@ class ZAuthenticateView: ZStackView, ZTextEditDelegate {
                 self?.handleForgot()
             }
         }
-        Add(h1, align:.Center | .HorExpand | .NonProp)
+        Add(h1, align:.Center | .HorExpand | .NonProp, marg:ZSize(10, 0))
 
         h1.Add(rightButton, align:.Right | .Top)
         rightButton.AddTarget(self, forEventType:.pressed)

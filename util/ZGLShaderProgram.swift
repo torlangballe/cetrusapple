@@ -212,7 +212,7 @@ class ZGLShaderProgram {
     
     func SetColorUniformValue(_ name:String, col:ZColor) {
         let c = col.RGBA
-        SetUniformArgF(4, name:name, a1:c.r, a2:c.g, a3:c.b, a4:c.a)
+        SetUniformArgF(4, name:name, a1:Float(c.r), a2:Float(c.g), a3:Float(c.b), a4:Float(c.a))
     }
 
     func UseNamedValues(_ useNames:String...) {

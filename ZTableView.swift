@@ -1,9 +1,9 @@
 //
 //  ZTableView.swift
-//  Zed
 //
 //  Created by Tor Langballe on /4/12/15.
 //
+// #package com.github.torlangballe.CetrusAndroid
 
 import UIKit
 
@@ -14,16 +14,27 @@ class zUITableViewCell : UITableViewCell {
 }
 
 protocol ZTableViewDelegate : class {
-    func TableViewGetNumberOfRowsInSection(_ section:Int) -> Int
-    func TableViewGetNumberOfSections() -> Int
-    func TableViewGetHeightOfItem(_ index: ZTableView.Index)  -> Double
-    func TableViewSetupCell(_ cellSize:ZSize, index:ZTableView.Index) -> ZCustomView?
-    func HandleTableDelete()
-    func HandleRowSelected(_ index:ZTableView.Index)
-    func GetAccessibilityForCell(_ index:ZTableView.Index, prefix:String) -> [ZAccessibilty]
+    func TableViewGetRowCount() -> Int
+    func TableViewGetHeightOfItem(_ index: ZTableIndex)  -> Double
+    func TableViewSetupCell(_ cellSize:ZSize, index:ZTableIndex) -> ZCustomView?
+    func HandleRowSelected(_ index:ZTableIndex)
+    func GetAccessibilityForCell(_ index:ZTableIndex, prefix:String) -> [ZAccessibilty]
 }
 
 typealias ZTableViewRowAnimation = UITableViewRowAnimation
+
+struct ZTableIndex {
+    var row = 0
+    var section = 0
+    init(row:Int = 0, section:Int = 0) {
+        self.row = row
+        self.section = section
+    }
+    init(path:IndexPath) {
+        row = (path as NSIndexPath).row
+        section = (path as NSIndexPath).section
+    }
+};
 
 class ZTableView : UITableView, ZView, UITableViewDelegate, UITableViewDataSource {
     var first = true
@@ -35,29 +46,16 @@ class ZTableView : UITableView, ZView, UITableViewDelegate, UITableViewDataSourc
     
     func View() -> UIView { return self }
     
-    struct Index {
-        var row = 0
-        var section = 0
-        init(row:Int = 0, section:Int = 0) {
-            self.row = row
-            self.section = section
-        }
-        init(path:IndexPath) {
-            row = (path as NSIndexPath).row
-            section = (path as NSIndexPath).section
-        }
-    };
-    
-    var selection = Index()
+    var selectionIndex = ZTableIndex()
     weak var owner: ZTableViewDelegate? = nil
     var selectable = true
     var deleteHandler: (()->Void)? = nil
     var selectedColor = ZColor()
     
-    init(grouped:Bool = false) {
-        super.init(frame:CGRect(x:0, y:0, width:10, height:10), style:(grouped ? .grouped : .plain))
+    init() {
+        super.init(frame:CGRect(x:0, y:0, width:10, height:10), style:.plain)
         delegate = self
-        selection.row = -1;
+        selectionIndex.row = -1;
         dataSource = self
         sectionFooterHeight = 3;
         backgroundView = nil
@@ -71,8 +69,8 @@ class ZTableView : UITableView, ZView, UITableViewDelegate, UITableViewDataSourc
     override func layoutSubviews() {
         if first {
             allowsSelection = true // selectable
-            if selection.row != -1 {
-                Select(selection.row, section:selection.section);
+            if selectionIndex.row != -1 {
+                Select(selectionIndex.row);
             }
             contentInset = UIEdgeInsetsMake(CGFloat(margins.h), 0, CGFloat(margins.h), 0)
             first = false
@@ -97,7 +95,7 @@ class ZTableView : UITableView, ZView, UITableViewDelegate, UITableViewDataSourc
     }
     
     func ScrollToMakeRowVisible(_ row:Int, animated:Bool = true) {
-        let path = makeIndexPathFromIndex(Index(row:row, section:0))
+        let path = makeIndexPathFromIndex(ZTableIndex(row:row, section:0))
         scrollToRow(at: path, at:.none, animated:animated)
         print("-------------------------- scrollToRow:", row)
     }
@@ -107,7 +105,7 @@ class ZTableView : UITableView, ZView, UITableViewDelegate, UITableViewDataSourc
             self.reloadSections([0], with:UITableViewRowAnimation.fade)
         } else {
             if row != nil {
-                reloadRows(at:[makeIndexPathFromIndex(Index(row:row!, section:0))], with:UITableViewRowAnimation.none)
+                reloadRows(at:[makeIndexPathFromIndex(ZTableIndex(row:row!, section:0))], with:UITableViewRowAnimation.none)
             } else {
                 reloadData()
             }
@@ -118,8 +116,8 @@ class ZTableView : UITableView, ZView, UITableViewDelegate, UITableViewDataSourc
     }
 
     func MoveRow(fromIndex:Int, toIndex:Int) {
-        let from = makeIndexPathFromIndex(Index(row:fromIndex, section:0))
-        let to = makeIndexPathFromIndex(Index(row:toIndex, section:0))
+        let from = makeIndexPathFromIndex(ZTableIndex(row:fromIndex, section:0))
+        let to = makeIndexPathFromIndex(ZTableIndex(row:toIndex, section:0))
         self.moveRow(at:from, to:to)
     }
     
@@ -138,7 +136,7 @@ class ZTableView : UITableView, ZView, UITableViewDelegate, UITableViewDataSourc
     }
     
     func GetRowViewFromIndex(_ index:Int) -> ZView? {
-        let indexpath = makeIndexPathFromIndex(Index(row:index, section:0))
+        let indexpath = makeIndexPathFromIndex(ZTableIndex(row:index, section:0))
         if let c = self.cellForRow(at: indexpath) {
             return getZViewChild(c)
         }
@@ -172,23 +170,22 @@ class ZTableView : UITableView, ZView, UITableViewDelegate, UITableViewDataSourc
         return v.GetIndexFromRowView(view) ?? -1 // -1 should never happen
     }
     
-    func Select(_ row:Int, section:Int = 0) {
-        let oldSelection = selection
-        selection = Index(row:row, section:section)
+    func Select(_ row:Int) {
+        let oldSelection = selectionIndex
+        selectionIndex = ZTableIndex(row:row, section:0)
         if selectable {
             if row == -1 {
                 if oldSelection.row != -1 {
                     deselectRow(at: makeIndexPathFromIndex(oldSelection), animated:true)
                 }
             } else {
-                selectRow(at: makeIndexPathFromIndex(selection), animated:true, scrollPosition:UITableViewScrollPosition.none) // none means least movement
+                selectRow(at: makeIndexPathFromIndex(selectionIndex), animated:true, scrollPosition:UITableViewScrollPosition.none) // none means least movement
             }
         }
     }
     
-    
     func DeleteChildRow(index:Int, animation:ZTableViewRowAnimation = .fade) { // call this after removing data
-        let ipath = makeIndexPathFromIndex(Index(row:index, section:0))
+        let ipath = makeIndexPathFromIndex(ZTableIndex(row:index, section:0))
         self.deleteRows(at:[ipath], with: .left)
     }
 
@@ -207,22 +204,22 @@ class ZTableView : UITableView, ZView, UITableViewDelegate, UITableViewDataSourc
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let index = ZTableView.Index(path:indexPath)
+        let index = ZTableIndex(path:indexPath)
         owner!.HandleRowSelected(index)
-        selection = index
+        selectionIndex = index
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        let index = ZTableView.Index(path:indexPath)
+        let index = ZTableIndex(path:indexPath)
         return CGFloat(owner!.TableViewGetHeightOfItem(index))
     }
     
     func numberOfSections(in tableView: UITableView) -> Int {
-        return owner!.TableViewGetNumberOfSections()
+        return 1
     }
 
     func tableView(_ tableView:UITableView, numberOfRowsInSection section:Int) -> Int {
-        let c = owner!.TableViewGetNumberOfRowsInSection(section)
+        let c = owner!.TableViewGetRowCount()
         return c
     }
 
@@ -230,7 +227,7 @@ class ZTableView : UITableView, ZView, UITableViewDelegate, UITableViewDataSourc
         //        let cell : UITableViewCell = self.dequeueReusableCellWithIdentifier("ZTableView", forIndexPath:indexPath) as UITableViewCell
         let cell = zUITableViewCell()
         cell.isEditing = true
-        let index = ZTableView.Index(path:indexPath)
+        let index = ZTableIndex(path:indexPath)
         var r = ZRect(size:ZSize(Rect.size.w, owner!.TableViewGetHeightOfItem(index)))
         r = r.Expanded(ZSize(-margins.w, 0))
         cell.frame = r.GetCGRect()
@@ -285,7 +282,7 @@ class ZTableView : UITableView, ZView, UITableViewDelegate, UITableViewDataSourc
         return false
     }
     
-    fileprivate func makeIndexPathFromIndex(_ index:ZTableView.Index) -> IndexPath {
+    fileprivate func makeIndexPathFromIndex(_ index:ZTableIndex) -> IndexPath {
         
         let indexes:[Int] = [ index.section, index.row]
         
@@ -294,11 +291,9 @@ class ZTableView : UITableView, ZView, UITableViewDelegate, UITableViewDataSourc
 }
 
 extension ZTableViewDelegate {
-    func TableViewGetNumberOfSections() -> Int { return 1 }
-    //    func TableViewGetHeightOfItem(index: ZTableView.Index) -> Double { return 52 }
-    func HandleTableDelete() { }
-    func HandleRowSelected(_ index:ZTableView.Index) { }
-    func GetAccessibilityForCell(_ index:ZTableView.Index, prefix:String) -> [ZAccessibilty] { return [] }
+    //    func TableViewGetHeightOfItem(index: ZTableIndex) -> Double { return 52 }
+    func HandleRowSelected(_ index:ZTableIndex) { }
+    func GetAccessibilityForCell(_ index:ZTableIndex, prefix:String) -> [ZAccessibilty] { return [] }
 }
 
 private func exposeAll(_ view:UIView) {

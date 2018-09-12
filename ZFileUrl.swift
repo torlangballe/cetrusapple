@@ -51,19 +51,19 @@ class ZFileUrl : ZUrl {
     var FilePath : String {
         get {
             let str = url?.path ?? ""
-            if IsFolder() && str.lastCharAsString != "/" {
+            if IsFolder() && ZStr.Tail(str) != "/" {
                 return str + "/"
             }
             return str
         }
     }
 
-    func OpenOutput(append:Bool = false) -> (ZOutputStream?, Error?) {
+    func OpenOutput(append:Bool = false) -> (ZOutputStream?, ZError?) {
         if let stream = OutputStream(url:url!, append:append) {
             stream.open()
             return (stream, stream.streamError)
         }
-        return (nil, ZError(message:"couldm't make stream"))
+        return (nil, ZNewError("couldn't make stream"))
     }
     
     func IsFolder() -> Bool {
@@ -120,10 +120,10 @@ class ZFileUrl : ZUrl {
         return ("", "", "", "")
     }
 
-    func GetInfo( ) -> (ZFileInfo, Error?) {
+    func GetInfo( ) -> (ZFileInfo, ZError?) {
         var info = ZFileInfo()
         if url == nil {
-            return (info, ZError(message:"No file url"))
+            return (info, ZNewError("No file url"))
         }
         do {
             let dict = try dm().attributesOfItem(atPath: url!.path)
@@ -181,16 +181,9 @@ class ZFileUrl : ZUrl {
         return -1
     }
 
-    struct WalkOptions : OptionSet {
-        let rawValue: Int
-        init(rawValue: Int) { self.rawValue = rawValue }
-        static let None = WalkOptions(rawValue: 0)
-        static let SubFolders = WalkOptions(rawValue: 1<<0)
-        static let GetInfo = WalkOptions(rawValue: 1<<1)
-        static let GetInvisible = WalkOptions(rawValue: 1<<1)
-    }
+    enum WalkOptions:Int { case None = 0, SubFolders = 1, GetInfo = 2, GetInvisible = 4 }
     
-    @discardableResult func Walk(options:WalkOptions = WalkOptions.None, wildcard:String? = nil, foreach:(ZFileUrl, ZFileInfo)->Bool) -> Error? {
+    @discardableResult func Walk(options:WalkOptions = WalkOptions.None, wildcard:String? = nil, foreach:(ZFileUrl, ZFileInfo)->Bool) -> ZError? {
         if url == nil {
             return nil
         }
@@ -205,7 +198,7 @@ class ZFileUrl : ZUrl {
         if let nsEnum = dm().enumerator(at: url! as URL, includingPropertiesForKeys:[URLResourceKey.typeIdentifierKey], options:nsOptions, errorHandler:nil) {
             while let nsurl = nsEnum.nextObject() as? URL {
                 var info = ZFileInfo()
-                var err:Error? = nil
+                var err:ZError? = nil
                 //                let isDir = (nsEnum.fileAttributes![NSFileType]?.string == NSFileTypeDirectory)
                 let file = ZFileUrl(nsUrl: nsurl)
                 //            file = self.AppendedPath(name, isDir:isDir)
@@ -232,13 +225,13 @@ class ZFileUrl : ZUrl {
                 }
             }
         } else {
-            return ZError(message:"ZFileUrl:Walk: Couldn't create enumerator")
+            return ZNewError("ZFileUrl:Walk: Couldn't create enumerator")
         }
         
         return nil
     }
 
-    @discardableResult func CopyTo(_ to: ZFileUrl) -> Error? {
+    @discardableResult func CopyTo(_ to: ZFileUrl) -> ZError? {
         do {
             try dm().copyItem(at: self.url! as URL, to:to.url! as URL)
         } catch let error as NSError {
@@ -247,7 +240,7 @@ class ZFileUrl : ZUrl {
         return nil
     }
 
-    @discardableResult func MoveTo(_ to: ZFileUrl) -> Error? {
+    @discardableResult func MoveTo(_ to: ZFileUrl) -> ZError? {
         do {
             try dm().moveItem(at: self.url! as URL, to:to.url! as URL)
         } catch let error as NSError {
@@ -256,7 +249,7 @@ class ZFileUrl : ZUrl {
         return nil
     }
 
-    @discardableResult func LinkTo(_ to: ZFileUrl) -> Error? { // links self to to, i.e self becomes a hard link pointing to to
+    @discardableResult func LinkTo(_ to: ZFileUrl) -> ZError? { // links self to to, i.e self becomes a hard link pointing to to
         do {
             try dm().linkItem(at: to.url! as URL, to:self.url! as URL)
         } catch let error as NSError {
@@ -276,7 +269,7 @@ class ZFileUrl : ZUrl {
         return ZFileUrl(nsUrl:resolved!)
     }
 
-    @discardableResult func Remove() -> Error? {
+    @discardableResult func Remove() -> ZError? {
         do {
             try dm().removeItem(at: url! as URL)
         } catch let error as NSError {
@@ -285,7 +278,7 @@ class ZFileUrl : ZUrl {
         return nil
     }
     
-    @discardableResult func RemoveContents() -> (Error?, [String]) {
+    @discardableResult func RemoveContents() -> (ZError?, [String]) {
         var errors = [String]()
         var paths = [String]()
         let fm = dm()
@@ -315,7 +308,7 @@ private func dm() -> FileManager {
     return FileManager.default
 }
 
-func |(a:ZFileUrl.WalkOptions, b:ZFileUrl.WalkOptions) -> ZFileUrl.WalkOptions { return ZFileUrl.WalkOptions(rawValue: a.rawValue | b.rawValue) }
-func &(a:ZFileUrl.WalkOptions, b:ZFileUrl.WalkOptions) -> Bool       { return (a.rawValue & b.rawValue) != 0                  }
+func |(a:ZFileUrl.WalkOptions, b:ZFileUrl.WalkOptions) -> ZFileUrl.WalkOptions { return ZFileUrl.WalkOptions(rawValue: a.rawValue | b.rawValue)! }
+func &(a:ZFileUrl.WalkOptions, b:ZFileUrl.WalkOptions) -> Bool { return (a.rawValue & b.rawValue) != 0 }
 
 

@@ -58,7 +58,7 @@ extension ZNotification {
         let center = UNUserNotificationCenter.current()
         center.add(self) { (error) in
             ZDebug.Print("ZNotifcation.SendLocal done:", error)
-            done(error as? ZError)
+            done(error)
         }
         ZDebug.Print("ZNotification.SendLocal:", self.trigger!)
     }

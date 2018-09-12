@@ -7,26 +7,6 @@
 //
 
 import UIKit
-fileprivate func < <T : Comparable>(lhs: T?, rhs: T?) -> Bool {
-  switch (lhs, rhs) {
-  case let (l?, r?):
-    return l < r
-  case (nil, _?):
-    return true
-  default:
-    return false
-  }
-}
-
-fileprivate func > <T : Comparable>(lhs: T?, rhs: T?) -> Bool {
-  switch (lhs, rhs) {
-  case let (l?, r?):
-    return l > r
-  default:
-    return rhs < lhs
-  }
-}
-
 
 class ZAnimation {
     static func Do(duration:Float = 0.4, animations:@escaping ()->Void, completion:((_ done:Bool)->Void)? = nil) {
@@ -44,7 +24,7 @@ class ZAnimation {
     }
     
     static func ViewHasAnimations(_ view:UIView) -> Bool {
-        return view.layer.animationKeys()?.count > 0
+        return view.layer.animationKeys()?.count ?? 0 > 0
     }
     
     static func PulseView(_ view:UIView, scale:Float, duration:Float, fromScale:Float = 1, repeatCount:Float = .infinity) {

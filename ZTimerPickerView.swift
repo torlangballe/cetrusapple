@@ -53,7 +53,7 @@ class ZTimePickerView : ZLabelPickerView {
             }
             columns[Part.amPm.rawValue].titles.append(sam)
             columns[Part.amPm.rawValue].titles.append(spm)
-            columns[Part.amPm.rawValue].name = ZLocale.GetDayPeriod()
+            columns[Part.amPm.rawValue].name = ZWords.GetDayPeriod()
         }
         var i = 0
         while i < 60 {
@@ -64,8 +64,8 @@ class ZTimePickerView : ZLabelPickerView {
         columns[Part.hour.rawValue].wrap = true
         columns[Part.min.rawValue].wrap = true
         
-        columns[Part.hour.rawValue].name = ZLocale.GetHour()
-        columns[Part.min.rawValue].name = ZLocale.GetMinute()
+        columns[Part.hour.rawValue].name = ZWords.GetHour()
+        columns[Part.min.rawValue].name = ZWords.GetMinute()
     }
     
     required init?(coder aDecoder: NSCoder) { fatalError("init(coder:) has not been implemented") }

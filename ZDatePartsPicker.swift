@@ -29,7 +29,7 @@ class ZDatePartsPicker : ZLabelPickerView {
     weak var datePickDelegate: ZDatePartsPickerDelegate? = nil
     
     init(useYear:Bool = false, monthChars:Int) {
-        endYear = ZTimeNow.GetGregorianDateParts().year
+        endYear = ZTime.Now().GetGregorianDateParts().year
         self.useYear = useYear
         self.monthChars = monthChars
         super.init(frame: ZRect(0, 0, 200, 216))
@@ -49,7 +49,7 @@ class ZDatePartsPicker : ZLabelPickerView {
                 columns[Part.year.rawValue].titles.append(" ")
             }
             for i in (startYear ... endYear).reversed() {
-                let y = "\(i)" + ZLocale.GetDateInsertYearSymbol()
+                let y = "\(i)" + ZWords.GetDateInsertYearSymbol()
                 columns[Part.year.rawValue].titles.append(y)
             }
         }
@@ -57,14 +57,14 @@ class ZDatePartsPicker : ZLabelPickerView {
             columns[Part.month.rawValue].titles.append(" ")
         }
         for i in 1 ... 12 {
-            let m = ZLocale.GetMonthFromNumber(i, chars:monthChars) + ZLocale.GetDateInsertMonthSymbol()
+            let m = ZWords.GetMonthFromNumber(i, chars:monthChars) + ZWords.GetDateInsertMonthSymbol()
             columns[Part.month.rawValue].titles.append(m)
         }
         if optionalDay {
             columns[Part.day.rawValue].titles.append(" ")
         }
         for i in 1 ... 31 {
-            let m = "\(i)" + ZLocale.GetDateInsertDaySymbol()
+            let m = "\(i)" + ZWords.GetDateInsertDaySymbol()
             columns[Part.day.rawValue].titles.append(m)
         }
 
@@ -72,9 +72,9 @@ class ZDatePartsPicker : ZLabelPickerView {
         columns[Part.month.rawValue].wrap = false
         columns[Part.day.rawValue].wrap = false
         
-        columns[Part.year.rawValue].name = ZLocale.GetYear()
-        columns[Part.month.rawValue].name = ZLocale.GetMonth()
-        columns[Part.day.rawValue].name = ZLocale.GetDayOfMonth()
+        columns[Part.year.rawValue].name = ZWords.GetYear()
+        columns[Part.month.rawValue].name = ZWords.GetMonth()
+        columns[Part.day.rawValue].name = ZWords.GetDayOfMonth()
         
         Reload()
         Refresh()
@@ -135,7 +135,7 @@ class ZDatePartsPicker : ZLabelPickerView {
         if m == nil {
             str = " "
         } else {
-            str = ZLocale.GetMonthFromNumber(m!, chars:monthChars)
+            str = ZWords.GetMonthFromNumber(m!, chars:monthChars)
         }
         SetWithTitle(str, column:Part.month.rawValue, animated:animate)
 

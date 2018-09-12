@@ -29,10 +29,7 @@ class ZScrollView : UIScrollView, ZView, UIScrollViewDelegate { // Add single ch
         if child != nil {
             let s = ZSize(Float(frame.size.width), 3000)
             var size = ZSize(child!.View().sizeThatFits(s.GetCGSize()))
-            //            maximize(&size.w, s.w)
             size.w = s.w
-            //            minimize(&size.w, ZScreen.Main.size.w)
-            //            frame.size.width = CGFloat(size.w)
             var r = ZRect(size:size)
             r += margin
             child!.View().frame = r.GetCGRect()

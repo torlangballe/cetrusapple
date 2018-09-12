@@ -1,9 +1,7 @@
 //
 //  ZUrlCache.swift
-//  Zed
 //
 //  Created by Tor Langballe on /2/12/15.
-//  Copyright © 2015 Capsule.fm. All rights reserved.
 //
 
 import Foundation
@@ -17,7 +15,7 @@ class ZUrlCache {
     private var listMutex = ZMutex()
     private var addingList = [String:ZURLSessionTask]()
 
-    init(name:String, removeOldHours:Double = 0, folderType:ZFolders.FolderType = .caches) {
+    init(name:String, removeOldHours:Double = 0, folderType:ZFolderType = .caches) {
         folder = ZFolders.GetFileInFolderType(folderType, addPath:name)
         if removeOldHours != 0 {
             RemoveOld(removeOldHours)
@@ -132,7 +130,7 @@ class ZUrlCache {
         }
         var file = ZFileUrl()
         if HasFile(url, file:&file) {
-            file.Modified = ZTimeNow
+            file.Modified = ZTime.Now()
             return file
         }
         listMutex.Lock()
@@ -190,7 +188,7 @@ class ZUrlCache {
     }
     
     func RemoveOld(_ hours:Double) {
-        let time = ZTimeNow - hours * ZTimeHour
+        let time = ZTime.Now() - hours * ZTimeHour
         folder.Walk(options:.GetInfo) { (file, info) in
             if info.modified < time {
                 if persistent {

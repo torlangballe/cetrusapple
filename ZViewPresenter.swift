@@ -1,20 +1,12 @@
 //
-//  ViewController.swift
-//  Zed
+//  ZViewPresenter.swift
 //
 //  Created by Tor Langballe on /22/9/14.
-//  Copyright (c) 2014 Capsule.fm. All rights reserved.
 //
 
 import UIKit
 import MapKit
 import AVFoundation
-
-/*
-func ZGetTopViewController() -> UIViewController? {
-    return UIApplication.sharedApplication().keyWindow?.rootViewController
-}
-*/
 
 var forcingRotationForPortraitOnly = false
 

@@ -1,62 +1,62 @@
 //
 //  ZShapeView.swift
-//  Zed
 //
 //  Created by Tor Langballe on /22/10/15.
-//  Copyright © 2015 Capsule.fm. All rights reserved.
 //
+
+// #package com.github.torlangballe.CetrusAndroid
 
 import UIKit
 
 class ZShapeView: ZContainerView, ZImageLoader {
     enum ShapeType:String { case circle = "circle", rectangle = "rectange", roundRect = "roundrect", star = "star", none = "" }
     var type = ShapeType.circle
-    var strokeWidth:Double = 0
-    var text: ZText
+    var strokeWidth:Double = 0.0
+    var text: ZTextDraw
     var image: ZImage? = nil
-    var imageMargin = ZSize(4, 1)
+    var imageMargin = ZSize(4.0, 1.0)
     var textXMargin = 0.0
     var imageFill = false
-    var imageOpacity: Float = 1.0
+    var imageOpacity: Float = Float(1)
     var ratio = 0.3
     var count = 5
     var strokeColor = ZColor.White()
-    var maxWidth:Double = 0
+    var maxWidth:Double = 0.0
     var imageAlign = ZAlignment.Center
     var fillBox = false
     var roundImage = false
-    var value:Float = 0
+    var value:Float = Float(0)
     
-    init(type t: ShapeType, minSize: ZSize) {
-        text = ZText()
+    init(type: ShapeType, minSize: ZSize) {
+        text = ZTextDraw()
         super.init(name:"ZShapeView")
         self.minSize = minSize
-        self.frame = ZRect(size:minSize).GetCGRect()
-        type = t
+        self.type = type
         foregroundColor = ZColor()
-        if type == .roundRect {
+        if type == ZShapeView.ShapeType.roundRect {
             ratio = 0.49
-        } else if type == .star {
+        }
+        if type == ZShapeView.ShapeType.star {
             ratio = 0.6
         }
         isAccessibilityElement = true
     }
-    
+    // #swift-only:
     required init?(coder aDecoder: NSCoder) { fatalError("init(coder:)") }
-    // override init(name: String) { fatalError("init(name:) has not been implemented") }
+    // #end
     
     override func CalculateSize(_ total: ZSize) -> ZSize {
         var s = minSize
         if !text.text.isEmpty {
-            var ts = (text.GetBounds().size + ZSize(16, 6))
-            ts.w *= 1.1
+            var ts = (text.GetBounds().size + ZSize(16.0, 6.0))
+            ts.w = ts.w * 1.1 // some strange bug in android doesn't allow *= here...
             s.Maximize(ts)
         }
-        if maxWidth != 0 {
-            minimize(&s.w, maxWidth)
+        if maxWidth != 0.0 {
+            s.w = min(s.w, maxWidth)
         }
-        if type == .circle {
-            maximize(&s.h, s.w)
+        if type == ZShapeView.ShapeType.circle {
+            s.h = max(s.h, s.w)
         }
         return s
     }
@@ -67,26 +67,25 @@ class ZShapeView: ZContainerView, ZImageLoader {
     }
     
     override func DrawInRect(_ rect: ZRect, canvas: ZCanvas) {
-        
         let path = ZPath()
-        var r = LocalRect //.Expanded(-strokeWidth/2)
+        var r = LocalRect
 
-        if type == .roundRect {
-            r = r.Expanded(ZSize(-1, -1))
+        if type == ZShapeView.ShapeType.roundRect {
+            r = r.Expanded(ZSize(-1.0, -1.0))
         }
         switch type  {
-            case .star:
+            case ZShapeView.ShapeType.star:
                 path.AddStar(rect:r, points:count, inRatio:ratio)
             
-            case .circle:
-                path.ArcDegFromToFromCenter(r.Center, radius:r.size.w / 2 - strokeWidth/2, degStart:0, degEnd:360)
+            case ZShapeView.ShapeType.circle:
+                path.ArcDegFromCenter(r.Center, radius:r.size.w / 2.0 - strokeWidth/2.0)
             
-            case .roundRect:
+            case ZShapeView.ShapeType.roundRect:
                 var corner = min(r.size.w, r.size.h) * ratio
-                minimize(&corner, 15)
+                corner = min(corner, 15.0)
                 path.AddRect(r, corner:ZSize(corner, corner))
             
-            case .rectangle:
+            case ZShapeView.ShapeType.rectangle:
                 path.AddRect(r)
             
             default:
@@ -100,7 +99,7 @@ class ZShapeView: ZContainerView, ZImageLoader {
             canvas.SetColor(getStateColor(foregroundColor), opacity:o)
             canvas.FillPath(path)
         }
-        if strokeWidth != 0 {
+        if strokeWidth != 0.0 {
             var o = strokeColor.Opacity
             if !Usable {
                 o *= 0.6
@@ -115,7 +114,7 @@ class ZShapeView: ZContainerView, ZImageLoader {
             }
             var o = imageOpacity
             if !Usable {
-                o *= 0.6
+                o *= Float(0.6)
             }
             if imageFill {
                 canvas.PushState()
@@ -125,13 +124,13 @@ class ZShapeView: ZContainerView, ZImageLoader {
             } else {
                 var a = imageAlign | ZAlignment.Shrink
                 if fillBox {
-                   a = .None
+                   a = ZAlignment.None
                 }
                 var corner:Double? = nil
                 if roundImage {
-                    if type == .roundRect {
-                        corner = min(15, min(r.size.w, r.size.h) * ratio) - imageMargin.Min()
-                    } else if type == .circle {
+                    if type == ZShapeView.ShapeType.roundRect {
+                        corner = min(15.0, min(r.size.w, r.size.h) * ratio) - imageMargin.Min()
+                    } else if type == ZShapeView.ShapeType.circle {
                         corner = image!.Size.Max()
                     }
                 }
@@ -141,12 +140,11 @@ class ZShapeView: ZContainerView, ZImageLoader {
         if(text.text != "") {
             var t = text
             t.color = getStateColor(t.color)
-            t.rect = r.Expanded(-(strokeWidth + 2)).Expanded(ZSize(-textXMargin, 0))
+            t.rect = r.Expanded(-(strokeWidth + 2.0)).Expanded(ZSize(-textXMargin, 0.0))
             t.rect.pos.y += 2
             if imageFill {
-                canvas.SetDropShadow(ZSize(0, 0), blur:2)
+                canvas.SetDropShadow(ZSize(0.0, 0.0), blur:Float(2))
             }
-            // path.Empty(); path.AddRect(r); canvas.SetColor(ZColor.Blue()); canvas.FillPath(path); path.Empty()
             t.Draw(canvas)
             if imageFill {
                 canvas.SetDropShadowOff()

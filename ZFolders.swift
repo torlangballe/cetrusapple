@@ -8,19 +8,19 @@
 
 import Foundation
 
+enum ZFolderType: Int {
+    case preferences = 1
+    case resources = 2
+    case caches = 4
+    case temporary = 8
+    case appSupport = 16
+    case preferencesOrResources = 64
+    case newestOfPreferencesOrResources = 128
+    case temporaryUniqueFolder = 256
+}
+
 struct ZFolders {
-    enum FolderType: Int {
-        case preferences = 1
-        case resources = 2
-        case caches = 4
-        case temporary = 8
-        case appSupport = 16
-        case preferencesOrResources = 64
-        case newestOfPreferencesOrResources = 128
-        case temporaryUniqueFolder = 256
-    }
-    static func GetFileInFolderType(_ type:FolderType, addPath:String = "") -> ZFileUrl {
-        
+    static func GetFileInFolderType(_ type:ZFolderType, addPath:String = "") -> ZFileUrl {
         if type == .preferencesOrResources {
             let fp = GetFileInFolderType(.preferences, addPath:addPath)
             if fp.Exists() {

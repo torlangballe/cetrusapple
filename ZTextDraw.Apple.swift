@@ -1,19 +1,17 @@
 //
-//  ZText.swift
-//  Zed
+//  ZTextDraw.swift
 //
 //  Created by Tor Langballe on /22/10/15.
-//  Copyright © 2015 Capsule.fm. All rights reserved.
 //
 
 import UIKit
 
-struct ZText {
-    enum DrawType { case fill, stroke, clip }
-    enum WrapType { case `default`, word, char, clip, headTruncate, tailTruncate, middleTruncate }
+enum ZTextDrawType { case fill, stroke, clip }
+enum ZTextWrapType { case `default`, word, char, clip, headTruncate, tailTruncate, middleTruncate }
 
-    var type = DrawType.fill
-    var wrap = WrapType.default
+struct ZTextDraw {
+    var type = ZTextDrawType.fill
+    var wrap = ZTextWrapType.default
     //    var AText: NSAttributedString
     var text = ""
     var color = ZColor.Black()
@@ -27,6 +25,7 @@ struct ZText {
 
     init() {
     }
+    
     func GetBounds(noWidth:Bool = false) -> ZRect {
         let aStr = NSAttributedString(string:text, attributes:MakeAttributes())
         let opt = NSStringDrawingOptions(rawValue:NSStringDrawingOptions.usesLineFragmentOrigin.rawValue | NSStringDrawingOptions.usesFontLeading.rawValue)
@@ -43,14 +42,14 @@ struct ZText {
         return rect.Align(size, align: alignment)
     }
 
-    static func GetNativeWrapMode(_ w: WrapType) -> NSLineBreakMode {
+    static func GetNativeWrapMode(_ w: ZTextWrapType) -> NSLineBreakMode {
         switch w {
-            case WrapType.word          : return NSLineBreakMode.byWordWrapping
-            case WrapType.char          : return NSLineBreakMode.byCharWrapping
-            case WrapType.headTruncate  : return NSLineBreakMode.byTruncatingHead
-            case WrapType.tailTruncate  : return NSLineBreakMode.byTruncatingTail
-            case WrapType.middleTruncate: return NSLineBreakMode.byTruncatingMiddle
-            default                     : return NSLineBreakMode.byClipping
+            case .word          : return NSLineBreakMode.byWordWrapping
+            case .char          : return NSLineBreakMode.byCharWrapping
+            case .headTruncate  : return NSLineBreakMode.byTruncatingHead
+            case .tailTruncate  : return NSLineBreakMode.byTruncatingTail
+            case .middleTruncate: return NSLineBreakMode.byTruncatingMiddle
+            default             : return NSLineBreakMode.byClipping
         }
     }
     
@@ -69,8 +68,8 @@ struct ZText {
 
     func MakeAttributes() -> [NSAttributedStringKey: Any] {
         let pstyle = NSParagraphStyle.default.mutableCopy() as! NSMutableParagraphStyle
-        pstyle.lineBreakMode = ZText.GetNativeWrapMode(wrap)
-        pstyle.alignment = ZText.GetTextAdjustment(alignment)
+        pstyle.lineBreakMode = ZTextDraw.GetNativeWrapMode(wrap)
+        pstyle.alignment = ZTextDraw.GetTextAdjustment(alignment)
 //        pstyle.allowsDefaultTighteningForTruncation = true
         if lineSpacing != 0.0 {
             pstyle.maximumLineHeight = font.lineHeight + CGFloat(lineSpacing)
@@ -89,17 +88,17 @@ struct ZText {
         //!        let attributes = MakeAttributes()
         
         switch type {
-            case DrawType.fill:
+            case ZTextDrawType.fill:
                 //                    CGContextSetFillColorWithColor(canvas.context, canvas->pf->color)
                 canvas.context.setTextDrawingMode(CGTextDrawingMode.fill)
             
-            case DrawType.stroke:
+            case ZTextDrawType.stroke:
                 canvas.context.setLineWidth(CGFloat(strokeWidth))
                 //                CGContextSetFillColorWithColor(canvas.context, canvas->pf->color)
                 // CGContextSetStrokeColorWithColor(canvas.context, canvas->pf->color)
                 canvas.context.setTextDrawingMode(CGTextDrawingMode.stroke)
             
-            case DrawType.clip:
+            case ZTextDrawType.clip:
                 canvas.context.setTextDrawingMode(CGTextDrawingMode.clip)
         }
         if pos == nil {
@@ -136,11 +135,11 @@ struct ZText {
         if s.w > w {
             var r = w / s.w
             if r < 0.94 {
-                maximize(&r, minScale)
+                r = max(r, minScale)
                 font = ZFont(name:font.fontName, Double(font.pointSize) * r)!
             }
         } else if s.h > rect.size.h {
-            let r = max(0, 5, (rect.size.h / s.h) * 1.01)
+            let r = max(5, (rect.size.h / s.h) * 1.01) // max was for all three args!!!
             font = ZFont(name:font.fontName, Double(font.pointSize) * r)!
         }
     }

@@ -52,7 +52,7 @@ class ZWebPageView: ZStackView, ZWebViewDelegate {
         //        spin->stop
     }
     
-    func HandleFailedDownload(_ view: ZWebView, error: Error) {
+    func HandleFailedDownload(_ view: ZWebView, error: ZError) {
         if zdelegate != nil {
             return zdelegate!.HandleFailedDownload(view, error:error)
         }

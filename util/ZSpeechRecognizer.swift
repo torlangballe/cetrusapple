@@ -101,7 +101,7 @@ class ZSpeechRecognizer : NSObject, SFSpeechRecognizerDelegate {
         }
         request = SFSpeechAudioBufferRecognitionRequest()
         if request == nil {
-            done(.final, [], ZError(message:"Error creating SFSpeechAudioBufferRecognitionRequest"))
+            done(.final, [], ZNewError("Error creating SFSpeechAudioBufferRecognitionRequest"))
             return
         }
         /*

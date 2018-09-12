@@ -86,7 +86,7 @@ class ZTextView : UITextView, UITextViewDelegate, ZTextBase, ZView {
         }
         if !placeHolderText.isEmpty && self.text!.isEmpty {
             let canvas = ZCanvas()
-            var text = ZText()
+            var text = ZTextDraw()
             text.color = ZColor(color:backgroundColor ?? UIColor.white).GetContrastingGray().OpacityChanged(0.3)
             text.text = placeHolderText
             text.alignment = .Top | .Left
@@ -112,7 +112,7 @@ class ZTextView : UITextView, UITextViewDelegate, ZTextBase, ZView {
     
     override func sizeThatFits(_ size: CGSize) -> CGSize {
         let inset = self.contentInset
-        var tinfo = ZText()
+        var tinfo = ZTextDraw()
         tinfo.text = self.text
         tinfo.font = self.font!
         var vsize = size
@@ -143,7 +143,7 @@ class ZTextView : UITextView, UITextViewDelegate, ZTextBase, ZView {
     }
 
     func SetAlignment(_ a: ZAlignment) {
-        self.textAlignment = ZText.GetTextAdjustment(a)
+        self.textAlignment = ZTextDraw.GetTextAdjustment(a)
     }
     
     func Unfocus() {

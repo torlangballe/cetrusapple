@@ -37,7 +37,7 @@ extension ZImage {
         get { return ZSize(size) }
     }
     
-    func MakeScaleImage(capInsets:ZRect) -> ZImage {
+    func Make9PatchImage(capInsets:ZRect) -> ZImage {
         let insets = UIEdgeInsets(top:CGFloat(capInsets.Min.y), left:CGFloat(capInsets.Min.x), bottom:CGFloat(capInsets.Max.y), right:CGFloat(capInsets.Max.x))
         return self.resizableImage(withCapInsets:insets, resizingMode:.tile)
     }
@@ -265,7 +265,7 @@ extension ZImage {
         if cache {
             return MainCache.DownloadFromUrl(url, done:done)
         }
-        //        let start = ZTimeNow
+        //        let start = ZTime.Now()
         let req = ZUrlRequest.Make(.Get, url:url)
         return ZUrlSession.Send(req, onMain:false, makeStatusCodeError:true) { (resp, data, err, code) in
             if err != nil {
@@ -313,24 +313,24 @@ extension ZImage {
         }
     }
     
-    func SaveToPng(_ file:ZFileUrl) -> Error? {
+    func SaveToPng(_ file:ZFileUrl) -> ZError? {
         let data:ZData? = UIImagePNGRepresentation(self) as ZData?
         if data != nil {
             if data!.SaveToFile(file) == nil {
                 return nil
             }
         }
-        return ZError(message:"error storing image as png")
+        return ZNewError("error storing image as png")
     }
     
-    func SaveToJpeg(_ file:ZFileUrl, quality:Float = 0.8) -> Error? {
+    func SaveToJpeg(_ file:ZFileUrl, quality:Float = 0.8) -> ZError? {
         let data:ZData? = UIImageJPEGRepresentation(self, CGFloat(quality)) as ZData?
         if data != nil {
             if data!.SaveToFile(file) != nil {
                 return nil
             }
         }
-        return ZError(message:"error storing image as png")
+        return ZNewError("error storing image as png")
     }
 
     class func FromFile(_ file:ZFileUrl) -> ZImage? {
@@ -385,10 +385,10 @@ extension ZImage {
         for y in 0 ..< Int(self.size.height) {
             for x in 0 ..< Int(self.size.width) {
                 let pixelInfo = y * rowBytes! + x * 4
-                let r = Float(data[pixelInfo]) / Float(255.0)
-                let g = Float(data[pixelInfo+1]) / Float(255.0)
-                let b = Float(data[pixelInfo+2]) / Float(255.0)
-                let a = Float(data[pixelInfo+3]) / Float(255.0)
+                let r = Double(data[pixelInfo]) / 255.0
+                let g = Double(data[pixelInfo+1]) / 255.0
+                let b = Double(data[pixelInfo+2]) / 255.0
+                let a = Double(data[pixelInfo+3]) / 255.0
                 got(ZPos(x, y), ZColor(r:r, g:g, b:b, a:a))
             }
         }
@@ -426,7 +426,7 @@ extension ZImage {
             canvas.DrawImage(self, destRect:ir)
         }
     }
-    
+/*
     func ClipToCircle2(fit:ZSize = ZSize(0, 0)) -> ZImage? {
         let ratio = size.width / size.height
         var s = fit
@@ -453,6 +453,7 @@ extension ZImage {
             canvas.DrawImage(self, destRect:rDraw)
         }
     }
+    */
     
     static func GetNamedImagesFromWildcard(_ wild:String) -> [ZImage] {
         var images = [ZImage]()
@@ -470,7 +471,7 @@ extension ZImage {
 class ZImageUploader {
     var url:String = ""
     var strId:String = ""
-    var error:Error? = nil
+    var error:ZError? = nil
     var image:ZImage? = nil
     var done:((_ uploader:ZImageUploader)->Void)? = nil
     
@@ -516,7 +517,7 @@ class ZImageCache : ZTimerOwner {
                 }
                 return nil
             }
-            c.stamp = ZTimeNow
+            c.stamp = ZTime.Now()
             cache[url] = c
             done?(c.image)
             return nil
@@ -537,7 +538,7 @@ class ZImageCache : ZTimerOwner {
             cache.removeValue(forKey:oldestTupple.0)
         }
         var c2 = Cache()
-        c2.stamp = ZTimeNow
+        c2.stamp = ZTime.Now()
         c2.getting = true
         self.cache[url] = c2
         return ZImage.DownloadFromUrl(url, cache:false, maxSize:maxSize) { (image) in

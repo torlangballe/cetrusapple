@@ -26,7 +26,7 @@ extension ZData {
             return (d, nil)
         } catch let error as NSError {
             ZDebug.Print("ZData.FromUrl error:", error.localizedDescription)
-            return (nil, error as? ZError)
+            return (nil, error)
         }
     }
     
@@ -49,7 +49,7 @@ extension ZData {
         return hex
     }
     
-    @discardableResult func SaveToFile(_ file:ZFileUrl) -> Error? {
+    @discardableResult func SaveToFile(_ file:ZFileUrl) -> ZError? {
         do {
             try write(to: file.url! as URL, options:.atomic)
         } catch let error {
@@ -58,7 +58,7 @@ extension ZData {
         return nil
     }
     
-    @discardableResult func LoadFromFile(_ file:ZFileUrl) -> Error? {
+    @discardableResult func LoadFromFile(_ file:ZFileUrl) -> ZError? {
         do {
             try write(to: file.url! as URL, options:.atomic)
         } catch let error {

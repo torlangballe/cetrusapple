@@ -1,18 +1,14 @@
 //
 //  ZUrl.swift
-//  Zed
 //
 //  Created by Tor Langballe on /30/10/15.
-//  Copyright © 2015 Capsule.fm. All rights reserved.
 //
 
 import UIKit
 import SafariServices
 import MobileCoreServices
 
-class ZUrl : Hashable  { // , Decodable, Encodable {
-//    enum CodingKeys: String, CodingKey { case url = "url" }
-    
+class ZUrl : Hashable  {
     var url: URL?
 
     var hashValue: Int {
@@ -22,11 +18,6 @@ class ZUrl : Hashable  { // , Decodable, Encodable {
     init() {
         url = nil
     }
-    
-//    required init(from decoder: Decoder) throws {
-//        let values = try decoder.container(keyedBy: CodingKeys.self)
-//        url = try values.decode(URL.self, forKey: .url)
-//    }
 
     init(string:String) {
         if let u = URL(string:string) {
@@ -44,19 +35,10 @@ class ZUrl : Hashable  { // , Decodable, Encodable {
         self.url = url.url
     }
 
-//    func encode(to encoder: Encoder) throws {
-//        var container = encoder.container(keyedBy: CodingKeys.self)
-//        try container.encode(url, forKey: .url)
-//    }
-
     var IsEmpty : Bool {
         return url == nil
     }
 
-    static func ==(lhs: ZUrl, rhs: ZUrl) -> Bool {
-        return lhs.url == rhs.url
-    }
-    
     func IsDirectory() -> Bool {
         var o: AnyObject?
         do {
@@ -86,16 +68,7 @@ class ZUrl : Hashable  { // , Decodable, Encodable {
         }
         UIApplication.shared.open(url!, options:[:]) // can have completion handler too
     }
-    func GetMimeTypeFromExtension() -> String {
-        /*
-        let ext = url!.pathExtension as! CFStringRef
-        let type = UTTypeCreatePreferredIdentifierForTag(kUTTagClassFilenameExtension, ext, nil);
-        let mimeType = UTTypeCopyPreferredTagWithClass(type as! CFStringRef, kUTTagClassMIMEType)
-        let str = mimeType as? NSString
-        return str as! String
-*/
-        return ""
-    }
+
     func GetName() -> String {
         if url != nil {
             return url!.lastPathComponent // if lastPathComponent is nil, ?? returns ""
@@ -160,3 +133,8 @@ class ZUrl : Hashable  { // , Decodable, Encodable {
         return queryStrings
     }
 }
+
+func ==(lhs: ZUrl, rhs: ZUrl) -> Bool {
+    return lhs.url == rhs.url
+}
+

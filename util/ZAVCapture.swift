@@ -87,7 +87,7 @@ class ZAVCapture : NSObject, AVCaptureVideoDataOutputSampleBufferDelegate, AVCap
         previewLayer?.frame = frame.GetCGRect()
     }
 
-    func SetPreviewOrientation(_ orientation:ZScreen.Layout) {
+    func SetPreviewOrientation(_ orientation:ZScreenLayout) {
         var o = AVCaptureVideoOrientation.portrait
         switch orientation {
         case .portrait:
@@ -218,7 +218,7 @@ class ZAVCapture : NSObject, AVCaptureVideoDataOutputSampleBufferDelegate, AVCap
             let newVideoInput = try AVCaptureDeviceInput(device:newCamera!)
             captureSession.addInput(newVideoInput)
         } catch let error as NSError {
-            return error as? ZError
+            return error
         }
         captureSession.commitConfiguration()
         SetPreviewOrientation(ZScreen.Orientation())

@@ -95,8 +95,6 @@ func ZDispatchTimeInSecs(_ secs:Double) -> DispatchTime {
     return DispatchTime.now() + Double(Int64(secs) * Int64(NSEC_PER_SEC)) / Double(NSEC_PER_SEC)
 }
 
-typealias ZOperationQueue = OperationQueue // not used...
-
 var ZMainQue: DispatchQueue {
     return DispatchQueue.main
 }

@@ -4,7 +4,7 @@
 //  Created by Tor Langballe on /23/9/14.
 //  Copyright (c) 2014 Capsule.fm. All rights reserved.
 
-// #package com.github.torlangballe.zetrus
+// #package com.github.torlangballe.CetrusAndroid
 
 // https://github.com/seivan/VectorArithmetic/blob/master/VectorArithmetic/VectorArithmetic.swift
 // http://practicalswift.com/2014/06/14/the-swift-standard-library-list-of-built-in-functions/
@@ -89,41 +89,31 @@ struct ZPos : Equatable, Codable
     func operator_times(_ a: ZPos) -> ZPos    { return ZPos(x * a.x, y * a.y) }
     func operator_div(_ a: ZPos) -> ZPos      { return ZPos(x / a.x, y / a.y) }
     func operator_unaryMinus() -> ZPos        { return ZPos(-x, -y) }
-    func operator_plus(_ s: ZSize) -> ZPos      { return ZPos(x + s.w, y + s.h) }
-    func equals(_ a: ZPos) -> Bool   { return x == a.x && y == a.y }
-
-    mutating func operator_timesAssign(_ a: ZPos) { x *= a.x; y *= a.y; }
-    mutating func operator_divAssign(_ a: ZPos)   { x /= a.x; y /= a.y; }
-    mutating func operator_plusAssign(_ a: ZPos)  { x += a.x; y += a.y; }
-    mutating func operator_minusAssign(_ a: ZPos) { x -= a.x; y -= a.y; }
-
-    mutating func operator_timesAssign(_ a: Double) { x *= a; y *= a; }
-    mutating func operator_divAssign(_ a: Double)   { x /= a; y /= a; }
-    mutating func operator_plusAssign(_ a: Double)  { x += a; y += a; }
-    mutating func operator_minusAssign(_ a: Double) { x -= a; y -= a; }
+    func operator_plus(_ s: ZSize) -> ZPos    { return ZPos(x + s.w, y + s.h) }
+    func equals(_ a: ZPos) -> Bool            { return x == a.x && y == a.y }
 }
 
 // #swift-only:
-func +=(me: inout ZPos, a: Double)    { me.operator_plusAssign(a) }
-func -=(me: inout ZPos, a: Double)    { me.operator_minusAssign(a) }
-func *=(me: inout ZPos, a: Double)    { me.operator_timesAssign(a) }
-func /=(me: inout ZPos, a: Double)    { me.operator_divAssign(a) }
-func +=(me: inout ZPos, a: ZPos)      { me.operator_plusAssign(a) }
-func -=(me: inout ZPos, a: ZPos)      { me.operator_minusAssign(a) }
-func *=(me: inout ZPos, a: ZPos)      { me.operator_timesAssign(a) }
-func /=(me: inout ZPos, a: ZPos)      { me.operator_divAssign(a) }
-func +(me: ZPos, a: Double) -> ZPos   { return me.operator_plus(a) }
-func -(me: ZPos, a: Double) -> ZPos   { return me.operator_minus(a) }
-func *(me: ZPos, a: Double) -> ZPos   { return me.operator_times(a) }
-func /(me: ZPos, a: Double) -> ZPos   { return me.operator_div(a) }
-func +(me: ZPos, a: ZPos) -> ZPos     { return me.operator_plus(a) }
-func -(me: ZPos, a: ZPos) -> ZPos     { return me.operator_minus(a) }
-func *(me: ZPos, a: ZPos) -> ZPos     { return me.operator_times(a) }
-func /(me: ZPos, a: ZPos) -> ZPos     { return me.operator_div(a) }
+func +=(me: inout ZPos, a: Double)    { me.x += a; me.y += a            }
+func -=(me: inout ZPos, a: Double)    { me.x -= a; me.y -= a            }
+func *=(me: inout ZPos, a: Double)    { me.x *= a; me.y *= a            }
+func /=(me: inout ZPos, a: Double)    { me.x /= a; me.y /= a            }
+func +=(me: inout ZPos, a: ZPos)      { me.x += a.x; me.y += a.y        }
+func -=(me: inout ZPos, a: ZPos)      { me.x -= a.x; me.y -= a.y        }
+func *=(me: inout ZPos, a: ZPos)      { me.x *= a.x; me.y *= a.y        }
+func /=(me: inout ZPos, a: ZPos)      { me.x /= a.x; me.y /= a.y        }
+func +(me: ZPos, a: Double) -> ZPos   { return me.operator_plus(a)      }
+func -(me: ZPos, a: Double) -> ZPos   { return me.operator_minus(a)     }
+func *(me: ZPos, a: Double) -> ZPos   { return me.operator_times(a)     }
+func /(me: ZPos, a: Double) -> ZPos   { return me.operator_div(a)       }
+func +(me: ZPos, a: ZPos) -> ZPos     { return me.operator_plus(a)      }
+func -(me: ZPos, a: ZPos) -> ZPos     { return me.operator_minus(a)     }
+func *(me: ZPos, a: ZPos) -> ZPos     { return me.operator_times(a)     }
+func /(me: ZPos, a: ZPos) -> ZPos     { return me.operator_div(a)       }
 prefix func -(me: ZPos) -> ZPos       { return me.operator_unaryMinus() }
-func +(me: ZPos, s: ZSize) -> ZPos    { return me.operator_plus(s) }
-func !=(me:ZPos, a: ZPos) -> Bool     { return !me.equals(a) }
-func ==(me:ZPos, a: ZPos) -> Bool     { return me.equals(a) }
+func +(me: ZPos, s: ZSize) -> ZPos    { return me.operator_plus(s)      }
+func !=(me:ZPos, a: ZPos) -> Bool     { return !me.equals(a)            }
+func ==(me:ZPos, a: ZPos) -> Bool     { return me.equals(a)             }
 // #end
 
 struct ZFPos

@@ -3,7 +3,7 @@
 //  Created by Tor Langballe on /23/9/14.
 //
 
-// #package com.github.torlangballe.zetrus
+// #package com.github.torlangballe.CetrusAndroid
 
 /* #kotlin-raw:
  import kotlin.math.*
@@ -30,9 +30,17 @@ struct ZMath {
         let R = 6371.0 // Radius of the earth in km
         let dLat = DegToRad(pos2.y - pos1.y)
         let dLon = DegToRad(pos2.x - pos1.x)
-        let a = (Pow(sin(dLat / 2), 2) + cos(DegToRad(pos1.y))) * cos(DegToRad(pos2.y)) * Pow(sin(dLon / 2), 2)
-        let c = 2 * Double(asin(sqrt(abs(a))))
-        return c * R * 1000
+        let a = (Pow(sin(dLat / 2.0), 2.0) + cos(DegToRad(pos1.y))) * cos(DegToRad(pos2.y)) * Pow(sin(dLon / 2.0), 2.0)
+        let c = 2.0 * Double(asin(sqrt(abs(a))))
+        return c * R * 1000.0
+    }
+    
+    static func Floor(_ v:Double) -> Double {
+        return floor(v)
+    }
+    
+    static func Ceil(_ v:Double) -> Double {
+        return ceil(v)
     }
     
     static func Pow(_ a:Double, _ power:Double) -> Double {
@@ -88,6 +96,7 @@ struct ZMath {
     // #swift-only:
     static func Random1() -> Double     { return Double(arc4random_uniform(10000)) / Double(10000) }
     static func RandomN(_ n:Int) -> Int { return Int(arc4random_uniform(UInt32(n))) }
+    // #end
     /* #kotlin-raw:
      fun Random1() : Double {
         val random = Random()
@@ -97,43 +106,11 @@ struct ZMath {
         val random = Random()
         return random.nextInt(n)
      }
-a     */
+     */
 }
 
 // #swift-only:
 func sign<T: FloatingPoint>(_ a:T) -> Int {
     return (a > 0) ? 1 : (a < 0) ? -1 : 0
 }
-@discardableResult func minimize<T: SignedNumeric & Comparable>(_ me: inout T, _ a: T) -> Bool {
-    if a < me {
-        me = a
-        return true
-    }
-    return false
-}
-
-@discardableResult func maximize<T: SignedNumeric & Comparable>(_ me: inout T, _ a: T) -> Bool {
-    if a > me {
-        me = a
-        return true
-    }
-    return false
-}
-/* #kotlin-raw:
-fun minimize<T: Comparable>(_ me: inout T, _ a: T) -> Bool {
-    if a < me {
-        me = a
-        return true
-    }
-    return false
-}
-
-@discardableResult func maximize<T: SignedNumeric & Comparable>(_ me: inout T, _ a: T) -> Bool {
-    if a > me {
-        me = a
-        return true
-    }
-    return false
-}
-*/
 

@@ -68,7 +68,7 @@ class ZBackblazeB2 {
         let req = ZUrlRequest.Make(.Post, url:uploadUrl)
         let sha1 = ZCrypto.Sha1AsHex(fileData)
         req.SetHeaderForKey("Authorization", value:uploadToken)
-        req.SetHeaderForKey("X-Bz-File-Name", value:ZStr.UrlQuote(name))
+        req.SetHeaderForKey("X-Bz-File-Name", value:ZStr.UrlEncode(name) ?? "")
         req.SetHeaderForKey("Content-Type", value:mimeType)
         req.SetHeaderForKey("Content-Length", value:"\(fileData.count)")
         req.SetHeaderForKey("X-Bz-Content-Sha1", value:sha1)
@@ -102,7 +102,7 @@ class ZBackblazeB2 {
                     if error == nil {
                         self.UploadFileToUrlWithToken(fileData, name:name, mimeType:mimeType, uploadUrl:uploadUrl, uploadToken:uploadToken) { (error, fileId) in
                             if error == nil {
-                                let url = "https://f001.backblazeb2.com/file/" + ZStr.UrlQuote(bucketName) + "/" + ZStr.UrlQuote(name)
+                                let url = "https://f001.backblazeb2.com/file/" + (ZStr.UrlEncode(bucketName) ?? "") + "/" + (ZStr.UrlEncode(name) ?? "")
                                 done(url, fileId, error )
                             } else {
                                 done("", "", error)

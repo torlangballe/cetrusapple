@@ -231,7 +231,7 @@ func ZReadAudioFileMonoSecondChunks(file:ZFileUrl, secs:Double, got:(_ samples:[
             return nil
         }
     }
-    return ZError(message:"bad format")
+    return ZNewError("bad format")
 }
 
 func ZReadAudioFileSampled(file:ZFileUrl, sampleRate:Int) -> ([Float], Double, Error?) {
@@ -260,7 +260,7 @@ func ZReadAudioFileSampled(file:ZFileUrl, sampleRate:Int) -> ([Float], Double, E
             return (array, duration, nil)
         }
     }
-    return ([], 0, ZError(message:"bad format"))
+    return ([], 0, ZNewError("bad format"))
 }
 
 

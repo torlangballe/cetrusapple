@@ -73,7 +73,7 @@ class ZImageBox : ZContainerView {
     fileprivate func uploadImage(_ image:ZImage, done:@escaping (_ downloadUrl:String, _ error:Error?)->Void) {
         if let data = UIImageJPEGRepresentation(image, 0.8) {
             imageActivity.Start()
-            let name = nameBase +  ZTimeNow.GetIsoString(format:ZTimeIsoFormatCompact) + ".jpeg"
+            let name = nameBase +  ZTime.Now().GetIsoString(format:ZTimeIsoFormatCompact) + ".jpeg"
             cApp.b2.UploadFileToBucket(data, buckedId:"dcfcd1d546bc530d55590c12", bucketName:"cappubphoto", name:name) { (url, fileId, error) in
                 self.imageActivity.Start(false)
                 if error != nil {
@@ -82,7 +82,7 @@ class ZImageBox : ZContainerView {
                 done(url, error)
             }
         } else {
-            done("", ZError(message:"Couldn't make image"))
+            done("", ZNewError("Couldn't make image"))
         }
     }
     

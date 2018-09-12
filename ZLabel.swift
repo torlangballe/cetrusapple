@@ -1,10 +1,10 @@
 //
 //  ZLabel.swift
-//  Zed
 //
 //  Created by Tor Langballe on /2/11/15.
-//  Copyright © 2015 Capsule.fm. All rights reserved.
 //
+
+// #package com.github.torlangballe.CetrusAndroid
 
 import UIKit
 
@@ -21,7 +21,7 @@ class ZLabel: UILabel, ZView {
         set { textColor = newValue.color }
     }
     
-    init(text:String="", minWidth:Double=0, maxWidth:Double=0, lines:Int=1, font:ZFont?=nil, align:ZAlignment = .Left, color:ZColor = ZColor.White()) {
+    init(text:String="", minWidth:Double=0, maxWidth:Double=0, lines:Int=1, font:ZFont? = nil, align:ZAlignment = .Left, color:ZColor = ZColor.White()) {
         self.minWidth = minWidth
         self.maxWidth = maxWidth
         super.init(frame:CGRect(x:0, y:0, width:10, height:10))
@@ -57,7 +57,7 @@ class ZLabel: UILabel, ZView {
         if maxWidth != 0 {
             box.w = maxWidth
         }
-        maximize(&box.w, Double(size.width))
+        box.w = max(box.w, Double(size.width))
         if self.numberOfLines > 1 {
             box = ZSize(Double(size.width), Double(font.lineHeight) * Double(self.numberOfLines) * 1.1)
         } else {
@@ -65,16 +65,16 @@ class ZLabel: UILabel, ZView {
         }
         var gs = super.sizeThatFits(box.GetCGSize())
         if minWidth != 0.0 {
-            maximize(&gs.width, CGFloat(minWidth))
+            gs.width = max(gs.width, CGFloat(minWidth))
         }
-        maximize(&gs.height, font.pointSize * 1.2)
+        gs.height = max(gs.height, font.pointSize * 1.2)
         gs.width -= CGFloat(margin.size.w) // margin is typically 10, -10, so must subtract
         gs.height -= CGFloat(margin.size.h)
         if maxWidth != 0.0 {
-            minimize(&gs.width, CGFloat(maxWidth))
+            gs.width = min(gs.width, CGFloat(maxWidth))
         }
         if maxHeight != nil {
-            minimize(&gs.height, CGFloat(maxHeight!))
+            gs.height = min(gs.height, CGFloat(maxHeight!))
         }
         return gs
     }
@@ -84,16 +84,7 @@ class ZLabel: UILabel, ZView {
     }
     
     func SetAlignment(_ a: ZAlignment) {
-        textAlignment = ZText.GetTextAdjustment(a)
-    }
-    
-    func FadeTransition(_ duration:Float) {
-        let animation:CATransition = CATransition()
-        animation.timingFunction = CAMediaTimingFunction(name:
-            kCAMediaTimingFunctionEaseInEaseOut)
-        animation.type = kCATransitionFade
-        animation.duration = CFTimeInterval(duration)
-        self.layer.add(animation, forKey: kCATransitionFade)
+        textAlignment = ZTextDraw.GetTextAdjustment(a)
     }
     
     func SetText(_ newText:String, animationDuration:Float=0) {
@@ -108,8 +99,8 @@ class ZLabel: UILabel, ZView {
         }
     }
     
-    func SetLinebreakMode(_ mode:ZText.WrapType) {
-        self.lineBreakMode = ZText.GetNativeWrapMode(mode)
+    func SetLinebreakMode(_ mode:ZTextWrapType) {
+        self.lineBreakMode = ZTextDraw.GetNativeWrapMode(mode)
     }
 
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {

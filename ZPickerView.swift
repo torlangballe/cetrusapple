@@ -84,7 +84,7 @@ class ZPickerView : UIPickerView, UIPickerViewDataSource, UIPickerViewDelegate, 
 }
 
 class ZLabelPickerView : ZPickerView {
-    var text = ZText()
+    var text = ZTextDraw()
     
     @objc func pickerView(_ pickerView: UIPickerView, viewForRow row: Int, forComponent component: Int, reusingView view: UIView?) -> UIView {
         var pickerLabel = view as? UILabel
@@ -113,7 +113,7 @@ class ZLabelPickerView : ZPickerView {
             for str in c.titles {
                 t.text = str
                 s.Maximize(t.GetBounds().size)
-                maximize(&rowHeight, s.h)
+                rowHeight = max(rowHeight, s.h)
             }
             columns[i].width = s.w * 1.05
             wAll += s.w
@@ -129,7 +129,7 @@ class ZLabelPickerView : ZPickerView {
         sizeThatFits(frame.size)
     }
     
-    func getText(_ component:Int) -> ZText {
+    func getText(_ component:Int) -> ZTextDraw {
         var t = text
         let size = columns[component].fontSize
         if size != 0 {

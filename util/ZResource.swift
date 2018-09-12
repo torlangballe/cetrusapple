@@ -63,7 +63,7 @@ class ZResource: NSBundleResourceRequest, ZTimerOwner {
     }
     
     func addToList(_ r:ZResource) {
-        if list.index(where: { $0.sid == r.sid }) == nil {
+        if list.indexWhere({ $0.sid == r.sid }) == nil {
             list.append(r)
         }
     }

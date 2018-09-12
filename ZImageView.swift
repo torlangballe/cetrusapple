@@ -59,7 +59,7 @@ class ZImageView: UIImageView, ZView, ZImageLoader, ZTimerOwner {
         
         if var image = ZImage(named:namedImage) {
             if !scaleInsets.IsNull {
-                image = image.MakeScaleImage(capInsets:scaleInsets)
+                image = image.Make9PatchImage(capInsets:scaleInsets)
             }
             super.init(image:image)
             self.contentMode = UIViewContentMode.scaleAspectFit
@@ -68,7 +68,7 @@ class ZImageView: UIImageView, ZView, ZImageLoader, ZTimerOwner {
         }
     }
     
-    convenience init(url:String, maxSize:ZSize = ZSize(), downloaded:((_ success:Bool)->Void)?=nil) {
+    convenience init(url:String, maxSize:ZSize = ZSize(), downloaded:((_ success:Bool)->Void)? = nil) {
         self.init(zimage:nil, name:url, maxSize:maxSize)
         downloadUrl = url
         if !url.isEmpty {
@@ -242,7 +242,7 @@ protocol ZImageLoader: class {
 }
 
 extension ZImageLoader {
-    func DownloadFromUrl(_ url:String, cache:Bool = true, done:((_ success:Bool)->Void)?=nil) { // , contentMode mode: UIViewContentMode
+    func DownloadFromUrl(_ url:String, cache:Bool = true, done:((_ success:Bool)->Void)? = nil) { // , contentMode mode: UIViewContentMode
         let s = self
         ZImage.DownloadFromUrl(url, cache:cache) { (image) in
             if image != nil {

@@ -34,7 +34,7 @@ class ZLocation: CLLocationManager, CLLocationManagerDelegate, ZTimerOwner {
     func SetFakePoints(points:[ZPos], durationSecs:Double) {
         fakePoints = points
         fakeDurationSecs = durationSecs
-        fakeStart = ZTimeNow
+        fakeStart = ZTime.Now()
         fakeTimer.Set(10, owner: self, now:true) { [weak self] () in
             if self == nil {
                 return false
@@ -196,7 +196,7 @@ class ZLocation: CLLocationManager, CLLocationManagerDelegate, ZTimerOwner {
     func GetCurrentLocation() -> (ZPos, ZTime, Float)? { // enabled, location-pos, time, altitude
         if IsFakingPoints() && !oldPos.IsNull() {
             //            ZDebug.Print("GetCurrentLocation (faked):", oldPos)
-            return (oldPos, ZTimeNow, 0)
+            return (oldPos, ZTime.Now(), 0)
         }
         if let loc = self.location {
             let coord = loc.coordinate;
@@ -206,7 +206,7 @@ class ZLocation: CLLocationManager, CLLocationManagerDelegate, ZTimerOwner {
         }
         if !oldPos.IsNull() {
             //            ZDebug.Print("GetCurrentLocation (oldpos):", oldPos)
-            return (oldPos, ZTimeNow, 0)
+            return (oldPos, ZTime.Now(), 0)
         }
         return nil
     }
@@ -344,14 +344,14 @@ class ZLocation: CLLocationManager, CLLocationManagerDelegate, ZTimerOwner {
             ZMainQue.async {
                 timer.Set(timeoutSecs!, owner:self) { () in
                     map.cancel()
-                    done(nil, mpp, ZError(message:"timed out"))
+                    done(nil, mpp, ZNewError("timed out"))
                 }
             }
         }
         map.start() { (snap, error) in
             timer.Stop()
             if error != nil {
-                done(nil, mpp, error as? ZError ?? nil)
+                done(nil, mpp, error)
             } else {
                 if rotateToHeading {
                     if let heading = mainLocation?.headingDirectionDegrees {

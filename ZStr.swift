@@ -6,18 +6,22 @@
 //  Copyright (c) 2014 Capsule.fm. All rights reserved.
 //
 
-// #package com.github.torlangballe.zetrus
+// #package com.github.torlangballe.CetrusAndroid
 
 import Foundation
 
 typealias ZStringCompareOptions = NSString.CompareOptions
 
 struct ZStr {
+    static func Utf8(_ str:String) -> String.UTF8View {
+        return str.utf8
+    }
+
     static func Format(_ format:String, _ args:CVarArg...) -> String {
         return String(format:format, args)
     }
     
-    @discardableResult static func SaveToFile(_ str:String, file:ZFileUrl) -> Error? {
+    @discardableResult static func SaveToFile(_ str:String, file:ZFileUrl) -> ZError? {
         do {
             try str.write(to: file.url! as URL, atomically:true, encoding:String.Encoding.utf8)
         } catch let error as NSError {
@@ -26,7 +30,7 @@ struct ZStr {
         return nil
     }
     
-    static func LoadFromFile(_ file:ZFileUrl) -> (String, Error?) {
+    static func LoadFromFile(_ file:ZFileUrl) -> (String, ZError?) {
         var str = ""
         do {
             str = try NSString(contentsOf:file.url! as URL, encoding: String.Encoding.utf8.rawValue) as String
@@ -81,9 +85,10 @@ struct ZStr {
     static func SplitInTwo(_ str:String, sep:String) -> (String, String) {
         let parts = SplitN(str, sep:sep, n:2)
         if parts.count == 2 {
-            let first = parts[0]
-            let rest = parts[1]
-            return (first, rest)
+            return (parts[0], parts[1])
+        }
+        if parts.count == 1 {
+            return (parts[0], "")
         }
         return ("", "")
     }
@@ -94,12 +99,12 @@ struct ZStr {
         return count
     }
     
-    static func Head(_ str: String, chars:Int) -> String {
+    static func Head(_ str: String, chars:Int = 1) -> String {
         var c = str.count
         if chars < 1 {
             return ""
         }
-        minimize(&c, chars)
+        c = min(c, chars)
         let pos = str.index(str.startIndex, offsetBy: c)
 //        let head = str.substring(to: index)
 //        return head
@@ -108,7 +113,7 @@ struct ZStr {
         return String(head)
 }
     
-    static func Tail(_ str: String, chars:Int) -> String {
+    static func Tail(_ str: String, chars:Int = 1) -> String {
         if chars >= str.count {
             return str
         }
@@ -132,7 +137,7 @@ struct ZStr {
         if vsize == -1 {
             vsize = c - vpos
         } else {
-            minimize(&vsize, c - vpos)
+            vsize = min(vsize, c - vpos)
         }
         let s = str.index(str.startIndex, offsetBy: pos)
         let e = str.index(s, offsetBy: vsize)
@@ -165,6 +170,14 @@ struct ZStr {
         return str
     }
 
+    static func TailUntilWithRest(_ str: String, sep:String, options: ZStringCompareOptions = .literal) -> (String, String) {
+        if let range = rangeOfWordAtEnd(str, sep:sep, options:options) {
+            let tail = str[range]
+            return (String(tail), Head(str, chars:range.lowerBound.encodedOffset))
+        }
+        return (str, "")
+    }
+    
     static func PopTailWord(_ str:inout String, sep:String = " ", options:ZStringCompareOptions = .literal) -> String {
         if let range = rangeOfWordAtEnd(str, sep:sep, options:options) {
             let tail = str[range]
@@ -185,16 +198,6 @@ struct ZStr {
         return str
     }
     
-    static func UrlQuote(_ str: String) -> String {
-        let characterSet = NSMutableCharacterSet.alphanumeric()
-        characterSet.addCharacters(in: "-._~")
-        return str.addingPercentEncoding(withAllowedCharacters: characterSet as CharacterSet)!
-    }
-
-    static func UrlQueryQuote(_ str: String) -> String {
-        return str.addingPercentEncoding(withAllowedCharacters:NSCharacterSet.urlQueryAllowed) ?? ""
-    }
-    
     @discardableResult static func HasPrefix(_ str:String, prefix:String, rest:inout String) -> Bool {
         if str.hasPrefix(prefix) {
             rest = ZStr.Body(str, pos:prefix.count)
@@ -211,13 +214,12 @@ struct ZStr {
         return false
     }
 
-    static func TruncatedEnd(_ str:String, chars:Int) -> String {
-        var c = str.count
-        c = c - chars
-        if c < 1 {
-            return ""
-        }
-        return Head(str, chars:c)
+    static func TruncatedEnd(_ str:String, chars:Int = 1) -> String {
+        return String(str.dropLast(chars))
+    }
+    
+    static func TruncatedStart(_ str:String, chars:Int = 1) -> String {
+        return String(str.dropFirst(chars))
     }
     
     static func TruncateMiddle(_ str:String, maxChars:Int, separator:String) -> String { // sss...eee of longer string
@@ -227,13 +229,13 @@ struct ZStr {
         return str
     }
     
-    static func ConcatNonEmpty(separator: String = " ", items: String...) -> String {
+    static func ConcatNonEmpty(sep: String = " ", items:[String]) -> String {
         var str = ""
         var first = true
         for item in items {
             if !item.isEmpty {
                 if !first {
-                    str += separator
+                    str += sep
                 }
                 str += String(item)
                 first = false
@@ -285,8 +287,9 @@ struct ZStr {
         }
     }
 
-    static func ReplaceWhiteSpacesWithSpace(_ str:String) -> String {
+    static func ReplaceWhiteSpaces(_ str:String, to:String) -> String {
         var out = [Character]()
+        let chars = Array(to)
         var white = false
         for c in str {
             switch c {
@@ -295,19 +298,20 @@ struct ZStr {
                 
                 default:
                     if(white) {
-                        out.append(" ")
+                        out += chars
                         white = false
                     }
                     out.append(c)
             }
         }
         if white {
-            out.append(" ")
+            out += chars
         }
         return String(out)
     }
     
-    static func Replace(_ str:String, find:String, with:String, options:ZStringCompareOptions = .literal) -> String {
+    static func Replace(_ str:String, find:String, with:String, caseless:Bool = false) -> String {
+        let options:ZStringCompareOptions = caseless ? .literal : .caseInsensitive
         return str.replacingOccurrences(of: find, with:with, options:options, range:str.fullRange)
     }
     
@@ -331,7 +335,7 @@ struct ZStr {
     }
     
     static func CountInstances(_ instance:String, str:String) -> Int {
-        return str.components(separatedBy: instance).count - 1 // return's [""] for empty string, which will be 0, so good
+        return str.components(separatedBy: instance).count - 1
     }
     
     static func FilterToAlphaNumeric(_ str:String) -> String {
@@ -406,10 +410,10 @@ struct ZStr {
         return vstr
     }
     
-    static func ForEachLine(_ str:String, line:(_ sline:String)->Bool) {
+    static func ForEachLine(_ str:String, forEach:(_ sline:String)->Bool) {
         let all = str.components(separatedBy: CharacterSet.newlines)
         for s in all {
-            if !line(s) {
+            if !forEach(s) {
                 break
             }
         }
@@ -455,12 +459,12 @@ struct ZStr {
         return pointer
     }
     
-    static func NiceDouble(_ d:Double, maxSig:Int = 8) -> String {
+    static func FormatNiceDouble(_ d:Double, maxSig:Int = 8) -> String {
         let format = "%.\(maxSig)lf"
         var str = ZStr.Format(format, d)
         if str.contains(".") {
             while true {
-                switch str.lastCharAsString {
+                switch ZStr.Tail(str) {
                 case "0":
                     str.removeLast()
                 case ".":
@@ -472,6 +476,18 @@ struct ZStr {
             }
         }
         return str
+    }
+    
+    static func ToDouble(str:String, def:Double = -1.0) -> Double {
+        if let d = Double(str) {
+            return d
+        }
+        return def
+    }
+    
+
+    static func GetStemAndExtension(fileName:String) -> (String, String) {
+        return ZStr.TailUntilWithRest(fileName, sep:".")
     }
     
     static func SplitLines(str:String, skipEmpty:Bool = true) -> [String] {

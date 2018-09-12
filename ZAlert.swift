@@ -15,10 +15,10 @@ class ZAlert {
         var vok = ok
         var vcancel = cancel
         if vok ==  "🆗" {
-            vok = ZLocale.GetOk()
+            vok = ZWords.GetOk()
         }
         if vcancel == "❌" {
-            vcancel = ZLocale.GetCancel()
+            vcancel = ZWords.GetCancel()
         }
         view.addAction(UIAlertAction(title:vok, style:.default) { (UIAlertAction) in
             if pressed != nil {
@@ -56,10 +56,10 @@ class ZAlert {
         let view = UIAlertController(title:title, message:subText, preferredStyle:UIAlertControllerStyle.alert)
         
         if vok.isEmpty {
-            vok = ZLocale.GetOk()
+            vok = ZWords.GetOk()
         }
         if vcancel.isEmpty{
-            vcancel = ZLocale.GetCancel()
+            vcancel = ZWords.GetCancel()
         }
         
         let okAction = UIAlertAction(title:vok, style:.default) { (UIAlertAction) in
@@ -98,7 +98,7 @@ class ZAlert {
         ZGetTopViewController()!.present(view, animated:true, completion:nil)
     }
     
-    static func ShowError(_ text:String, error:Error) {
+    static func ShowError(_ text:String, error:ZError) {
         ZAlert.Say(text, subText:error.GetMessage())
         ZDebug.Print("Show Error:\n", text)
     }

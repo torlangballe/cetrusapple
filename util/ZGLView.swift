@@ -41,7 +41,7 @@ class ZGLView : GLKView, ZView, GLKViewControllerDelegate {
         viewController.preferredFramesPerSecond = drawFramesPerSec
         viewController.isPaused = false
         self.window?.rootViewController = viewController
-        start = ZTimeNow.SecsSinceEpoc
+        start = ZTime.Now().SecsSinceEpoc
         drawTime = 0
         //        if drawFramesPerSec > 0 {
         //    setDrawFramesPerSec(drawFramesPerSec)
@@ -62,7 +62,7 @@ class ZGLView : GLKView, ZView, GLKViewControllerDelegate {
         if timeManualIncrease {
             drawTime += 1.0 / Double(drawFramesPerSec)
         } else {
-            drawTime = ZTimeNow.SecsSinceEpoc - start
+            drawTime = ZTime.Now().SecsSinceEpoc - start
         }
         doDraw(ZRect(rect))
         inited = true

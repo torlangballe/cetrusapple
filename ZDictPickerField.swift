@@ -14,7 +14,7 @@ class ZDictPickerField : ZShapeView {
     var edited = false
     var handleValueChanged:((_ key:String)->Void)? = nil
     var selectedKey = ""
-    var popupText = ZText()
+    var popupText = ZTextDraw()
     
     init(dict:[String:AnyObject], selectedKey:String) {
         
@@ -46,7 +46,7 @@ class ZDictPickerField : ZShapeView {
         }
     }
 
-    static func Pick(_ dict:[String:AnyObject], selectedKey:String = "", textInfo:ZText, got:@escaping (_ key:String?, _ val:AnyObject?)->Void) {
+    static func Pick(_ dict:[String:AnyObject], selectedKey:String = "", textInfo:ZTextDraw, got:@escaping (_ key:String?, _ val:AnyObject?)->Void) {
         let v1 = ZVStackView(space:2)
         let picker = ZLabelPickerView(frame:ZRect(0, 0, 200, 216))
         picker.height = 400

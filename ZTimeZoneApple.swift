@@ -37,7 +37,7 @@ extension ZTimeZone {
         return Double(secondsFromGMT()) / 3600
     }
     
-    func CalculateOffsetHours(_ time:ZTime = ZTimeNow, localDeltaHours:inout Double) -> Double {
+    func CalculateOffsetHours(_ time:ZTime = ZTime.Now(), localDeltaHours:inout Double) -> Double {
         let secs = secondsFromGMT(for: time.date)
         let lsecs = TimeZone.autoupdatingCurrent.secondsFromGMT(for: time.date)
         localDeltaHours = Double(secs - lsecs) / 3600

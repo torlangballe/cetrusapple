@@ -5,7 +5,7 @@
 //  Created by Tor Langballe on /13/7/18.
 //
 
-// #package com.github.torlangballe.zetrus
+// #package com.github.torlangballe.CetrusAndroid
 
 import UIKit
 
@@ -16,8 +16,9 @@ typealias ZViewContentMode = UIViewContentMode
 var collapsedViews = [UIView:ZContainerView]()
 
 protocol ZView {
-    var objectName: String { get set }
+    var  objectName: String { get set }
     var  Usable: Bool { get set }
+    var  Alpha: Double { get set }
     func View() -> UIView
     func Child(_ path: String) -> UIView?
     func DumpTree()
@@ -71,6 +72,14 @@ extension ZView {
         set {
             View().isUserInteractionEnabled = newValue
             View().alpha = newValue ? 1.0 : 0.3
+        }
+    }
+    var Alpha: Double {
+        get {
+            return Double(View().alpha)
+        }
+        set {
+            View().alpha = CGFloat(newValue)
         }
     }
     func RemoveFromParent() {

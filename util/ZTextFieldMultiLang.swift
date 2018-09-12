@@ -108,7 +108,7 @@ class ZTextFieldMultiLang : ZStackView, ZTextEditDelegate {
         for f in from {
             dict[f] = f
         }
-        var t = ZText()
+        var t = ZTextDraw()
         t.font = textView.font!
         t.color = textView.Color
         ZDictPickerField.Pick(dict as [String : AnyObject], selectedKey:from[0], textInfo:t, got:got)

@@ -26,9 +26,9 @@ class ZInAppPurchases : NSObject, SKProductsRequestDelegate, SKPaymentTransactio
     var handlePurchaseSuccess: ((_ productId: String, _ done:@escaping ()->Void)->Void)? = nil
     //    private var purchasedProductIdentifiers = Set()
     var productsRequest: SKProductsRequest?
-    var gotProductsRequestHandler: ((_ products:[ZInAppProduct], _ error:Error?)->Void)?
+    var gotProductsRequestHandler: ((_ products:[ZInAppProduct], _ error:ZError?)->Void)?
 
-    func RequestProducts(_ ids:Set<String>, got:@escaping (_ products:[ZInAppProduct], _ error:Error?)->Void) {
+    func RequestProducts(_ ids:Set<String>, got:@escaping (_ products:[ZInAppProduct], _ error:ZError?)->Void) {
         productsRequest?.cancel()
         gotProductsRequestHandler = got
         productsRequest = SKProductsRequest(productIdentifiers:ids)
@@ -66,7 +66,7 @@ class ZInAppPurchases : NSObject, SKProductsRequestDelegate, SKPaymentTransactio
         clearRequestAndHandler()
     }
     
-    func request(_ request: SKRequest, didFailWithError error: Error) {
+    func request(_ request: SKRequest, didFailWithError error: ZError) {
         ZDebug.Print("Failed to load list of products:", error.localizedDescription)
         gotProductsRequestHandler?([], error)
         clearRequestAndHandler()
@@ -82,7 +82,7 @@ class ZInAppPurchases : NSObject, SKProductsRequestDelegate, SKPaymentTransactio
             ZAlert.Say(ZTS("You are not set up to purchase in-app payments.")) // dialog box when user tries to buy in-app-purchase
             return
         }
-        if let i = allSKProducts.index(where:{ $0.productIdentifier == sid }) {
+        if let i = allSKProducts.indexWhere({ $0.productIdentifier == sid }) {
             let product = allSKProducts[i]
             let payment = SKPayment(product:product)
             ZKeyValueStore.SetBool(true, key:"ZInAppPurchasesInProgress")

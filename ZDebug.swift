@@ -6,23 +6,16 @@
 //  Copyright © 2015 Capsule.fm. All rights reserved.
 //
 
-// #package com.github.torlangballe.zetrus
+// #package com.github.torlangballe.CetrusAndroid
 
 import Foundation
 
-typealias StringFunc = (String)->() // we need to define this outside for now, translation fails
-
 extension ZDebug {
-    static let mutex = ZMutex()
-    static var storePrintLines = 0
-    static var storedLines = [String]()
-    static var lastStampTime = ZTimeNull
-    static var printHooks = [StringFunc]()
-
     static func Print(_ items: Any?..., separator: String = " ", terminator: String = "\n") {
         var str = ""
-        if ZTime.UpdateIfOlderThanSecs(3, time:&lastStampTime) {
-            str = lastStampTime.GetString(format:"============= yy-MM-dd' 'HH:mm:ssZZ =============\n")
+        if ZDebug.lastStampTime.Since() > 3.0 {
+            ZDebug.lastStampTime = ZTime.Now()
+            str = ZDebug.lastStampTime.GetString(format:"============= yy-MM-dd' 'HH:mm:ssZZ =============\n")
         }
         for (i, item) in items.enumerated() {
             if i != 0 {
@@ -30,55 +23,59 @@ extension ZDebug {
             }
             str += "\(item ?? "<nil>")"
         }
-        mutex.Lock()
-        if storePrintLines != 0 {
-            if storedLines.count > storePrintLines {
-                storedLines.removeFirst()
+        ZDebug.mutex.Lock()
+        if ZDebug.storePrintLines != 0 {
+            if ZDebug.storedLines.count > ZDebug.storePrintLines {
+                ZDebug.storedLines.removeFirst()
             }
-            storedLines.append(str)
+            ZDebug.storedLines.append(str)
         }
-        for h in printHooks {
+        for h in ZDebug.printHooks {
             h(str)
         }
-        mutex.Unlock()
-        basePrint(str, terminator:terminator)
+        ZDebug.mutex.Unlock()
+        ZDebug.basePrint(str, terminator:terminator)
     }
 
     static func ErrorOnRelease() {
-        if IsRelease() {
-            for _ in 1...100 {
-                Print("Should not run on ")
+        if ZDebug.IsRelease() {
+            var n = 100
+            while n > 0 {
+                ZDebug.Print("Should not run on ")
+                n -= 1
             }
         }
     }
 
     static func LoadSavedLog(prefix:String) {
-        let file = ZFolders.GetFileInFolderType(.temporary, addPath:prefix + "/zdebuglog.txt")
+        let file = ZFolders.GetFileInFolderType(ZFolderType.temporary, addPath:prefix + "/zdebuglog.txt")
         let (str, _) = ZStr.LoadFromFile(file)
-        storedLines = ZStr.Split(str, sep:"\n")
+        ZDebug.storedLines = ZStr.Split(str, sep:"\n").writable()
     }
 
     static func AppendToFileAndClearLog(prefix:String) {
-        let file = ZFolders.GetFileInFolderType(.temporary, addPath:prefix + "/zdebuglog.txt")
+        let file = ZFolders.GetFileInFolderType(ZFolderType.temporary, addPath:prefix + "/zdebuglog.txt")
         
         if file.DataSizeInBytes > 5 * 1024 * 1024 {
             file.Remove()
-            storedLines.insert("--- ZDebug.Cleared early part of large stored log.", at:0)
+            ZDebug.storedLines.insert("--- ZDebug.Cleared early part of large stored log.", at:0)
         }
+// #swift-only:
         let (stream, err) = file.OpenOutput(append:true)
         if err != nil || stream == nil {
             print("ZDebug.AppendToFileAndClearLog open err:", err?.localizedDescription ?? "")
             return
         }
-        for s in storedLines {
-            let a = [UInt8](s.Utf8())
+        for s in ZDebug.storedLines {
+            let a = [UInt8](ZStr.Utf8(s))
             if stream!.write(a, maxLength: a.count) != a.count {
                 print("ZDebug.AppendToFileAndClearLog error writing.")
                 return
             }
-            stream!.write([UInt8]("\n".Utf8()), maxLength:1)
+            stream!.write([UInt8](ZStr.Utf8("\n")), maxLength:1)
         }
-        storedLines.removeAll()
+// #end
+        ZDebug.storedLines.removeAll()
     }
 }
 

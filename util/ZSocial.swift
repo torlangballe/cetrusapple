@@ -64,7 +64,7 @@ class ZSocial {
                 }
             case .message:
                 let m = MessageView()
-                str = ZStr.ConcatNonEmpty(separator:" ", items: str, post.surl)
+                str = ZStr.ConcatNonEmpty(sep:" ", items:[str, post.surl])
                 m.Send(str, done:done)
 
 

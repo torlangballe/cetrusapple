@@ -67,15 +67,15 @@ class ZDatePartsField : ZShapeView {
         var smonth = ""
         var syear = ""
         if day != nil {
-            sday = "\(day!)" + ZLocale.GetDateInsertDaySymbol()
+            sday = "\(day!)" + ZWords.GetDateInsertDaySymbol()
         }
         if month != nil {
-            smonth = ZLocale.GetMonthFromNumber(month!) + ZLocale.GetDateInsertMonthSymbol()
+            smonth = ZWords.GetMonthFromNumber(month!) + ZWords.GetDateInsertMonthSymbol()
         }
         if useYear && year != nil {
-            syear = "\(year!)" + ZLocale.GetDateInsertYearSymbol()
+            syear = "\(year!)" + ZWords.GetDateInsertYearSymbol()
         }
-        let str = ZStr.ConcatNonEmpty(separator:" ", items:sday, smonth, syear)
+        let str = ZStr.ConcatNonEmpty(sep:" ", items:[sday, smonth, syear])
         text.text = str
         Expose()
     }

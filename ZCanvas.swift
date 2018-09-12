@@ -8,6 +8,7 @@
 import UIKit
 
 typealias ZMatrix = CGAffineTransform
+typealias ZCanvasBlendMode = CGBlendMode
 
 func ZMatrixForRotatingAroundPoint(_ point:ZPos, deg:Double) -> ZMatrix {
     var transform = CGAffineTransform.identity;
@@ -37,7 +38,7 @@ struct ZCanvas {
         context = UIGraphicsGetCurrentContext()!
     }
     
-    func SetColor(_ color: ZColor, opacity:Float = -1.0) {
+    func SetColor(_ color: ZColor, opacity:Double = -1.0) {
         /*
          if(color.type == ZNColor::TILE)
          {
@@ -125,7 +126,7 @@ struct ZCanvas {
         context.drawPath(using: eofill ? CGPathDrawingMode.eoFillStroke : CGPathDrawingMode.fillStroke);
     }
     
-    @discardableResult func DrawImage(_ image: ZImage, destRect: ZRect, align:ZAlignment = ZAlignment.None, opacity:Float32 = 1.0, blendMode:CGBlendMode = .normal, corner:Double? = nil, margin:ZSize = ZSize()) -> ZRect {
+    @discardableResult func DrawImage(_ image: ZImage, destRect: ZRect, align:ZAlignment = ZAlignment.None, opacity:Float32 = 1.0, blendMode:ZCanvasBlendMode = .normal, corner:Double? = nil, margin:ZSize = ZSize()) -> ZRect {
         var vdestRect = destRect
         if align != ZAlignment.None {
             vdestRect = vdestRect.Align(ZSize(image.size), align:align, marg:margin)

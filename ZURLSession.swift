@@ -91,13 +91,13 @@ extension ZUrlRequest {
     }    
 }
 
-private func checkStatusCode(_ response:ZUrlResponse!, check:Bool, error:inout Error?) {
+private func checkStatusCode(_ response:ZUrlResponse!, check:Bool, error:inout ZError?) {
     if check {
         if error == nil {
             if let code = response.StatusCode {
                 if code >= 300 {
                     let str = HTTPURLResponse.localizedString(forStatusCode: code)
-                    error = ZError(domain:ZUrlErrorDomain, code:code, userInfo:[NSLocalizedDescriptionKey:str])
+                    error = ZNewError(str, code:code, domain:ZUrlErrorDomain)
                 }
             }
         }
@@ -109,7 +109,7 @@ class ZUrlSession {
     static var transactionMutex = ZMutex()
     static var transactions = [(String, Int, Bool)]() // url, length, upload
     
-    @discardableResult static func Send(_ request:ZUrlRequest, onMain:Bool = true, async:Bool = true, sessionCount:Int = -1, makeStatusCodeError:Bool = false, done:@escaping (_ response:ZUrlResponse?, _ data:ZData?, _ error:Error?, _ sessionCount:Int)->Void) -> ZURLSessionTask? {
+    @discardableResult static func Send(_ request:ZUrlRequest, onMain:Bool = true, async:Bool = true, sessionCount:Int = -1, makeStatusCodeError:Bool = false, done:@escaping (_ response:ZUrlResponse?, _ data:ZData?, _ error:ZError?, _ sessionCount:Int)->Void) -> ZURLSessionTask? {
         if !async {
             SendSync(request, sessionCount:sessionCount, makeStatusCodeError:makeStatusCodeError, done:done)
             return nil
@@ -146,7 +146,7 @@ class ZUrlSession {
         return task
     }
     
-    static func DownloadPersistantlyToFileInThread(_ request:ZUrlRequest, onCellular:Bool? = nil, makeStatusCodeError:Bool = false, done:@escaping (_ response:ZUrlResponse?, _ file:ZFileUrl?, _ error:Error?)->Void) -> ZURLSessionTask? {
+    static func DownloadPersistantlyToFileInThread(_ request:ZUrlRequest, onCellular:Bool? = nil, makeStatusCodeError:Bool = false, done:@escaping (_ response:ZUrlResponse?, _ file:ZFileUrl?, _ error:ZError?)->Void) -> ZURLSessionTask? {
         let config = URLSessionConfiguration.default
         config.isDiscretionary = true
         let session = URLSession(configuration:config)
@@ -168,13 +168,13 @@ class ZUrlSession {
         return task
     }
     
-    static func SendSync(_ request:ZUrlRequest, timeoutSecs:Double = 11, sessionCount:Int = -1, makeStatusCodeError:Bool = false, done:@escaping (_ response:ZUrlResponse?, _ data:ZData?, _ error:Error?, _ sessionCount:Int)->Void) {
+    static func SendSync(_ request:ZUrlRequest, timeoutSecs:Double = 11, sessionCount:Int = -1, makeStatusCodeError:Bool = false, done:@escaping (_ response:ZUrlResponse?, _ data:ZData?, _ error:ZError?, _ sessionCount:Int)->Void) {
         print("SendSync:", request.url!)
         let downloadGroup = DispatchGroup()
         downloadGroup.enter()
         var vresponse:ZUrlResponse? = nil
         var vdata:ZData? = nil
-        var verror:Error? = nil
+        var verror:ZError? = nil
         var vscount = sessionCount
         Send(request, onMain:false, sessionCount:sessionCount, makeStatusCodeError:makeStatusCodeError) { (resp, data, err, scount) in
             downloadGroup.leave()
@@ -184,7 +184,7 @@ class ZUrlSession {
             vscount = scount
         }
         if downloadGroup.wait(timeout: ZDispatchTimeInSecs(timeoutSecs)) == .timedOut {
-            verror = ZError(message:"SendSync, timed out: " + (request.url?.absoluteString)!)
+            verror = ZNewError("SendSync, timed out: " + (request.url?.absoluteString)!)
         }
         done(vresponse, vdata as ZData?, verror, vscount)
     }
@@ -212,14 +212,14 @@ class ZUrlSession {
         UserDefaults.standard.synchronize()
     }
     
-    static func CheckError(data:ZJSONData) -> (Error?, Int?) {
+    static func CheckError(data:ZJSONData) -> (ZError?, Int?) {
         var m = ZUrlRequestReturnMessage()
         if data.Decode(&m) == nil {
             if m.messages != nil && m.messages!.count != 0 {
-                return (ZError(message:m.messages!.first!), nil)
+                return (ZNewError(m.messages!.first!), nil)
             }
             if m.message != nil {
-                return (ZError(message:m.message!), m.code)
+                return (ZNewError(m.message!), m.code)
             }
         }
         return (nil, nil)
@@ -237,7 +237,7 @@ class ZRateLimiter {
     }
     
     func Add() {
-        timeStamps.append(ZTimeNow)
+        timeStamps.append(ZTime.Now())
     }
     
     func IsExceded() -> Bool {

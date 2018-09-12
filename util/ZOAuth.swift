@@ -18,7 +18,7 @@ class ZOAuth {
     
     func GetAuthorizationHeader(_ url:String, callbackUrl:String, get:Bool, urlArgs:[String:String]) -> String {
         let shttpmethod = get ? "GET" : "POST"
-        let stimestamp = "\(ZTimeNow.date.timeIntervalSince1970)"
+        let stimestamp = "\(ZTime.Now().date.timeIntervalSince1970)"
         let snonce = ZCrypto.MakeUuid()
         
         //url = "https://api.twitter.com/1/statuses/update.json"
@@ -50,10 +50,10 @@ class ZOAuth {
         args += urlArgs
         
         var sargs = args.stringFromHttpParameters()
-        sargs = ZStr.UrlQuote(sargs)
+        sargs = ZStr.UrlEncode(sargs) ?? ""
         
-        let ssignaturebase = shttpmethod + "&" + ZStr.UrlQuote(url) + "&" + sargs
-        let skey  = ZStr.UrlQuote(sconsumerSecret) + "&" + ZStr.UrlQuote(sauthTokenSecret)
+        let ssignaturebase = shttpmethod + "&" + (ZStr.UrlEncode(url) ?? "") + "&" + sargs
+        let skey  = (ZStr.UrlEncode(sconsumerSecret) ?? "") + "&" + (ZStr.UrlEncode(sauthTokenSecret) ?? "")
         
         let ssignature64 = ZCrypto.HmacSha1ToBase64(ssignaturebase, key:skey)
         authargs["oauth_signature"] = ssignature64

@@ -4,7 +4,7 @@
 //  Created by Tor Langballe on /23/9/14.
 //
 
-// #package com.github.torlangballe.zetrus
+// #package com.github.torlangballe.CetrusAndroid
 
 /* #kotlin-raw:
  import kotlin.math.*
@@ -21,11 +21,10 @@ struct ZRect {
     var TopRight: ZPos     { return ZPos(Max.x, Min.y) }
     var BottomLeft: ZPos   { return ZPos(Min.x, Max.y) }
     var BottomRight: ZPos  { return Max }
-    static var Null: ZRect { get { return ZRect(0.0, 0.0, 0.0, 0.0) } }
     
     var MaxPos : ZPos {
         get { return Max }
-        set { pos.operator_plusAssign(newValue - Max) }
+        set { pos += (newValue - Max) }
     }
     var Max: ZPos {
         get { return ZPos(pos.x + size.w, pos.y + size.h) }
@@ -37,29 +36,51 @@ struct ZRect {
     var Min: ZPos {
         get { return pos }
         set {
-            size += newValue.Size
+            size.w += (pos.x - newValue.x)
+            size.h += (pos.y - newValue.y)
             pos = newValue
         }
     }
     var Center : ZPos {
-        get { return pos + size / 2 }
+        get { return pos + size / 2.0 }
         set { pos = newValue - size.GetPos() / 2.0 }
     }
-
+    
+    static var Null: ZRect { get { return ZRect(0.0, 0.0, 0.0, 0.0) } }
+    static func MergeAll(_ rects:[ZRect]) -> [ZRect] {
+        var merged = true
+        var rold = rects
+        while merged {
+            var rnew = [ZRect]()
+            merged = false;
+            for (i, r) in rold.enumerated() {
+                var used = false
+                for j in i + 1 ..< rold.count {
+                    if r.Overlaps(rold[j].Expanded(4.0)) {
+                        var n = rects[i]
+                        n.UnionWith(rect:rold[j])
+                        rnew.append(n)
+                        merged = true
+                        used = true
+                    }
+                }
+                if !used {
+                    rnew.append(r)
+                }
+            }
+            rold = rnew
+        }
+        return rold
+    }
+    
     init(_ x0:Float64, _ y0:Float64, _ x1:Float64, _ y1:Float64) { self.init(pos:ZPos(x0, y0), size:ZSize(x1 - x0, y1 - y0)) }
     init(min: ZPos, max: ZPos)                                   { self.init(pos:min, size:ZSize(max.x - min.x, max.y - min.y)) }
-
-    init(center:ZPos, radius:Double, radiusy:Double? = nil) {
-        var s = ZSize(radius, radius)
-        if radiusy != nil {
-            s = ZSize(radius, radiusy!)
-        }
-        self.init(pos:center - s.GetPos(), size:s * 2)
-    }
+    init(rect:ZRect)                                             { self.init(pos:rect.pos, size:rect.size) }
+    init(center:ZPos, radius:Double, radiusy:Double? = nil)      { self.init(rect:centerToRect(center:center, radius:radius, radiusy:radiusy)) }
 
     func Expanded(_ e: ZSize) -> ZRect                           { return ZRect(pos: pos - e.GetPos(), size:size + e * Float64(2.0)); }
     func Expanded(_ n: Float64) -> ZRect                         { return Expanded(ZSize(n, n)) }
-    func Centered(_ center:ZPos) -> ZRect                        { return ZRect(pos:center-size.GetPos()/2, size:size) }
+    func Centered(_ center:ZPos) -> ZRect                        { return ZRect(pos:center-size.GetPos() / 2.0, size:size) }
     func Overlaps(_ rect:ZRect) -> Bool                          { return rect.Min.x < Max.x && rect.Min.y < Max.y && rect.Max.x > Min.x && rect.Max.y > Min.y }
     func Contains(_ pos:ZPos) -> Bool                            { return pos.x >= Min.x && pos.x <= Max.x && pos.y >= Min.y && pos.y <= Max.y }
     func Align(_ s:ZSize, align:ZAlignment, marg:ZSize = ZSize(), maxSize:ZSize = ZSize()) -> ZRect {
@@ -71,9 +92,9 @@ struct ZRect {
         var wa = Double(s.w)
         var wf = Double(size.w)
         //        if (align & (ZAlignment.HorShrink|ZAlignment.HorExpand)) {
-        if !(align & .MarginIsOffset) {
+        if !(align & ZAlignment.MarginIsOffset) {
             wf -= Double(marg.w)
-            if align & .HorCenter {
+            if align & ZAlignment.HorCenter {
                 wf -= Double(marg.w)
             }
         }
@@ -81,14 +102,14 @@ struct ZRect {
         var ha = Double(s.h)
         var hf = Double(size.h)
         //        if (align & (ZAlignment.VertShrink|ZAlignment.VertExpand)) {
-        if !(align & .MarginIsOffset) {
-            hf -= Double(marg.h * 2)
+        if !(align & ZAlignment.MarginIsOffset) {
+            hf -= Double(marg.h * 2.0)
         }
-        if align == .ScaleToFitProportionally {
+        if align == ZAlignment.ScaleToFitProportionally {
             let xratio = wf / wa
             let yratio = hf / ha
             var ns = size
-            if xratio != 1 || yratio != 1 {
+            if xratio != 1.0 || yratio != 1.0 {
                 if xratio > yratio {
                     ns = ZSize(wf, ha * xratio)
                 } else {
@@ -97,7 +118,6 @@ struct ZRect {
             }
             return ZRect(size:ns).Centered(Center)
         }
-        //        }
         if (align & ZAlignment.HorExpand) && (align & ZAlignment.VertExpand) {
             if (align & ZAlignment.NonProp) {
                 wa = wf
@@ -164,18 +184,18 @@ struct ZRect {
             ha = hf;
         }
         
-        if maxSize.w != 0 {
-            minimize(&wa, Double(maxSize.w))
+        if maxSize.w != 0.0 {
+            wa = min(wa, Double(maxSize.w))
         }
-        if maxSize.h != 0 {
-            minimize(&ha, Double(maxSize.h))
+        if maxSize.h != 0.0 {
+            ha = min(ha, Double(maxSize.h))
         }
         if (align & ZAlignment.HorOut) {
             if (align & ZAlignment.Left) {
                 x = Double(pos.x - marg.w - s.w)
             } else if (align & ZAlignment.HorCenter) {
-                //                x = Double(pos.x) - wa / 2
-                x = Double(pos.x) + (wf - wa) / 2
+                //                x = Double(pos.x) - wa / 2.0
+                x = Double(pos.x) + (wf - wa) / 2.0
             } else {
                 x = Double(Max.x + marg.w)
             }
@@ -188,11 +208,11 @@ struct ZRect {
                 x = Double(Max.x) - wa - Double(marg.w)
             } else {
                 x = Double(pos.x)
-                if !(align & .MarginIsOffset) {
+                if !(align & ZAlignment.MarginIsOffset) {
                     x += Double(marg.w)
                 }
-                x = x + (wf - wa) / 2
-                if align & .MarginIsOffset {
+                x = x + (wf - wa) / 2.0
+                if align & ZAlignment.MarginIsOffset {
                     x  += Double(marg.w)
                 }
             }
@@ -202,56 +222,30 @@ struct ZRect {
             if (align & ZAlignment.Top) {
                 y = Double(pos.y - marg.h) - ha;
             } else if (align & ZAlignment.VertCenter) {
-                //                y = Double(pos.y) - ha / 2;
-                y = Double(pos.y) + (hf - ha) / 2
+                //                y = Double(pos.y) - ha / 2.0;
+                y = Double(pos.y) + (hf - ha) / 2.0
             } else {
                 y = Double(pos.y + marg.h);
             }
         }
         else
         {
-            if (align & .Top) {
+            if (align & ZAlignment.Top) {
                 y = Double(pos.y + marg.h);
-            } else if (align & .Bottom) {
+            } else if (align & ZAlignment.Bottom) {
                 y = Double(Max.y) - ha - Double(marg.h);
             } else {
                 y = Double(pos.y)
-                if !(align & .MarginIsOffset) {
+                if !(align & ZAlignment.MarginIsOffset) {
                     y  += Double(marg.h)
                 }
                 y = y + max(0.0, hf - ha) / 2.0;
-                if align & .MarginIsOffset {
+                if align & ZAlignment.MarginIsOffset {
                     y += Double(marg.h)
                 }
             }
         }
         return ZRect(pos:ZPos(x, y), size:ZSize(wa, ha));
-    }
-    
-    static func MergeAll(_ rects:[ZRect]) -> [ZRect] {
-        var merged = true
-        var rold = rects
-        while merged {
-            var rnew:[ZRect] = []
-            merged = false;
-            for (i, r) in rold.enumerated() {
-                var used = false
-                for j in i + 1 ..< rold.count {
-                    if r.Overlaps(rold[j].Expanded(4.0)) {
-                        var n = rects[i]
-                        n.UnionWith(rect:rold[j])
-                        rnew.append(n)
-                        merged = true
-                        used = true
-                    }
-                }
-                if !used {
-                    rnew.append(r)
-                }
-            }
-            rold = rnew
-        }
-        return rold
     }
     
     mutating func MoveInto(_ rect:ZRect) {
@@ -264,7 +258,8 @@ struct ZRect {
     mutating func UnionWith(rect:ZRect) {
         if !rect.IsNull {
             if IsNull {
-                self = rect
+                pos = rect.pos
+                size = rect.size
             } else {
                 if rect.Min.x < Min.x { Min.x = rect.Min.x }
                 if rect.Min.y < Min.y { Min.y = rect.Min.y }
@@ -281,14 +276,14 @@ struct ZRect {
         if pos.y < Min.y { Min.y = pos.y }
     }
     
-    func operator_plus(_ a:ZRect) -> ZRect     { return ZRect(min:pos + a.pos, max:Max + a.Max) }
-    func operator_minus(_ a:ZRect) -> ZRect    { return ZRect(min:pos - a.pos, max:Max - a.Max) }
-    func operator_div(_ a:ZSize) -> ZRect      { return ZRect(min:Min / a.GetPos(), max:Max / a.GetPos()) }
-    mutating func operator_plusAssign(_ a:ZRect)        { pos += (a.pos); Max += (a.Max) }
-    mutating func operator_minusAssign(_ a:ZRect)       { pos -= (a.pos); Max -= (a.Max) }
-    mutating func operator_plusAssign(_ a:ZPos)         { pos += a }
-    mutating func vminusAssign(_ a:ZPos)        { pos -= a }
-
+    func operator_plus(_ a:ZRect) -> ZRect        { return ZRect(min:pos + a.pos, max:Max + a.Max) }
+    func operator_minus(_ a:ZRect) -> ZRect       { return ZRect(min:pos - a.pos, max:Max - a.Max) }
+    func operator_div(_ a:ZSize) -> ZRect         { return ZRect(min:Min / a.GetPos(), max:Max / a.GetPos()) }
+//    mutating func operator_plusAssign(_ a:ZRect)  { Min += (a.pos); Max += (a.Max) }
+//    mutating func operator_minusAssign(_ a:ZRect) { Min -= (a.pos); Max -= (a.Max) }
+    mutating func operator_plusAssign(_ a:ZPos)   { pos += a }
+    mutating func vminusAssign(_ a:ZPos)          { pos -= a }
+    
     // #swift-only:
     init(pos:ZPos = ZPos(), size:ZSize = ZSize()) { self.pos = pos; self.size = size }
     init(_ r: CGRect)                             { pos = ZPos(r.origin); size = ZSize(r.size) }
@@ -296,14 +291,21 @@ struct ZRect {
     // #end
 }
 
+private func centerToRect(center:ZPos, radius:Double, radiusy:Double? = nil) -> ZRect {
+    var s = ZSize(radius, radius)
+    if radiusy != nil {
+        s = ZSize(radius, radiusy!)
+    }
+    return ZRect(pos:center - s.GetPos(), size:s * 2.0)
+}
+
 // #swift-only:
-func +(me:ZRect, a:ZRect) -> ZRect      { return me.operator_plus(a)  }
-func -(me:ZRect, a:ZRect) -> ZRect      { return me.operator_minus(a) }
-func +=(me:inout ZRect, a:ZRect)        { me.operator_plusAssign(a)   }
-func -=(me:inout ZRect, a:ZRect)        { me.operator_minusAssign(a)  }
-func +=(me:inout ZRect, a:ZPos)         { me.operator_plusAssign(a)   }
-//func -=(me:inout ZRect, a:ZPos)         { me.operator_minusAssign(a)  }
-func /(me:ZRect, a:ZSize) -> ZRect      { return me.operator_div(a)   }
+func +(me:ZRect, a:ZRect) -> ZRect       { return me.operator_plus(a)       }
+func -(me:ZRect, a:ZRect) -> ZRect       { return me.operator_minus(a)      }
+func +=(me:inout ZRect, a:ZRect)         { me.Min += a.pos; me.Max += a.Max }
+func -=(me:inout ZRect, a:ZRect)         { me.Min -= a.pos; me.Max -= a.Max }
+func +=(me:inout ZRect, a:ZPos)          { me.operator_plusAssign(a)        }
+func /(me:ZRect, a:ZSize) -> ZRect       { return me.operator_div(a)        }
 extension ZRect: CustomStringConvertible {
     var description: String {
         return "[\(Min.x),\(Min.y) \(size.w)x\(size.h)]"

@@ -1,10 +1,10 @@
 //
-//  BottomRow.swift
-//  Zed
+//  ZTitleBar.swift
 //
 //  Created by Tor Langballe on /16/11/15.
-//  Copyright © 2015 Capsule.fm. All rights reserved.
 //
+
+// #package com.github.torlangballe.CetrusAndroid
 
 import UIKit
 
@@ -18,49 +18,43 @@ class ZTitleBar : ZStackView {
     
     static var Color = ZColor(r:0.2, g:0.3, b:1)
     
-    init(text:String = "", closeType:CloseButtons = .cross, showDots:Bool = false, closeAlignX:ZAlignment = .Left) {
+    init(text:String = "", closeType:CloseButtons = CloseButtons.cross, closeAlignX:ZAlignment = ZAlignment.Left) {
         closeButton = ZImageView(namedImage:closeType.rawValue + ".png")
-        title = ZLabel(text:text, maxWidth:ZScreen.Main.size.w, font:ZFont.Nice(25), align:.Left)
+        title = ZLabel(text:text, maxWidth:ZScreen.Main.size.w, font:ZFont.Nice(25.0), align:ZAlignment.Left)
         title.Color = ZColor.White()
         title.adjustsFontSizeToFitWidth = true
         title.minimumScaleFactor = 0.5
 
         super.init(name:"titlebar")
         
-        space = 0
-        margin = ZRect(0, 0, 0, -4)
+        space = 0.0
+        margin = ZRect(0.0, 0.0, 0.0, -4.0)
         accessibilityLabel = text
         minSize = ZSize(100, 60)
 //        if ZScreen.HasNotch() {
 //            minSize.h += 88
 //        }
-        closeButton.AddTarget(self, forEventType:.pressed)
-        closeButton.accessibilityLabel = ZLocale.GetClose()
-        AddTarget(self, forEventType:.pressed)
-        Add(closeButton, align:closeAlignX | .Bottom)
-        Add(title, align:.HorCenter | .Bottom, marg:ZSize(0, 5))
+        closeButton.AddTarget(self, forEventType:ZControlEventType.pressed)
+        closeButton.accessibilityLabel = ZWords.GetClose()
+        AddTarget(self, forEventType:ZControlEventType.pressed)
+        Add(closeButton, align:closeAlignX | ZAlignment.Bottom)
+        Add(title, align:ZAlignment.HorCenter | ZAlignment.Bottom, marg:ZSize(0, 5))
         SetBackgroundColor(ZTitleBar.Color)
     }
 
+    // #swift-only:
     required init?(coder aDecoder: NSCoder) { fatalError("init(coder:) has not been implemented") }
-
-    func SetDotCount(_ count:Int, level:Int, arrange:Bool = false) {
-        if arrange {
-            ArrangeChildrenAnimated()
-        }
-    }
+    // #end
     
     override func HandlePressed(_ sender: ZView, pos:ZPos) {
-        switch sender.View() {
-        case closeButton:
+        if sender.View() == closeButton {
             if closeHandler != nil {
                 closeHandler!.HandleClose(sender:self)
             } else {
                 ZPopTopView() //overrideDuration:0) //, overrideTransition:.fade)
             }
-        default:
+        } else {
             ZTextDismissKeyboard()
-            break
         }
     }
 
@@ -80,7 +74,7 @@ class ZTitleBar : ZStackView {
     func ShowActivity(_ show:Bool = true) {
         if show && FindCellWithName("activity") == nil {            
             let activity = ZActivityIndicator(big:false)
-            Add(activity, align:.VertCenter | .Right)
+            Add(activity, align:ZAlignment.VertCenter | ZAlignment.Right)
             activity.Start()
         } else {
             RemoveNamedChild("activity")

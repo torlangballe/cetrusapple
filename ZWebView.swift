@@ -10,7 +10,7 @@ import UIKit
 
 protocol ZWebViewDelegate {
     func HandleFinishedDownload(_ view:ZWebView, url:String)
-    func HandleFailedDownload(_ view:ZWebView, error:Error)
+    func HandleFailedDownload(_ view:ZWebView, error:ZError)
     func HandleShouldNotLoadUrl(_ view:ZWebView, url:String) -> Bool
     func HandleEnableBack(_ view:ZWebView, enabled:Bool)
     func HandleEnableForward(_ view:ZWebView, enabled:Bool)

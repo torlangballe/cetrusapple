@@ -21,10 +21,14 @@ extension Dictionary where Value : Equatable {
     }
 }
 
-extension String {
-    func Utf8() -> String.UTF8View {
-        return self.utf8
+extension Array {
+    func writable() -> Array {
+        return self
     }
+}
+
+func ZBitwiseInvert<T : BinaryInteger>(_ v:T) -> T {
+    return ~v
 }
 
 extension Dictionary where Value : Comparable {
@@ -48,8 +52,8 @@ extension Dictionary where Key : Comparable {
         let sorted = self.keys.sorted(by: {$0 < $1})
         let params = sorted.map { (k)->String in
             if escape {
-                let percentEscapedKey = ZStr.UrlQuote((k as! String))
-                let percentEscapedValue = ZStr.UrlQuote((self[k] as! String))
+                let percentEscapedKey = ZStr.UrlEncode((k as! String)) ?? ""
+                let percentEscapedValue = ZStr.UrlEncode((self[k] as! String)) ?? ""
                 return "\(percentEscapedKey)=\(percentEscapedValue)"
             } else {
                 return "\(k)=\(String(describing: self[k]))"
@@ -86,10 +90,14 @@ extension ZRange {
 }
 
 extension Array {
-    mutating func removeAt(_ index:Int) {
-        self.remove(at:index)
+//    mutating func removeAt(_ index:Int) {
+//        self.remove(at:index)
+//    }
+//
+    func indexWhere(_ w:(Element)->Bool) -> Int? {
+        return index(where:w)
     }
-
+    
     @discardableResult mutating func removeIf(_ check:(_ object:Element)-> Bool) -> Int {
         let c = count
         self = filter { return !check($0) }
@@ -153,8 +161,8 @@ extension Array where Element : Equatable {
         return self.filter{!sub.contains($0)}
     }
     
-    @discardableResult mutating func removeValue(_ v:Element) -> Bool {
-        if let i = index(where:{$0 == v}) {
+    @discardableResult mutating func removeByValue(_ v:Element) -> Bool {
+        if let i = indexWhere({$0 == v}) {
             remove(at:i)
             return true
         }
@@ -200,22 +208,7 @@ extension String {
         let e = self.endIndex
         let range = s ..< e
         return range
-    }
-    
-    var lastCharAsString: String {
-        if let c = self.last {
-            return String(c)
-        }
-        return ""
-    }
-
-    var firstCharAsString: String {
-        if let c = self.first {
-            return String(c)
-        }
-        return ""
-    }
-
+    }    
 }
 
 extension Character

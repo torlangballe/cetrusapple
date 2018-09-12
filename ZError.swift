@@ -8,35 +8,20 @@
 
 import Foundation
 
-//typealias Error = Error
+typealias ZError = Error
 
-var ZGeneralError = ZError(message:"Zed", code:1)
+func ZNewError(_ message:String, code:Int = 0, domain:String = "Zetrus") -> ZError {
+    return NSError(domain:domain, code:code, userInfo:[NSLocalizedDescriptionKey:message])
+}
+
+extension ZError {
+    func GetMessage() -> String {
+        return localizedDescription
+    }
+}
+
+var ZGeneralError = ZNewError("Zed", code:1)
 
 let ZUrlErrorDomain = NSURLErrorDomain
 let ZCapsuleErrorDomain = "fm.capsule.error"
-
-class ZError : NSError {
-    convenience init(message:String, code:Int = 0) {
-        self.init(domain:"Zed", code:code, userInfo:[NSLocalizedDescriptionKey:message])
-    }
-}
-
-extension Error {
-    
-    func GetMessage() -> String {
-        let ns = self as NSError
-        if let m = ns.userInfo["message"] as? String {
-            return m
-        }
-        return localizedDescription
-    }
-
-    func GetTypeString() -> String {
-        let ns = self as NSError
-        if let m = ns.userInfo["__type"] as? String {
-            return m
-        }
-        return ""
-    }
-}
 

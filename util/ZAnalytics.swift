@@ -8,7 +8,7 @@
 
 import Foundation
 //import Fabric
-import Crashlytics
+//import Crashlytics
 
 //import HockeySDK
 
@@ -60,13 +60,13 @@ class ZAnalytics {
         SetValue(kGAIUserId, value:id)
         
         if !email.isEmpty {
-            Crashlytics.sharedInstance().setUserEmail(email)
+//            Crashlytics.sharedInstance().setUserEmail(email)
         }
         if !id.isEmpty {
-            Crashlytics.sharedInstance().setUserIdentifier(id)
+//            Crashlytics.sharedInstance().setUserIdentifier(id)
         }
         if !name.isEmpty {
-            Crashlytics.sharedInstance().setUserName(name)
+//            Crashlytics.sharedInstance().setUserName(name)
         }
         //        BITHockeyManager.shared().userID = id
         //        BITHockeyManager.shared().userEmail = email
@@ -82,7 +82,7 @@ class ZAnalytics {
     }
  
     func InitCrashReporter() {
-        Crashlytics().debugMode = true
+//        Crashlytics().debugMode = true
         /*
         let shared = BITHockeyManager.shared()
         shared.configure(withIdentifier:"b8c90f7a36c0459899bda324de819f9e")
@@ -96,7 +96,7 @@ class ZAnalytics {
     
     static func Crash() {
         ZDebug.Print("Crash!")
-        Crashlytics.sharedInstance().crash()
+//        Crashlytics.sharedInstance().crash()
     }
 }
 

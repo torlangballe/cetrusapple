@@ -43,9 +43,9 @@ struct ZPlaceNames {
     }
     
     func Concat() -> String {
-        var str = ZStr.ConcatNonEmpty(items:streetNo, route, " ")
-        str = ZStr.ConcatNonEmpty(separator:", ", items:str, subLocality, locality)
-        str = ZStr.ConcatNonEmpty(separator:", ", items:str, adminArea, countryName)
+        var str = ZStr.ConcatNonEmpty(items:[streetNo, route, " "])
+        str = ZStr.ConcatNonEmpty(sep:", ", items:[str, subLocality, locality])
+        str = ZStr.ConcatNonEmpty(sep:", ", items:[str, adminArea, countryName])
         return str
     }
 }

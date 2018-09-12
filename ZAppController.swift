@@ -229,13 +229,13 @@ class ZAppController : UIResponder, UIApplicationDelegate, UNUserNotificationCen
     }
     
     func applicationDidEnterBackground(_ application:UIApplication) {
-        mainZApp?.backgroundTime = ZTimeNow
+        mainZApp?.backgroundTime = ZTime.Now()
         mainZApp?.activationTime = ZTimeNull
         mainZApp?.HandleBackgrounded(true)
     }
     
     func applicationWillEnterForeground(_ application:UIApplication) {
-        mainZApp?.activationTime = ZTimeNow
+        mainZApp?.activationTime = ZTime.Now()
         mainZApp?.backgroundTime = ZTimeNull
         mainZApp?.HandleBackgrounded(false)
     }
@@ -253,7 +253,7 @@ class ZAppController : UIResponder, UIApplicationDelegate, UNUserNotificationCen
     
     func applicationDidBecomeActive(_ application:UIApplication) {
 //!        FBSDKAppEvents.activateApp()
-        mainZApp?.activationTime = ZTimeNow
+        mainZApp?.activationTime = ZTime.Now()
         mainZApp?.HandleActivated(true)
         ZRecusivelyHandleActivation(activated:true)
     }

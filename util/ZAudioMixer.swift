@@ -79,7 +79,7 @@ import AVFoundation
         str = ZStr.Head(str, chars:30)
         //    ZDebug.Print("*** mixadd:", pos, item.calculatedDuration, str)
         pos += item.calculatedDuration - item.end.overlapSecs
-        maximize(&pos, 0)
+        pos = max(pos, 0)
         return pos
     } catch {
         return pos
@@ -90,7 +90,7 @@ import AVFoundation
 
 class ZAudioMixer : AVMutableAudioMix {
     func MixMediaItemsToFile(_ mediaItems:[ZMediaItem], outFile:ZFileUrl, async:Bool = true, done:@escaping (Error?,[ZMediaItem])->Void) {
-        let start = ZTimeNow
+        let start = ZTime.Now()
         var vmediaItems = mediaItems
         let (composition, mixer) = getMixerAndComponentsForMediaItems(&vmediaItems)
         //        ZDebug.Print("MixMediaItemsToFile comps:", composition.tracks.count)
@@ -103,7 +103,7 @@ class ZAudioMixer : AVMutableAudioMix {
                 }
                 done(err, vmediaItems)
             } else {
-                done(ZError(message:"Error copying silent audo file for empty media items"), vmediaItems)
+                done(ZNewError("Error copying silent audo file for empty media items"), vmediaItems)
             }
             return
         }
@@ -144,7 +144,7 @@ class ZAudioMixer : AVMutableAudioMix {
                     if !outFile.Exists() {
                         let str = "Mixing: No file for successful mix: " + outFile.AbsString
                         ZDebug.Print(str)
-                        done(ZError(message:str), vmediaItems)
+                        done(ZNewError(str), vmediaItems)
                     } else {
                         ZDebug.Print("MixingTime Secs:", start.Since())
                         done(nil, vmediaItems)
@@ -162,7 +162,7 @@ class ZAudioMixer : AVMutableAudioMix {
                     }
 
                 }
-                done(ZError(message:"ZAudioMixer.MixMediaItemsToFile: timed out mixing."), vmediaItems)
+                done(ZNewError("ZAudioMixer.MixMediaItemsToFile: timed out mixing."), vmediaItems)
             }
         }
     }
@@ -201,13 +201,13 @@ private func getMixerAndComponentsForMediaItems(_ mediaItems:inout [ZMediaItem])
             if m.voice.type != .acapela {
                 continue
             }
-            //            let time = ZTimeNow
+            //            let time = ZTime.Now()
             let error = m.RenderTextToTemporary()
             if error != nil {
                 mainZApp?.ShowDebugText("getMixerAndComponentsForMediaItems:Error rendering text: " + m.processedText + ": " + error!.localizedDescription)
                 continue
             }
-            //            ZDebug.Print("rendered text in:", (ZTimeNow - time), "for:", m.text)
+            //            ZDebug.Print("rendered text in:", (ZTime.Now() - time), "for:", m.text)
         }
         assert(!m.url.isEmpty)
         pos = addTrackFromMediaItem(&m, composition:composition, posSecs:pos, mixer:mixer, background:false)

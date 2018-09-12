@@ -1,18 +1,16 @@
 //
 //  ZTranslations.swift
-//  capsulefm
 //
 //  Created by Tor Langballe on /10/6/16.
-//  Copyright © 2016 Capsule.fm. All rights reserved.
 //
-
 
 import Foundation
 
-let ZTSOverrideKey = "/ZOverrideTransLangCode" // make this absolute, as it's read very early before userid is used as prefix to keys
+// set a 2-char langcode with key ztsLangCodeOverrideKey to override language
+
+private let ztsLangCodeOverrideKey = "/ZOverrideTransLangCode" // make this absolute, as it's read very early before userid is used as prefix to keys
 private var translations = Translations()
 private var mainLoaded = false;
-
 
 func ZTS(_ str:String, langCode:String = "", filePath:String = #file, args:CVarArg...) -> String {
     var trans: Translations
@@ -35,7 +33,7 @@ func ZTS(_ str:String, langCode:String = "", filePath:String = #file, args:CVarA
 }
 
 func ZSetTranslationLangCode(_ code:String) {
-    ZKeyValueStore.SetString(code, key:ZTSOverrideKey)
+    ZKeyValueStore.SetString(code, key:ztsLangCodeOverrideKey)
     mainLoaded = false
 }
 
@@ -74,7 +72,7 @@ class Translations {
             if lang == "nb" {
                 lang = "no"
             }
-            if let overrideLang = ZKeyValueStore.StringForKey(ZTSOverrideKey) {
+            if let overrideLang = ZKeyValueStore.StringForKey(ztsLangCodeOverrideKey) {
                 if !overrideLang.isEmpty {
                     lang = overrideLang
                 }
@@ -136,7 +134,7 @@ class Translations {
 @discardableResult private func getQuoted(_ str:String, dest: inout String) -> Bool {
     var vstr = ZStr.Trim(str, chars:" \t\r\n")
     if !vstr.isEmpty {
-        if vstr.firstCharAsString == "\"" && vstr.lastCharAsString == "\"" {
+        if ZStr.Head(str) == "\"" && ZStr.Tail(vstr) == "\"" {
             vstr = ZStr.Body(vstr, pos:1, size:vstr.count - 2)
             dest += ZStr.Unescape(vstr)
             return true

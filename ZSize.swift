@@ -5,12 +5,11 @@
 //  Copyright (c) 2014 Capsule.fm. All rights reserved.
 //
 
-// #package com.github.torlangballe.zetrus
+// #package com.github.torlangballe.CetrusAndroid
 
 import UIKit
 
-struct ZSize
-{
+struct ZSize {
     var w:Double = 0.0
     var h:Double = 0.0
 
@@ -60,6 +59,7 @@ struct ZSize
         w = max(w, a.w)
         h = max(h, a.h)
     }
+/*
     mutating func operator_plusAssign(_ a:ZSize) {
         w += a.w
         h += a.h
@@ -68,6 +68,7 @@ struct ZSize
         w -= a.w
         h -= a.h
     }
+ */
     mutating func operator_timesAssign(_ a:Double) {
         w *= a
         h *= a
@@ -91,13 +92,6 @@ struct ZSize
     func operator_div(_ a:Double) -> ZSize    { return ZSize(w / a, h / a)     }
 }
 
-//func operator_plus(_ me:ZSize, _ a:ZSize) -> ZSize    { return ZSize(me.w + a.w, me.h + a.h) }
-//func operator_minus(_ me:ZSize, _ a:ZSize) -> ZSize   { return ZSize(me.w - a.w, me.h - a.h) }
-//func operator_times(_ me:ZSize, _ a:ZSize) -> ZSize   { return ZSize(me.w * a.w, me.h * a.h) }
-//func operator_times(_ me:ZSize, _ a:Double) -> ZSize  { return ZSize(me.w * a, me.h * a)     }
-//func operator_div(_ me:ZSize, _ a:ZSize) -> ZSize     { return ZSize(me.w / a.w, me.h / a.h) }
-//func operator_div(_ me:ZSize, _ a:Double) -> ZSize    { return ZSize(me.w * a, me.h * a)     }
-
 // #swift-only:
 func +(me:ZSize, a:ZSize) -> ZSize       { return me.operator_plus(a)      }
 func -(me:ZSize, a:ZSize) -> ZSize       { return me.operator_minus(a)     }
@@ -105,8 +99,8 @@ func *(me:ZSize, a:ZSize) -> ZSize       { return me.operator_times(a)     }
 func *(me:ZSize, a:Double) -> ZSize      { return me.operator_times(a)     }
 func /(me:ZSize, a:Double) -> ZSize      { return me.operator_div(a)       }
 func /(me:ZSize, a:ZSize) -> ZSize       { return me.operator_div(a)       }
-func += (me:inout ZSize, a:ZSize)        { me.operator_plusAssign(a)       }
-func -= (me:inout ZSize, a:ZSize)        { me.operator_minusAssign(a)      }
+func += (me:inout ZSize, a:ZSize)        { me.w += a.w; me.h += a.h        }
+func -= (me:inout ZSize, a:ZSize)        { me.w -= a.w; me.h -= a.h        }
 func *= (me:inout ZSize, a:Double)       { me.operator_timesAssign(a)      }
 func *= (me:inout ZSize, a:Float)        { me.operator_timesAssign(a)      }
 prefix func -(me:ZSize) -> ZSize         { return me.operator_unaryMinus() }
@@ -116,5 +110,4 @@ extension ZSize {
     func GetCGSize() -> CGSize       { return CGSize(width:CGFloat(w), height:CGFloat(h)) }
     init(_ s:CGSize)                 { self.init(Double(s.width), Double(s.height)) }
 }
-
 // #end

@@ -12,10 +12,13 @@ typealias ZCalendarUnit = NSCalendar.Unit
 
 let ZTimeNull = ZTime(date:Date.distantPast)
 let ZTimeDistantFuture = ZTime(date:Date.distantFuture)
-let ZTimeNow = ZTime(timeIntervalSinceNow:0)
 
 class ZTime {
     let date:Date
+
+    static func Now() -> ZTime {
+        return ZTime(timeIntervalSinceNow:0)
+    }
 
     var IsNull:Bool {
         return date.timeIntervalSinceReferenceDate == ZTimeNull.date.timeIntervalSinceReferenceDate
@@ -45,7 +48,7 @@ class ZTime {
         let cal = Calendar(identifier:Calendar.Identifier.gregorian)
         var comps = DateComponents()
         
-        let t = ZTimeNow
+        let t = ZTime.Now()
         let parts = t.GetGregorianDateParts(timezone:timezone)
         
         comps.year = (year == -1 ? parts.year : year)

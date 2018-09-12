@@ -8,9 +8,9 @@
 
 import UIKit
 
-class ZScreen {
-    enum Layout:Int { case portrait, portraitUpsideDown, landscapeLeft, landscapeRight }
+enum ZScreenLayout:Int { case portrait, portraitUpsideDown, landscapeLeft, landscapeRight }
 
+class ZScreen {
     static var isLocked: Bool = false
     static var MainUsableRect = ZRect(UIScreen.main.bounds)
     static var Scale = Float(UIScreen.main.scale)
@@ -77,7 +77,7 @@ class ZScreen {
         UIApplication.shared.isIdleTimerDisabled = !on
     }
     
-    static func Orientation() -> Layout {
+    static func Orientation() -> ZScreenLayout {
         switch UIDevice.current.orientation {
         case .landscapeLeft:
             return .landscapeLeft

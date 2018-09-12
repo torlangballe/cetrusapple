@@ -19,11 +19,11 @@ class ZConfirmStack : ZStackView {
         var ca = ZAlignment.HorCenter
         if useOk {
             let set = createShape("check", strokeColor:strokecolor, align:.Right)
-            set.accessibilityLabel = ZLocale.GetSet()
+            set.accessibilityLabel = ZWords.GetSet()
             ca = .Left
         }
         let cancel = createShape("cross", strokeColor:strokecolor, align:ca)
-        cancel.accessibilityLabel = ZLocale.GetCancel()
+        cancel.accessibilityLabel = ZWords.GetCancel()
     }
     
     required init?(coder aDecoder: NSCoder) { fatalError("init(coder:) has not been implemented") }

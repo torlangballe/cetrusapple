@@ -13,7 +13,7 @@ class ZApp : ZObject {
     static var appFile: ZFileUrl? = nil
     var activationTime = ZTimeNull
     var backgroundTime = ZTimeNull // -1 if not in background
-    var startTime = ZTimeNow
+    var startTime = ZTime.Now()
     var startedCount = 0
     var oldVersion = 0.0
 
@@ -38,15 +38,15 @@ class ZApp : ZObject {
     }
 
     func GetRuntimeSecs() -> Double {
-        return ZTimeNow - activationTime
+        return ZTime.Now() - activationTime
     }
     
     func GetbackgroundTimeSecs() -> Double {
-        return ZTimeNow - backgroundTime
+        return ZTime.Now() - backgroundTime
     }
     
     override init() {
-        activationTime = ZTimeNow
+        activationTime = ZTime.Now()
         super.init()
         mainZApp = self
     }

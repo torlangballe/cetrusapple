@@ -12,18 +12,16 @@ protocol ZCustomViewDelegate {
 }
 
 class ZCustomView: UIControl, ZView, UIGestureRecognizerDelegate, ZTimerOwner {
-    var objectName: String
-//    @objc var stringValue = ""
-    var minSize: ZSize
-    var drawHandler:((_ rect: ZRect, _ canvas: ZCanvas, _ view:ZCustomView)->Void)!
-    var foregroundColor: ZColor
+    var objectName = ""
+    var minSize = ZSize(0, 0)
+    var drawHandler:((_ rect: ZRect, _ canvas: ZCanvas, _ view:ZCustomView)->Void)? = nil
+    var foregroundColor = ZColor.Black()
     var touchDownRepeatSecs = 0.0
     let touchDownRepeatTimer = ZRepeater()
     var canFocus = false
     var HandlePressedInPosFunc: ((_ pos:ZPos)->Void)? = nil
     
     private var handleValueChangedFunc: (()->Void)? = nil
-
     
     weak var tapTarget: ZCustomView? = nil
     weak var valueTarget: ZCustomView? = nil
@@ -311,49 +309,6 @@ class ZCustomView: UIControl, ZView, UIGestureRecognizerDelegate, ZTimerOwner {
             mainZApp?.HandleShake()
         }
     }
-/*
-    override func remoteControlReceived(with event: UIEvent?) {
-        if event!.type == UIEventType.remoteControl {
-            let command:ZAudioRemoteCommand
-            
-            switch event!.subtype {
-            case UIEventSubtype.remoteControlPlay:
-                command = .play
-                
-            case UIEventSubtype.remoteControlPause:
-                command = .pause
-                
-            case UIEventSubtype.remoteControlStop:
-                command = .stop
-                
-            case UIEventSubtype.remoteControlTogglePlayPause:
-                command = .togglePlayPause
-                
-            case UIEventSubtype.remoteControlBeginSeekingBackward:
-                command = .beginSeekingBackward
-                
-            case UIEventSubtype.remoteControlEndSeekingBackward:
-                command = .endSeekingBackward
-                
-            case UIEventSubtype.remoteControlBeginSeekingForward:
-                command = .beginSeekingForward
-                
-            case UIEventSubtype.remoteControlEndSeekingForward:
-                command = .endSeekingForward
-                
-            case UIEventSubtype.remoteControlNextTrack:
-                command = .nextTrack
-                
-            case UIEventSubtype.remoteControlPreviousTrack:
-                command = .previousTrack
-                
-            default:
-                return
-            }
-            mainZApp?.HandleAudioRemote(command)
-        }
-    }
-    */
     
     func AddGestureTo(_ view:ZView, type:ZGestureType, taps:Int = 1, touches:Int = 1, duration:Float = 0.8, movement:Float = 10, dir:ZAlignment = .None) {
         view.View().isUserInteractionEnabled = true
@@ -512,5 +467,17 @@ private func addGesture(_ g: UIGestureRecognizer, view:ZView, handler:ZCustomVie
     view.View().isUserInteractionEnabled = true
     g.delaysTouchesEnded = true
     g.delegate = handler
+}
+
+func zConvertViewSizeThatFitstToZSize(view:UIView, sizeIn:ZSize) -> ZSize {
+    return ZSize(view.sizeThatFits(sizeIn.GetCGSize()))
+}
+
+func zSetViewFrame(_ view:UIView, frame:ZRect) {
+    view.frame = frame.GetCGRect()
+}
+
+func zRemoveViewFromSuper(_ view:UIView) {
+    view.removeFromSuperview()
 }
 

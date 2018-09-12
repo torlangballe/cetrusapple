@@ -77,7 +77,7 @@ class ZSpeech: ZObject, AVSpeechSynthesizerDelegate {
         lock.unlock()
         rendering = false;
         if !file.Exists() {
-            return ZError(message:"ZSpeech:GetTextAudio:No file created")
+            return ZNewError("ZSpeech:GetTextAudio:No file created")
         }
         return nil
     }
@@ -207,7 +207,7 @@ class ZSpeech: ZObject, AVSpeechSynthesizerDelegate {
                 switch voice.base.type {
                     case .acapela:
                         if !acaTTS.setVoice(voice.voiceId) {
-                            return ZError(message:"ZSpeech setVoice error for:" + voice.base.name)
+                            return ZNewError("ZSpeech setVoice error for:" + voice.base.name)
                         }
                         acaTTS.setVolume(volume * 100)
                         acaTTS.setRate(acaTTS.rate() * voice.base.speed)
@@ -231,7 +231,7 @@ class ZSpeech: ZObject, AVSpeechSynthesizerDelegate {
             voice = sameLangVoice
             return setVoiceInfo(&voice, volume:volume, substitute:false)
         }
-        return ZError(message:"ZSpeech setVoice: voice not found: " + voice.base.name)
+        return ZNewError("ZSpeech setVoice: voice not found: " + voice.base.name)
     }
     
     func StopSpeaking() {

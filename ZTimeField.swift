@@ -60,7 +60,7 @@ class ZTimeField : ZShapeView {
         if showSeconds {
             stime += "::ss"
         }
-        let format = ZStr.ConcatNonEmpty(separator:" ", items:sdate, stime)
+        let format = ZStr.ConcatNonEmpty(sep:" ", items:[sdate, stime])
         text.text = time.GetString(format:format)
     }
     
