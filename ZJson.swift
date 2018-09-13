@@ -1,6 +1,5 @@
 //
 //  ZJson.swift
-//  SwiftyJSON
 //
 //  Created by Tor Langballe on /1/11/15.
 //

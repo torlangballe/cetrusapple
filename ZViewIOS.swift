@@ -19,6 +19,7 @@ protocol ZView {
     var  objectName: String { get set }
     var  Usable: Bool { get set }
     var  Alpha: Double { get set }
+    func SetOpaque(_ opaque:Bool)
     func View() -> UIView
     func Child(_ path: String) -> UIView?
     func DumpTree()
@@ -46,6 +47,9 @@ extension ZView {
     }
     var LocalRect: ZRect {
         return ZRect(size:Rect.size)
+    }
+    func SetOpaque(_ opaque:Bool) {
+        View().isOpaque = opaque 
     }
     func Pop(animated:Bool = true, done:(()->Void)? = nil) {
         ZPopTopView(animated:animated, done:done)

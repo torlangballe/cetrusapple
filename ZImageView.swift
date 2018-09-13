@@ -189,7 +189,7 @@ class ZImageView: UIImageView, ZView, ZImageLoader, ZTimerOwner {
         return (s + margin * 2.0).GetCGSize()
     }
     
-    func SetImage(_ image:ZImage?, downloadUrl:String = "") {
+    func SetImage(_ image:ZImage?, _ downloadUrl:String = "") {
         self.downloadUrl = downloadUrl
         self.image = image
         if minSize != nil && image != nil {
@@ -238,7 +238,7 @@ class ZImageView: UIImageView, ZView, ZImageLoader, ZTimerOwner {
 }
 
 protocol ZImageLoader: class {
-    func SetImage(_ image:ZImage?, downloadUrl:String)
+    func SetImage(_ image:ZImage?, _ downloadUrl:String)
 }
 
 extension ZImageLoader {
@@ -246,7 +246,7 @@ extension ZImageLoader {
         let s = self
         ZImage.DownloadFromUrl(url, cache:cache) { (image) in
             if image != nil {
-                s.SetImage(image, downloadUrl:url)
+                s.SetImage(image, url)
                 done?(true)
             } else {
                 done?(false)

@@ -27,7 +27,7 @@ extension ZJSONData {
         do {
             target = try decoder.decode(T.self, from:self)
         } catch let error {
-            ZDebug.Print("error trying to json to object:", error.localizedDescription)
+            ZDebug.Print("error trying to convert json to object:", error.localizedDescription)
             return error
         }
         return nil

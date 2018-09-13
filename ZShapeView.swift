@@ -61,7 +61,7 @@ class ZShapeView: ZContainerView, ZImageLoader {
         return s
     }
     
-    func SetImage(_ image:ZImage?, downloadUrl:String = "") {
+    func SetImage(_ image:ZImage?, _ downloadUrl:String = "") {
         self.image = image
         Expose()
     }

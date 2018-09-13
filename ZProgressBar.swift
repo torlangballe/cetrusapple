@@ -1,10 +1,10 @@
 //
 //  ZProgressBar.swift
-//  PocketProbe
 //
 //  Created by Tor Langballe on /14/12/17.
-//  Copyright © 2017 Bridgetech. All rights reserved.
 //
+
+// #package com.github.torlangballe.CetrusAndroid
 
 import Foundation
 
@@ -13,9 +13,9 @@ class ZProgressBar: ZCustomView {
     var width:Double
     var color:ZColor
 
-    fileprivate var value:Float = 0
+    fileprivate var value:Double = 0.0
     fileprivate var timer = ZRepeater()
-    var Value:Float {
+    var Value:Double {
         get { return value }
         set {
             value = newValue
@@ -23,7 +23,7 @@ class ZProgressBar: ZCustomView {
         }
     }
     
-    init(height:Double = 2, width:Double = 100, color:ZColor = ZColor.Blue(), value:Float = 0) {
+    init(height:Double = 2.0, width:Double = 100.0, color:ZColor = ZColor.Blue(), value:Double = 0.0) {
         self.height = height
         self.width = width
         self.color = color
@@ -39,11 +39,11 @@ class ZProgressBar: ZCustomView {
         timer.Stop()
     }
     
-    func SetUpdate(_ update:(()->Float)? = nil) {
+    func SetUpdate(_ update:(()->Double)? = nil) {
         if update != nil {
             timer.Set(0.2, owner:self) { [weak self] () in
                 let v = update!()
-                if v == -1 {
+                if v == -1.0 {
                     return false
                 }
                 self?.Value = v
@@ -54,7 +54,9 @@ class ZProgressBar: ZCustomView {
         }
     }
     
+    // #swift-only:
     required init?(coder aDecoder: NSCoder) { fatalError("init(coder:) has not been implemented") }
+    // #end
     
     override func DrawInRect(_ rect: ZRect, canvas: ZCanvas) {
         var r = rect
