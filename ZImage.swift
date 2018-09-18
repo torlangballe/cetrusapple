@@ -488,7 +488,7 @@ class ZImageUploader {
     }
 }
 
-class ZImageCache : ZTimerOwner {
+class ZImageCache {
     var maxHours = 24.0
     var maxSize:ZSize? = nil
     var maxByteSize:Int64? = nil
@@ -512,8 +512,8 @@ class ZImageCache : ZTimerOwner {
                     done?(nil)
                     return nil
                 }
-                mainZApp!.PerformAfterDelay(2) { () in
-                    self.DownloadFromUrl(url, done:done)
+                ZPerformAfterDelay(2) { [weak self] () in
+                    self?.DownloadFromUrl(url, done:done)
                 }
                 return nil
             }

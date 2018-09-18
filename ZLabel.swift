@@ -15,7 +15,8 @@ class ZLabel: UILabel, ZView {
     var maxWidth:Double = 0
     var maxHeight:Double? = nil
     var margin = ZRect()
-    private var handlePressedInPosFunc: ((_ pos:ZPos)->Void)? = nil
+    var touchInfo = ZTouchInfo()
+    
     var Color: ZColor {
         get { return ZColor(color:textColor) }
         set { textColor = newValue.color }
@@ -34,20 +35,20 @@ class ZLabel: UILabel, ZView {
 
     var HandlePressedInPosFunc: ((_ pos:ZPos)->Void)? {
         set {
-            handlePressedInPosFunc = newValue
+            touchInfo.handlePressedInPosFunc = newValue
             isUserInteractionEnabled = true
             isAccessibilityElement = true
             accessibilityTraits |= UIAccessibilityTraitButton
         }
         get {
-            return handlePressedInPosFunc;
+            return touchInfo.handlePressedInPosFunc;
         }
     }
 
     override func drawText(in rect: CGRect) {
         let insets = UIEdgeInsets.init(top:CGFloat(margin.Min.y), left:CGFloat(margin.Min.x), bottom:CGFloat(-margin.Max.y), right:CGFloat(-margin.Max.x))
         super.drawText(in: UIEdgeInsetsInsetRect(rect, insets))
-        if handlePressedInPosFunc != nil { // we hack this in here...
+        if touchInfo.handlePressedInPosFunc != nil { // we hack this in here...
             isUserInteractionEnabled = true
         }
     }
@@ -105,43 +106,25 @@ class ZLabel: UILabel, ZView {
 
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         if isUserInteractionEnabled {
-            if tapTarget != nil {
-                let pos = ZPos(touches.first!.location(in: self))
-                tapTarget?.HandleTouched(self, state:.began, pos:pos, inside:true)
-            }
-            isHighlighted = true
-            Expose()
+            touchInfoBeginTracking(touchInfo:touchInfo, view:self, touch:touches.first!, event:event)
         }
     }
     
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         if isUserInteractionEnabled {
-            if tapTarget != nil {
-                let pos = ZPos(touches.first!.location(in: self))
-                let inside = self.Rect.Contains(pos)
-                tapTarget?.HandleTouched(self, state:.ended, pos:pos, inside:inside)
-            }
-            isHighlighted = false
-            self.PerformAfterDelay(0.05) { () in
-                self.Expose()
-            }
-            let pos = ZPos(touches.first!.location(in: self))
-            if handlePressedInPosFunc != nil {
-                handlePressedInPosFunc!(pos)
-            } else if tapTarget != nil {
-                tapTarget?.HandlePressed(self, pos:pos)
-            }
+            touchInfoEndTracking(touchInfo:touchInfo, view:self, touch:touches.first!, event:event)
         }
     }
     
+    override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
+        if isUserInteractionEnabled {
+            touchInfoContinueTracking(touchInfo:touchInfo, view:self, touch:touches.first!, event:event)
+        }
+    }
     
     override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
         if isUserInteractionEnabled {
-            if tapTarget != nil {
-                tapTarget?.HandleTouched(self, state:.canceled, pos:ZPos(), inside:false)
-            }
-            isHighlighted = false
-            Expose()
+            touchInfoTrackingCanceled(touchInfo:touchInfo, view:self, touch:touches.first!, event:event)
         }
     }
     

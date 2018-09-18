@@ -134,13 +134,13 @@ class ZSlider: UISlider, ZView, ZControl {
         w.ArrangeChildren()
         w.Show(true)
         
-        let oldHandle = parent.HandlePressedInPosFunc
+        let oldHandle = parent.touchInfo.handlePressedInPosFunc
         
         AddTarget(parent, forEventType:.pressed)
-        parent.HandlePressedInPosFunc = { (pos) in
+        parent.touchInfo.handlePressedInPosFunc = { (pos) in
             done(self.value)
             parent.RemoveChild(w)
-            parent.HandlePressedInPosFunc = oldHandle
+            parent.touchInfo.handlePressedInPosFunc = oldHandle
         }
         ZAnimation.Do(duration:0.5, animations: {
             w.alpha = 1

@@ -15,7 +15,7 @@ var list = [ZResource]()
 // NSBundleOnDemandResourceOutOfSpaceError: 4992
 
 @available(iOS 9.0, *)
-class ZResource: NSBundleResourceRequest, ZTimerOwner {
+class ZResource: NSBundleResourceRequest {
     var sid = ""
     var done = false
     let timer = ZTimer()
@@ -40,7 +40,7 @@ class ZResource: NSBundleResourceRequest, ZTimerOwner {
             } else {
                 ZDebug.Print("ZResource.BeginAccessing. NOT ready conditionally.", self!.sid, self!.tags)
             }
-            self!.timer.Set(5, owner:self) { () in
+            self!.timer.Set(5) { () in
                 if self != nil {
                     ZDebug.Print("ZResource still getting:", self!.progress.fractionCompleted, self!.sid, self!.tags)
                 }

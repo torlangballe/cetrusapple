@@ -31,7 +31,7 @@ class ZDictPickerField : ZShapeView {
         
         AddTarget(self, forEventType:.pressed)
         
-        HandlePressedInPosFunc = { [weak self] (pos) in
+        touchInfo.handlePressedInPosFunc = { [weak self] (pos) in
             ZDictPickerField.Pick(dict, selectedKey:selectedKey, textInfo:self!.popupText) { (key, val) in
                 if key != nil {
                     self!.selectedKey = key!

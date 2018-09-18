@@ -195,7 +195,7 @@ class ZAppController : UIResponder, UIApplicationDelegate, UNUserNotificationCen
 //        }
         if let notification = launchOptions?[UIApplicationLaunchOptionsKey.remoteNotification] as? [String: AnyObject] {
             let aps = notification["aps"] as! [String: AnyObject]
-            PerformAfterDelay(0.5) { () in
+            ZPerformAfterDelay(0.5) { () in
                 mainZApp?.HandlePushNotificationWithDictionary(aps, fromStartup:true, whileActive:false)
             }
         }

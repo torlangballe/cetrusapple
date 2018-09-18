@@ -8,7 +8,7 @@
 
 import UIKit
 
-class ZShapeView: ZContainerView, ZImageLoader {
+/* #k: open */ class ZShapeView: ZContainerView, ZImageLoader {
     enum ShapeType:String { case circle = "circle", rectangle = "rectange", roundRect = "roundrect", star = "star", none = "" }
     var type = ShapeType.circle
     var strokeWidth:Double = 0.0
@@ -61,7 +61,7 @@ class ZShapeView: ZContainerView, ZImageLoader {
         return s
     }
     
-    func SetImage(_ image:ZImage?, _ downloadUrl:String = "") {
+    /* #k: override */ func SetImage(_ image:ZImage?, _ downloadUrl:String) {
         self.image = image
         Expose()
     }

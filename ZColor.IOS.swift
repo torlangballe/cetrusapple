@@ -48,9 +48,9 @@ class ZColor : Hashable {
         return hsba
     }
     
-    init(pattern:ZImage) {
+    init(tile:ZImage) {
         undefined = false
-        color = UIColor(patternImage:pattern)
+        color = UIColor(patternImage:tile)
     }
     
     var RGBA: ZRGBA {

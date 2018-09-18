@@ -1,10 +1,10 @@
 //
 //  ZLinkLabel.swift
-//  PocketProbe
 //
 //  Created by Tor Langballe on /22/12/17.
-//  Copyright © 2017 Bridgetech. All rights reserved.
 //
+
+// #package com.github.torlangballe.CetrusAndroid
 
 import UIKit
 class ZLinkLabel : ZLabel {

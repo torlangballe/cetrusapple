@@ -31,7 +31,7 @@ class ZButton : ZShapeView {
     func SetColorName(_ col:String) {
         var cimage = ZImage(named:col + "Button.png")
         cimage = cimage!.Make9PatchImage(capInsets:ZRect(insets.w, insets.h, insets.w, insets.h))
-        SetImage(cimage)
+        SetImage(cimage, "")
     }
 }
 

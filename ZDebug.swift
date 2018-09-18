@@ -77,5 +77,6 @@ extension ZDebug {
 // #end
         ZDebug.storedLines.removeAll()
     }
+    var IsRelease = false
 }
 

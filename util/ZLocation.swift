@@ -16,7 +16,7 @@ protocol ZLocationDelegate {
     func HandleNewHeadingDirectionDegrees(direction:Double)
 }
 
-class ZLocation: CLLocationManager, CLLocationManagerDelegate, ZTimerOwner {
+class ZLocation: CLLocationManager, CLLocationManagerDelegate {
     var oldPos = ZPos()
     var getPlace:Bool = true
     var zdelegate: ZLocationDelegate? = nil
@@ -35,7 +35,7 @@ class ZLocation: CLLocationManager, CLLocationManagerDelegate, ZTimerOwner {
         fakePoints = points
         fakeDurationSecs = durationSecs
         fakeStart = ZTime.Now()
-        fakeTimer.Set(10, owner: self, now:true) { [weak self] () in
+        fakeTimer.Set(10, now:true) { [weak self] () in
             if self == nil {
                 return false
             }
@@ -342,7 +342,7 @@ class ZLocation: CLLocationManager, CLLocationManagerDelegate, ZTimerOwner {
         let timer = ZTimer()
         if timeoutSecs != nil {
             ZMainQue.async {
-                timer.Set(timeoutSecs!, owner:self) { () in
+                timer.Set(timeoutSecs!) { () in
                     map.cancel()
                     done(nil, mpp, ZNewError("timed out"))
                 }

@@ -41,6 +41,21 @@ struct ZRect {
             pos = newValue
         }
     }
+    mutating func SetMaxX(_ x:Double) {
+        size.w = x - pos.x
+    }
+    mutating func SetMaxY(_ y:Double) {
+        size.h = y - pos.y
+    }
+    mutating func SetMinX(_ x:Double) {
+        size.w += (pos.x - x)
+        pos.x = x
+    }
+    mutating func SetMinY(_ y:Double) {
+        size.h += (pos.y - y)
+        pos.y = y
+    }
+
     var Center : ZPos {
         get { return pos + size / 2.0 }
         set { pos = newValue - size.GetPos() / 2.0 }

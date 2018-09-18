@@ -136,10 +136,20 @@ class ZStackView: ZContainerView {
                         zSetViewFrame(c4.view!, frame:vr)
                     }
                     if (c4.alignment & aless) {
-                        r.Min[vertical] = max(r.Min[vertical], vr.Max[vertical] + space)
+                        let m = max(r.Min[vertical], vr.Max[vertical] + space)
+                        if vertical {
+                            r.SetMinY(m)
+                        } else {
+                            r.SetMinX(m)
+                        }
                     }
                     if (c4.alignment & amore) {
-                        r.Max[vertical] = min(r.Max[vertical], vr.pos[vertical] - space)
+                        let m = min(r.Max[vertical], vr.pos[vertical] - space)
+                        if vertical {
+                            r.SetMaxY(m)
+                        } else {
+                            r.SetMaxX(m)
+                        }
                     }
                     if let v = c4.view as? ZContainerView {
                         v.ArrangeChildren()
@@ -155,8 +165,16 @@ class ZStackView: ZContainerView {
                 }
             }
         }
-        r.Min[vertical] = max(r.Min[vertical], cn - centerDim / 2)
-        r.Max[vertical] = min(r.Max[vertical], cn + centerDim / 2)
+        if vertical {
+            r.SetMinY(max(r.Min.y, cn - centerDim / 2))
+        } else {
+            r.SetMinX(max(r.Min.x, cn - centerDim / 2))
+        }
+        if vertical {
+            r.SetMaxY(min(r.Max.y, cn + centerDim / 2))
+        } else {
+            r.SetMaxX(min(r.Max.x, cn + centerDim / 2))
+        }
         for c5 in cells {
             if !c5.collapsed && (c5.alignment & amid) && !c5.free { // .reversed()
                 let a = ZAlignment(rawValue:(c5.alignment.rawValue & ZBitwiseInvert(amid.rawValue)) | aless.rawValue)

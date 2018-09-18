@@ -41,7 +41,7 @@ class ZProgressBar: ZCustomView {
     
     func SetUpdate(_ update:(()->Double)? = nil) {
         if update != nil {
-            timer.Set(0.2, owner:self) { [weak self] () in
+            timer.Set(0.2) { [weak self] () in
                 let v = update!()
                 if v == -1.0 {
                     return false

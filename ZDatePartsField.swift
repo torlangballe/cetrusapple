@@ -32,7 +32,7 @@ class ZDatePartsField : ZShapeView {
         
         AddTarget(self, forEventType:.pressed)
         
-        HandlePressedInPosFunc = { [weak self] (pos) in
+        touchInfo.handlePressedInPosFunc = { [weak self] (pos) in
             let v1 = ZVStackView(space:2)
             self!.picker = ZDatePartsPicker(useYear:self!.useYear, monthChars:self!.monthChars)
             self!.picker!.optionalYear = self!.optionalYear

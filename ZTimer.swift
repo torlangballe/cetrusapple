@@ -27,15 +27,10 @@ class ZTimerBase : NSObject {
     }
 }
 
-protocol ZTimerOwner {
-    //    var timers: [ZTimerBase] { get set }
-    //mutating func AddTimer(timer:ZTimerBase)
-}
-
 class ZRepeater : ZTimerBase {
     var closure:(()->Bool)? = nil
 
-    func Set(_ secs:Double, owner:ZTimerOwner? = nil, now:Bool = false, done:@escaping ()->Bool) {
+    func Set(_ secs:Double, now:Bool = false, done:@escaping ()->Bool) {
         Stop()
         if now {
             if !done() {
@@ -57,7 +52,7 @@ class ZRepeater : ZTimerBase {
 class ZTimer : ZTimerBase {
     var closure:(()->Void)? = nil
     
-    func Set(_ secs:Double, owner:ZTimerOwner? = nil, done:@escaping ()->Void) {
+    func Set(_ secs:Double, done:@escaping ()->Void) {
         Stop()
         //        owner?.AddTimer(self)
         closure = done
@@ -81,14 +76,18 @@ class _ZBlocker : NSObject {
     }
 }
 
-extension NSObject {
-    func PerformAfterDelay(_ afterDelay:Float, _ block:@escaping ()->Void) {
-        let blocker = _ZBlocker(block:block)
-        self.perform(#selector(NSObject.fireBlockAfterDelay(_:)), with:blocker, afterDelay:TimeInterval(afterDelay))
-    }
+class zTimerPerformer : NSObject {
+    var blocker: _ZBlocker? = nil
+    
     @objc func fireBlockAfterDelay(_ blocker:_ZBlocker) {
         blocker.block()
     }
+}
+
+func ZPerformAfterDelay(_ afterDelay:Float, _ block:@escaping ()->Void) {
+    let o = zTimerPerformer()
+    o.blocker = _ZBlocker(block:block)
+    o.perform(#selector(zTimerPerformer.fireBlockAfterDelay(_:)), with:o.blocker, afterDelay:TimeInterval(afterDelay))
 }
 
 func ZDispatchTimeInSecs(_ secs:Double) -> DispatchTime {

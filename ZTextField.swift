@@ -51,7 +51,7 @@ struct ZKeyboardInfo {
     var returnType: ZReturnKeyType? = nil
 }
 
-protocol ZTextEditDelegate : class { // need class here to make a weak link as target below
+protocol ZTextEditDelegate : class {
     func HandleFocus(_ focused:Bool, from:ZView)
     func HandleTextShouldBeginEditing(_ from:ZView) -> Bool
     func HandleTextShouldEndEditing(_ from:ZView) -> Bool
@@ -109,7 +109,7 @@ class ZTextField : UITextField, UITextFieldDelegate, ZTextBase, ZView {
 //        attributedPlaceholder = ZAttributedString(string:text, attributes:[NSAttributedStringKey.foregroundColor:color.rawColor])
 //    }
     
-    init(text:String="", minWidth:Double=0, maxWidth:Double=0, font:ZFont?=nil, alignment:ZAlignment = .Left, margin:ZSize = ZSize(0, 0)) {
+    init(text:String="", minWidth:Double = 0, maxWidth:Double=0, font:ZFont? = nil, alignment:ZAlignment = ZAlignment.Left, margin:ZSize = ZSize(0.0, 0.0)) {
         self.minWidth = minWidth
         self.maxWidth = maxWidth
         super.init(frame:CGRect(x:0, y:0, width:10, height:10))
@@ -252,9 +252,6 @@ class ZTextField : UITextField, UITextFieldDelegate, ZTextBase, ZView {
             return target!.HandleTextShouldReturn(self)
         }
         return true
-        //        if(((NSTextFieldWidget *)textField)->widget)
-        //        ((NSTextFieldWidget *)textField)->widget->Event(ZTextBaseWgt::EV_RETURN_PRESSED, 0, true);
-        //        [ textField resignFirstResponder ];
     }
 
     func textFieldDidBeginEditing(_ textField: UITextField) {
@@ -321,18 +318,10 @@ class ZTextField : UITextField, UITextFieldDelegate, ZTextBase, ZView {
                 for view in subviews {
                     if view is UIButton {
                         let button = view as! UIButton
-                        if let image = ZImage(named:"ztext.clear.png") {
+                        if let image = ZImage(named:"ztextclear.png") {
                             button.setImage(image, for:.highlighted)
                             button.setImage(image, for:UIControlState())
                         }
-                        /*
-                        if let uiImage = button.imageForState(.Highlighted) {
-                            if tintedClearImage == nil {
-                                tintedClearImage = uiImage.TintedWithColor(ZColor.Gray())
-                            }
-                            button.setImage(tintedClearImage, forState: .Normal)
-                        }
- */
                     }
                 }
             }
@@ -341,43 +330,3 @@ class ZTextField : UITextField, UITextFieldDelegate, ZTextBase, ZView {
 
     var tintedClearImage: UIImage?
 }
-/*
-class ZNumberField : ZTextField {
-    var real = false
-    
-    convenience init(value:Double, real:Bool, minChars:Int=4, maxChars:Int=10, font:ZFont?=nil, alignment:ZAlignment = .Left, margin:ZSize = ZSize(0, 0)) {
-        self.real = real
-        var t = ""
-        if real {
-            t = ZStr.Format("%g", value)
-        } else {
-            t = ZStr.Format("%lld", Int64(value))
-        }
-        self.init(text:t, font:font, alignment:alignment, margin:margin)
-        minWidth = calcWidth(minChars)
-        maxWidth = calcWidth(maxChars)
-    }
-    
-    private func calcWidth(decimals:Int) -> Float {
-        var text = ZTextDraw()
-        text.text = String(count:decimals, repeatedValue:Character("8"))
-        if real {
-            text.text += "."
-        }
-        text.font = font!
-        return text.GetBounds().size.w
-    }
-    
-    override func textField(textField: UITextField, shouldChangeCharactersInRange range: NSRange, replacementString string: String) -> Bool {
-        var chars = "0123456789"
-        if floating {
-            chars += ".,"
-        }
-        let aSet = NSCharacterSet(charactersInString:chars).invertedSet
-        let compSepByCharInSet = string.componentsSeparatedByCharactersInSet(aSet)
-        let numberFiltered = compSepByCharInSet.joinWithSeparator("")
-        return string == numberFiltered
-        return true
-    }
-}
-*/

@@ -1,10 +1,10 @@
 //
 //  ZSoundPlayer.swift
-//  Zed
 //
 //  Created by Tor Langballe on /25/11/15.
-//  Copyright © 2015 Capsule.fm. All rights reserved.
 //
+
+// #package com.github.torlangballe.CetrusAndroid
 
 import MediaPlayer
 

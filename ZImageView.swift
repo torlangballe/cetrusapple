@@ -8,42 +8,37 @@
 
 import UIKit
 fileprivate func < <T : Comparable>(lhs: T?, rhs: T?) -> Bool {
-  switch (lhs, rhs) {
-  case let (l?, r?):
-    return l < r
-  case (nil, _?):
-    return true
-  default:
-    return false
-  }
+    switch (lhs, rhs) {
+    case let (l?, r?):
+        return l < r
+    case (nil, _?):
+        return true
+    default:
+        return false
+    }
 }
 
 fileprivate func > <T : Comparable>(lhs: T?, rhs: T?) -> Bool {
-  switch (lhs, rhs) {
-  case let (l?, r?):
-    return l > r
-  default:
-    return rhs < lhs
-  }
+    switch (lhs, rhs) {
+    case let (l?, r?):
+        return l > r
+    default:
+        return rhs < lhs
+    }
 }
 
-
-class ZImageView: UIImageView, ZView, ZImageLoader, ZTimerOwner {
+class ZImageView: UIImageView, ZView, ZImageLoader {
     // use contentMode for aspect fill etc
-    weak var tapTarget: ZCustomView? = nil
     var objectName: String
     var maxSize = ZSize()
     var minSize : ZSize? = nil
     var margin = ZSize()
+    var touchInfo = ZTouchInfo()
     var hightlightTint = ZColor(white:0.4)
-    var touchDownRepeatSecs = 0.0
-    var touchDownRepeats = 0
-    let touchDownRepeatTimer = ZRepeater()
     var downloadUrl = ""
     var edited = false
     var minUrlImageSize = ZSize() // if not null, and downloaded image is < w and h of this, dont show
     var alignment = ZAlignment.None // to align when contentMode is fit/scale
-    private var handlePressedInPosFunc: ((_ pos:ZPos)->Void)? = nil
     
     init(zimage:ZImage? = nil, name:String = "ZImageView", maxSize:ZSize = ZSize()) {
         objectName = name
@@ -86,7 +81,7 @@ class ZImageView: UIImageView, ZView, ZImageLoader, ZTimerOwner {
     
     var HandlePressedInPosFunc: ((_ pos:ZPos)->Void)? {
         set {
-            handlePressedInPosFunc = newValue
+            touchInfo.handlePressedInPosFunc = newValue
             isUserInteractionEnabled = true
             isAccessibilityElement = true
             accessibilityTraits |= UIAccessibilityTraitButton
@@ -95,17 +90,17 @@ class ZImageView: UIImageView, ZView, ZImageLoader, ZTimerOwner {
             }
         }
         get {
-            return handlePressedInPosFunc;
+            return touchInfo.handlePressedInPosFunc;
         }
     }
     
     override func layoutSubviews() {
-//        if _isDebugAssertConfiguration() {
-//            if accessibilityLabel == nil && isAccessibilityElement { // isAccessibilityElement is BOOL, not Boolean
-//                //!                print("ZImageView: No accessiblity label")
-//            }
-//        }
-        if handlePressedInPosFunc != nil {
+        //        if _isDebugAssertConfiguration() {
+        //            if accessibilityLabel == nil && isAccessibilityElement { // isAccessibilityElement is BOOL, not Boolean
+        //                //!                print("ZImageView: No accessiblity label")
+        //            }
+        //        }
+        if touchInfo.handlePressedInPosFunc != nil {
             isUserInteractionEnabled = true
             if highlightedImage == nil && image != nil {
                 highlightedImage = image!.TintedWithColor(hightlightTint)
@@ -120,67 +115,28 @@ class ZImageView: UIImageView, ZView, ZImageLoader, ZTimerOwner {
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         if isUserInteractionEnabled {
-            if tapTarget != nil {
-                let pos = ZPos(touches.first!.location(in: self))
-                tapTarget?.HandleTouched(self, state:.began, pos:pos, inside:true)
-                if touchDownRepeatSecs != 0 {
-                    touchDownRepeats = 0
-                    touchDownRepeatTimer.Set(touchDownRepeatSecs, owner:self) { [weak self] () in
-                        if self?.touchDownRepeats > 2 {
-                            self?.tapTarget!.HandlePressed(self!, pos:pos)
-                        }
-                        self?.touchDownRepeats += 1
-                        return true
-                    }
-                }
-            }
-            isHighlighted = true
-            Expose()
+            touchInfoBeginTracking(touchInfo:touchInfo, view:self, touch:touches.first!, event:event)
         }
     }
-
+    
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         if isUserInteractionEnabled {
-            var handled = false
-            isHighlighted = false
-            PerformAfterDelay(0.05) { [weak self] () in
-                self?.Expose()
-            }
-            if tapTarget != nil || handlePressedInPosFunc != nil {
-                let pos = ZPos(touches.first!.location(in: self))
-                let inside = LocalRect.Contains(pos)
-                if tapTarget != nil {
-                    handled = tapTarget!.HandleTouched(self, state:.ended, pos:pos, inside:inside)
-                }
-                if inside && !handled {
-                    if handlePressedInPosFunc != nil {
-                        handlePressedInPosFunc!(pos)                        
-                    } else {
-                        tapTarget?.HandlePressed(self, pos:ZPos(touches.first!.location(in: self)))
-                    }
-                }
-                touchDownRepeatTimer.Stop()
-            }
-            if animationImages != nil {
-                startAnimating()
-            }
+            touchInfoEndTracking(touchInfo:touchInfo, view:self, touch:touches.first!, event:event)
+        }
+        if animationImages != nil {
+            startAnimating()
         }
     }
     
     override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
         if isUserInteractionEnabled {
-            if tapTarget != nil {
-                tapTarget?.HandleTouched(self, state:.canceled, pos:ZPos(), inside:false)
-            }
-            isHighlighted = false
-            Expose()
-            touchDownRepeatTimer.Stop()
-            if animationImages != nil {
-                startAnimating()
-            }
+            touchInfoTrackingCanceled(touchInfo:touchInfo, view:self, touch:touches.first!, event:event)
+        }
+        if animationImages != nil {
+            startAnimating()
         }
     }
-
+        
     override func sizeThatFits(_ size: CGSize) -> CGSize {
         if !maxSize.IsNull(){
             return maxSize.GetCGSize()
@@ -200,7 +156,7 @@ class ZImageView: UIImageView, ZView, ZImageLoader, ZTimerOwner {
     }
     
     func AddTarget(_ t: ZCustomView?, forEventType:ZControlEventType) {
-        tapTarget = t
+        touchInfo.tapTarget = t
         assert(forEventType == .pressed)
         isUserInteractionEnabled = true
         isAccessibilityElement = true
@@ -214,11 +170,11 @@ class ZImageView: UIImageView, ZView, ZImageLoader, ZTimerOwner {
         animationImages = images
         animationDuration = TimeInterval(durationForAll)
         if start {
-        startAnimating()
+            startAnimating()
             startAnimating()
         }
     }
-
+    
     func Animate(_ on:Bool) {
         if on {
             startAnimating()
@@ -254,4 +210,8 @@ extension ZImageLoader {
         }
     }
 }
+
+
+
+
 

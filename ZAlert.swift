@@ -1,9 +1,10 @@
 //
 //  ZAlert.swift
-//  Cetrus
 //
 //  Created by Tor Langballe on /7/11/15.
 //
+
+// #package com.github.torlangballe.CetrusAndroid
 
 import UIKit
 

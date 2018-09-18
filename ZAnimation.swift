@@ -71,7 +71,7 @@ class ZAnimation {
         animation.timingFunction = CAMediaTimingFunction(name:kCAMediaTimingFunctionLinear)
         view.View().layer.add(animation, forKey:"position")
         if view.View().window == nil {
-            view.View().PerformAfterDelay(2.5) { () in
+            ZPerformAfterDelay(2.5) { () in
                 view.View().layer.add(animation, forKey:key)
             }
         } else {

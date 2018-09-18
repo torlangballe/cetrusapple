@@ -1,10 +1,10 @@
 //
 //  ZApp.swift
-//  capsulefm
 //
 //  Created by Tor Langballe on /15/11/15.
-//  Copyright © 2015 Capsule.fm. All rights reserved.
 //
+
+// #package com.github.torlangballe.CetrusAndroid
 
 import UIKit
 import MediaPlayer

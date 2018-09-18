@@ -11,19 +11,16 @@ protocol ZCustomViewDelegate {
     func DrawInRect(_ rect: ZRect, canvas: ZCanvas)
 }
 
-class ZCustomView: UIControl, ZView, UIGestureRecognizerDelegate, ZTimerOwner {
+/* #k: open */ class ZCustomView: UIControl, ZView, UIGestureRecognizerDelegate {
     var objectName = ""
     var minSize = ZSize(0, 0)
     var drawHandler:((_ rect: ZRect, _ canvas: ZCanvas, _ view:ZCustomView)->Void)? = nil
     var foregroundColor = ZColor.Black()
-    var touchDownRepeatSecs = 0.0
-    let touchDownRepeatTimer = ZRepeater()
     var canFocus = false
-    var HandlePressedInPosFunc: ((_ pos:ZPos)->Void)? = nil
+    var touchInfo = ZTouchInfo()
     
     private var handleValueChangedFunc: (()->Void)? = nil
     
-    weak var tapTarget: ZCustomView? = nil
     weak var valueTarget: ZCustomView? = nil
     var timers = [ZTimerBase]()
     
@@ -35,7 +32,7 @@ class ZCustomView: UIControl, ZView, UIGestureRecognizerDelegate, ZTimerOwner {
     func AddTarget(_ t: ZCustomView?, forEventType:ZControlEventType) {
         switch forEventType {
         case .pressed:
-            tapTarget = t
+            touchInfo.tapTarget = t
         case .valueChanged:
             valueTarget = t
         }
@@ -66,6 +63,7 @@ class ZCustomView: UIControl, ZView, UIGestureRecognizerDelegate, ZTimerOwner {
         super.init(frame: ZRect(size:minSize).GetCGRect())
         isOpaque = false
         backgroundColor = UIColor.clear
+        isUserInteractionEnabled = true
         Expose()
     }
     
@@ -108,69 +106,28 @@ class ZCustomView: UIControl, ZView, UIGestureRecognizerDelegate, ZTimerOwner {
         return (false, "")
     }
     
-    fileprivate func doPressed(_ touch: UITouch?) {
-        var pos = LocalRect.Center
-        if touch != nil {
-            pos = ZPos(touch!.location(in: self))
-        }
-        if HandlePressedInPosFunc != nil {
-            HandlePressedInPosFunc!(pos)
-        } else {
-            tapTarget!.HandlePressed(self, pos:pos)
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        if isUserInteractionEnabled {
+            touchInfoBeginTracking(touchInfo:touchInfo, view:self, touch:touches.first!, event:event)
         }
     }
     
-    internal override func beginTracking(_ touch: UITouch, with event: UIEvent?) -> Bool {
-        if tapTarget != nil || HandlePressedInPosFunc != nil {
-            isHighlighted = true
-            Expose()
-            tapTarget?.HandleTouched(self, state:.began, pos:ZPos(touch.location(in: self)), inside:true)
-            if touchDownRepeatSecs != 0 {
-                touchDownRepeatTimer.Set(touchDownRepeatSecs, owner:self) { [weak self] () in
-                    self?.doPressed(touch)
-                    return true
-                }
-            }
-        }
-        return super.beginTracking(touch, with:event)
-    }
-    
-    internal override func continueTracking(_ touch: UITouch, with event: UIEvent?) -> Bool {
-        if tapTarget != nil || HandlePressedInPosFunc != nil {
-            let pos = ZPos(touch.location(in: self))
-            let inside = Rect.Contains(pos)
-            tapTarget?.HandleTouched(self, state:.changed, pos:pos, inside:inside)
-            touchDownRepeatTimer.Stop()
-        }
-        return super.continueTracking(touch, with:event)
-    }
-    
-    internal override func endTracking(_ touch: UITouch?, with event: UIEvent?) {
-        if !Thread.isMainThread {
-            return
-        }
-        isHighlighted = false
-        if tapTarget != nil || HandlePressedInPosFunc != nil {
-            let pos = ZPos((touch?.location(in: self))!)
-            let inside = LocalRect.Contains(pos)
-            if tapTarget == nil || !tapTarget!.HandleTouched(self, state:.ended, pos:pos, inside:inside) {
-                PerformAfterDelay(0.05) { [weak self] () in
-                    self?.Expose()
-                }
-                if inside {
-                    doPressed(touch!)
-                }
-                super.endTracking(touch, with:event)
-            }
-            touchDownRepeatTimer.Stop()
+    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
+        if isUserInteractionEnabled {
+            touchInfoEndTracking(touchInfo:touchInfo, view:self, touch:touches.first!, event:event)
         }
     }
     
-    internal override func cancelTracking(with event: UIEvent?) {
-        super.cancelTracking(with: event)
-        isHighlighted = false
-        Expose()
-        touchDownRepeatTimer.Stop()
+    override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
+        if isUserInteractionEnabled {
+            touchInfoContinueTracking(touchInfo:touchInfo, view:self, touch:touches.first!, event:event)
+        }
+    }
+    
+    override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
+        if isUserInteractionEnabled {
+            touchInfoTrackingCanceled(touchInfo:touchInfo, view:self, touch:touches.first!, event:event)
+        }
     }
     
     func DrawInRect(_ rect: ZRect, canvas: ZCanvas) {
@@ -221,7 +178,7 @@ class ZCustomView: UIControl, ZView, UIGestureRecognizerDelegate, ZTimerOwner {
     }
     
     @objc func handlePressed(_ sender:UIView?) { // this is for special ZControl views to send press to parent
-        doPressed(nil)
+        touchInfo.doPressed?(LocalRect.Center)
     }
     
     @objc func handleValueChanged(_ sender:UIView?) {

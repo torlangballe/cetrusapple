@@ -67,7 +67,7 @@ class ZContainerView: ZCustomView {
         if h > 20 && !ZScreen.HasNotch() {
             frame.size.height -= h
         } else if useableArea {
-            margin.Min.y = Double(h)
+            margin.SetMinY(Double(h))
         }
     }
     

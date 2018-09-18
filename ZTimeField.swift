@@ -24,7 +24,7 @@ class ZTimeField : ZShapeView {
         
         AddTarget(self, forEventType:.pressed)
         
-        HandlePressedInPosFunc = { [weak self] (pos) in
+        touchInfo.handlePressedInPosFunc = { [weak self] (pos) in
             let v1 = ZVStackView(space:2)
             self!.picker = ZDatePicker(time:time, useTime:self!.showTime, useDate:self!.showDate, minuteInterval:5)
             self!.picker!.TextColor = self!.text.color
