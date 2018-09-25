@@ -15,7 +15,7 @@ let ZLocaleEngUsPosix = "en_US_POSIX"
 enum ZWeekday:Int { case none = 0, mon, tue, wed, thu, fri, sat, sun }
 enum ZMonth:Int   { case none = 0, jan, feb, mar, apr, may, jun, jul, aug, sep, oct, nov, dec }
 
-struct ZGregorianParts {
+struct ZGregorianParts : ZCopy {
     var year:Int = 0
     var month:ZMonth = ZMonth.none
     var day:Int = 0

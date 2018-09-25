@@ -57,7 +57,7 @@ enum ZUrlRequestType: String {
     case Delete = "DELETE"
 }
 
-struct ZUrlRequestReturnMessage : Codable {
+struct ZUrlRequestReturnMessage : Codable, ZCopy {
     var messages:[String]? = nil
     var message:String? = nil
     var code:Int? = nil

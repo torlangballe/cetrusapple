@@ -27,7 +27,7 @@ func ZMatrixForRotationDeg(_ deg:Double) -> ZMatrix {
     return transform
 }
 
-struct ZCanvas {
+class ZCanvas {
     var context: CGContext
     
     init(context c: CGContext) {

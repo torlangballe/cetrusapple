@@ -32,7 +32,7 @@ class ZSoundPlayer: NSObject, AVAudioPlayerDelegate {
     func PlayUrl(_ url:String, volume:Float = -1, loop:Bool = false, stopLast:Bool = true, done:(()->Void)? = nil) {
         var vurl = url
         if !vurl.hasPrefix("file:") {
-            let file = ZFolders.GetFileInFolderType(.resources, addPath:"sound/" + vurl)
+            let file = ZGetResourceFileUrl("sound/" + vurl)
             if file.Exists() {
                 vurl = String(describing:file.url!)
             } else {

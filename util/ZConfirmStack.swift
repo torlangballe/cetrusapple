@@ -1,41 +1,56 @@
 //
 //  ZConfirmStack.swift
-//  capsulefm
 //
 //  Created by Tor Langballe on /26/6/16.
-//  Copyright © 2016 Capsule.fm. All rights reserved.
 //
+
+// #package com.github.torlangballe.CetrusAndroid
 
 import UIKit
 
 class ZConfirmStack : ZStackView {
-    let done:((_ result:Bool)->Void)?
+    var done:((_ result:Bool)->Void)? = nil
     
+    @discardableResult static func PushViewWithTitleBar(_ view:ZView, title:String) -> ZStackView {
+        let v1 = ZVStackView(space:0.0)
+        if let cv = view as? ZContainerView {
+            v1.portraitOnly = cv.portraitOnly
+        }
+        let titleBar = ZTitleBar(text:title, closeType:ZTitleBar.CloseButtons.cross)
+        v1.Add(titleBar, align:ZAlignment.Top | ZAlignment.HorCenter | ZAlignment.HorExpand | ZAlignment.NonProp)
+        v1.Add(view.View(), align:ZAlignment.HorCenter | ZAlignment.Bottom | ZAlignment.Expand | ZAlignment.NonProp)
+        ZPresentView(v1)
+        
+        return v1
+    }
+
     init(useOk:Bool = true, strokecolor:ZColor = ZColor.White(), done:((_ result:Bool)->Void)? = nil) {
-        self.done = done
         super.init(name:"confirm")
-        margin = ZRect(30, 0, -30, 0)
+        self.done = done
+        margin = ZRect(30.0, 0.0, -30.0, 0.0)
         
         var ca = ZAlignment.HorCenter
         if useOk {
-            let set = createShape("check", strokeColor:strokecolor, align:.Right)
+            let set = createShape("check", strokeColor:strokecolor, align:ZAlignment.Right)
             set.accessibilityLabel = ZWords.GetSet()
-            ca = .Left
+            ca = ZAlignment.Left
         }
         let cancel = createShape("cross", strokeColor:strokecolor, align:ca)
         cancel.accessibilityLabel = ZWords.GetCancel()
     }
     
+    // #swift-only:
     required init?(coder aDecoder: NSCoder) { fatalError("init(coder:) has not been implemented") }
+    // #end
     
     fileprivate func createShape(_ name:String, strokeColor:ZColor, align:ZAlignment) -> ZShapeView {
-        let shape = ZShapeView(type:.circle, minSize:ZSize(64, 64))
+        let shape = ZShapeView(type:ZShapeView.ShapeType.circle, minSize:ZSize(64.0, 64.0))
         shape.image = ZImage(named:name + ".png")
         shape.objectName = name
         shape.strokeColor = strokeColor
-        shape.strokeWidth = 2
-        shape.AddTarget(self, forEventType:.pressed)
-        Add(shape, align:align | .VertCenter)
+        shape.strokeWidth = 2.0
+        shape.AddTarget(self, forEventType:ZControlEventType.pressed)
+        Add(shape, align:align | ZAlignment.VertCenter)
         
         return shape
     }
@@ -52,22 +67,9 @@ class ZConfirmStack : ZStackView {
     }
     
     func WrapForPushWithView(_ view:ZView) -> ZCustomView {
-        let v1 = ZVStackView(space:40)
-        v1.Add(self, align:.Center | .HorExpand | .NonProp)
-        v1.Add(view.View(), align:.Center)
-        
-        return v1
-    }
-    
-    @discardableResult static func PushViewWithTitleBar(_ view:ZView, title:String) -> ZStackView {
-        let v1 = ZVStackView(space:0)
-        if let cv = view as? ZContainerView {
-            v1.portraitOnly = cv.portraitOnly
-        }
-        let titleBar = ZTitleBar(text:title, closeType:.cross)
-        v1.Add(titleBar, align:.Top | .HorCenter | .HorExpand | .NonProp)
-        v1.Add(view.View(), align:.HorCenter | .Bottom | .Expand | .NonProp)
-        ZPresentView(v1)
+        let v1 = ZVStackView(space:40.0)
+        v1.Add(self, align:ZAlignment.Center | ZAlignment.HorExpand | ZAlignment.NonProp)
+        v1.Add(view.View(), align:ZAlignment.Center)
         
         return v1
     }

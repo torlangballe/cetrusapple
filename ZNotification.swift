@@ -11,7 +11,7 @@ import UserNotifications
 
 // https://useyourloaf.com/blog/local-notifications-with-ios-10/
 
-struct ZNotificationAction
+struct ZNotificationAction : ZCopy
 {
     var sid = ""
     var title = ""
@@ -23,7 +23,7 @@ struct ZNotificationAction
 
 typealias ZNotification = UNNotificationRequest
 
-struct ZNotificationInfo {
+struct ZNotificationInfo : ZCopy {
     var sendInSecs:Float = 0
     var repeats:Bool = false
     var triggerTime:ZTime = ZTimeNull

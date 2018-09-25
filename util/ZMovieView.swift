@@ -1,9 +1,11 @@
 //
-//  ZMoviePlayer.swift
-//  PocketProbe
+//  ZMovieView.swift
 //
 //  Created by Tor Langballe on /18/12/17.
 //
+
+// #package com.github.torlangballe.CetrusAndroid
+
 
 import AVKit
 

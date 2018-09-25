@@ -338,7 +338,7 @@ struct ZWords {
             word = "GB"
             n = Double(b)/gigaByte
         }
-        let str = ZStr.FormatNiceDouble(n, maxSig:maxSignificant) + " " + word
+        let str = ZStr.NiceDouble(n, maxSig:maxSignificant) + " " + word
         return str
     }
     

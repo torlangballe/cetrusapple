@@ -84,10 +84,10 @@ class zTimerPerformer : NSObject {
     }
 }
 
-func ZPerformAfterDelay(_ afterDelay:Float, _ block:@escaping ()->Void) {
+func ZPerformAfterDelay(_ afterDelay:Double, _ block:@escaping ()->Void) {
     let o = zTimerPerformer()
     o.blocker = _ZBlocker(block:block)
-    o.perform(#selector(zTimerPerformer.fireBlockAfterDelay(_:)), with:o.blocker, afterDelay:TimeInterval(afterDelay))
+    o.perform(#selector(zTimerPerformer.fireBlockAfterDelay(_:)), with:o.blocker, afterDelay:TimeInterval(Float(afterDelay)))
 }
 
 func ZDispatchTimeInSecs(_ secs:Double) -> DispatchTime {

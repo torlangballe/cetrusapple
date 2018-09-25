@@ -3,7 +3,7 @@
 
 import UIKit
 
-struct ZContainerCell {
+struct ZContainerCell : ZCopy {
     var alignment: ZAlignment
     var margin: ZSize
     var view: UIView? = nil

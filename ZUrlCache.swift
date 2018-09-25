@@ -22,7 +22,7 @@ class ZUrlCache {
         }
         folder.CreateFolder()
         
-        let preCachedFolder = ZFolders.GetFileInFolderType(.resources, addPath:"ZUrlCache/" + name)
+        let preCachedFolder = ZGetResourceFileUrl("ZUrlCache/" + name)
         if preCachedFolder.Exists() {
             preCachedFolder.Walk() { (furl, finfo) in
                 let name = furl.GetName()

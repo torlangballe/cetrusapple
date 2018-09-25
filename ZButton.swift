@@ -11,11 +11,10 @@ import UIKit
 class ZButton : ZShapeView {
     var insets = ZSize()
     
-    init(title:String, namedImage:String, w:Double, insets:ZSize = ZSize(6.0, 13.0), titleColor:ZColor = ZColor.White()) {
+    init(title:String, colorName:String, w:Double, insets:ZSize = ZSize(6.0, 13.0), titleColor:ZColor = ZColor.White()) {
         super.init(type:ZShapeView.ShapeType.none, minSize:ZSize(w, 44.0))
         self.insets = insets
-        image = ZImage(named:namedImage)
-        image = image!.Make9PatchImage(capInsets:ZRect(insets.w, insets.h, insets.w, insets.h))
+        SetColorName(colorName)
         text.text = title
         text.font = ZFont.Nice(22.0, style:ZFont.Style.bold)
         text.color = titleColor

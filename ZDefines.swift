@@ -10,6 +10,7 @@ import Foundation
 
 typealias ZObject = NSObject
 typealias ZAnyObject = AnyObject
+
 extension Dictionary where Value : Equatable {
     func oneKeyForValue(_ val : Value) -> Key? {
         for (k, v) in self {
@@ -21,6 +22,13 @@ extension Dictionary where Value : Equatable {
     }
 }
 
+protocol ZCopy {
+    func copy() -> Self
+}
+
+extension ZCopy {
+    func copy() -> Self { return self }
+}
 
 extension Array {
     func writable() -> Array {
@@ -91,10 +99,10 @@ extension ZRange {
 }
 
 extension Array {
-//    mutating func removeAt(_ index:Int) {
-//        self.remove(at:index)
-//    }
-//
+    mutating func removeAt(_ index:Int) {
+        self.remove(at:index)
+    }
+
     func indexWhere(_ w:(Element)->Bool) -> Int? {
         return index(where:w)
     }
@@ -146,6 +154,11 @@ extension Array where Element : Equatable {
             insert(element, at:atIndex)
         }
         return true
+        
+    }
+
+    func head(count:Int) -> Array<Element> {
+        return Array(self.prefix(count))
     }
 
     @discardableResult mutating func appendUnique(_ elements:[Element]) -> Int { // adds if doesn't contain already.  returns how many added
@@ -173,6 +186,10 @@ extension Array where Element : Equatable {
 }
 
 extension Array {
+    mutating func sortWithCondition(_ sortFunc:@escaping (_ a:Element, _ b:Element) -> Int) {
+        sort(by:{ a, b in sortFunc(a, b) < 0 })
+    }
+
     func Max<T:Comparable>(get:(_ e:Element)->T) -> Element {
         return reduce(first!) { (r, e) in
             if get(r) < get(e) {

@@ -11,6 +11,7 @@ import UIKit
 
 enum ZGestureType:Int { case tap = 1, longpress = 2, pan = 4, pinch = 8, swipe = 16, rotation = 32 }
 enum ZGestureState:Int { case began = 1, ended = 2, changed = 4, possible = 8, canceled = 16, failed = 32 }
+
 typealias ZViewContentMode = UIViewContentMode
 
 var collapsedViews = [UIView:ZContainerView]()
@@ -18,7 +19,8 @@ var collapsedViews = [UIView:ZContainerView]()
 protocol ZView {
     var  objectName: String { get set }
     var  Usable: Bool { get set }
-    var  Alpha: Double { get set }
+    var  Alpha: Double { get }
+    func SetAlpha(_ a: Double)
     func SetOpaque(_ opaque:Bool)
     func View() -> UIView
     func Child(_ path: String) -> UIView?
@@ -78,13 +80,11 @@ extension ZView {
             View().alpha = newValue ? 1.0 : 0.3
         }
     }
+    func SetAlpha(_ a: Double) {
+        View().alpha = CGFloat(a)
+    }
     var Alpha: Double {
-        get {
-            return Double(View().alpha)
-        }
-        set {
-            View().alpha = CGFloat(newValue)
-        }
+        return Double(View().alpha)
     }
     func RemoveFromParent() {
         if let s = View().superview as? ZContainerView {
@@ -237,7 +237,7 @@ func getUIViewChild(_ view: UIView, path: String) -> UIView? {
     return nil
 }
 
-struct ZTouchInfo {
+struct ZTouchInfo : ZCopy {
     weak var tapTarget: ZCustomView? = nil
     var touchDownRepeatSecs = 0.0
     var touchDownRepeats = 0

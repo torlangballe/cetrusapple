@@ -13,7 +13,7 @@ protocol ZPickerDelegate {
 }
 //
 class ZPickerView : UIPickerView, UIPickerViewDataSource, UIPickerViewDelegate, UIPickerViewAccessibilityDelegate, ZView {
-    struct Column {
+    struct Column : ZCopy {
         var name = ""
         var titles = [String]()
         var width: Double = 10

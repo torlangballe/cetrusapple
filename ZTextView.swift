@@ -96,6 +96,10 @@ class ZTextView : UITextView, UITextViewDelegate, ZTextBase, ZView {
         }
     }
     
+    func SetTintColor(_ c:ZColor) {
+        tintColor = c.color
+    }
+    
     func SetMargins(_ margins:ZRect) {
         self.contentInset = UIEdgeInsetsMake(CGFloat(margins.Min.y), CGFloat(margins.Min.x), -CGFloat(margins.Max.y), -CGFloat(margins.Max.x))
     }
@@ -154,6 +158,10 @@ class ZTextView : UITextView, UITextViewDelegate, ZTextBase, ZView {
         _ = self.becomeFirstResponder()
     }
     
+    func SetPlaceholderText(_ placeholder:String, color:ZColor = ZColor()) {
+        self.placeHolderText = placeholder
+    }
+
     func SetAutoCorrect(_ on:Bool) {
         self.autocorrectionType = on ? .yes : .no
     }

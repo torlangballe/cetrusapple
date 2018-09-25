@@ -457,7 +457,7 @@ extension ZImage {
     
     static func GetNamedImagesFromWildcard(_ wild:String) -> [ZImage] {
         var images = [ZImage]()
-        let folder = ZFolders.GetFileInFolderType(.resources, addPath:"")
+        let folder = ZGetResourceFileUrl("")
         folder.Walk(wildcard:wild) { (furl, finfo) in
             if let image = ZImage(named:furl.GetName()) {
                 images.append(image)

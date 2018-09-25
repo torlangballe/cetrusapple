@@ -10,7 +10,7 @@ import Foundation
 
 typealias ZOutputStream = OutputStream
 
-struct ZFileInfo
+struct ZFileInfo : ZCopy 
 {
     var dataSize = 0
     var created = ZTimeNull, modified = ZTimeNull, accessed = ZTimeNull

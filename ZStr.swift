@@ -18,7 +18,7 @@ struct ZStr {
     }
 
     static func Format(_ format:String, _ args:CVarArg...) -> String {
-        return String(format:format, args)
+        return NSString(format:format, arguments: getVaList(args)) as String
     }
     
     @discardableResult static func SaveToFile(_ str:String, file:ZFileUrl) -> ZError? {
@@ -459,7 +459,7 @@ struct ZStr {
         return pointer
     }
     
-    static func FormatNiceDouble(_ d:Double, maxSig:Int = 8) -> String {
+    static func NiceDouble(_ d:Double, maxSig:Int = 8) -> String {
         let format = "%.\(maxSig)lf"
         var str = ZStr.Format(format, d)
         if str.contains(".") {

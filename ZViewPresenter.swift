@@ -48,107 +48,6 @@ func ZGetTopZViewController(base: UIViewController? = UIApplication.shared.keyWi
 
 enum ZTransitionType: Int { case none, fromLeft, fromRight, fromTop, fromBottom, fade, reverse }
 
-/*
-func setTransitionFrame(_ vc: UIViewController, transition: ZTransitionType, frame: CGRect, bounds: CGRect) {
-    switch transition {
-        case .fromLeft:
-            vc.view.frame = frame.offsetBy(dx: -bounds.size.width, dy: 0)
-        case .fromRight:
-            vc.view.frame = frame.offsetBy(dx: bounds.size.width, dy: 0)
-        case .fromTop:
-            vc.view.frame = frame.offsetBy(dx: 0, dy: -bounds.size.height)
-        case .fromBottom:
-            vc.view.frame = frame.offsetBy(dx: 0, dy: bounds.size.height)
-        default:
-            break
-    }
-}
-
-func flippedTransition(_ type:ZTransitionType) -> ZTransitionType {
-    switch type {
-        case .fromLeft  : return .fromRight
-        case .fromRight : return .fromLeft
-        case .fromTop   : return .fromBottom
-        case .fromBottom: return .fromTop
-        default         : return type
-    }
-}
-
-class Transitioner: UIViewController, UIViewControllerAnimatedTransitioning {
-    var entering:Bool = true
-    var transition: ZTransitionType = .fade
-    var duration: Float = 0.3
-    var fadeSubView: UIView? = nil
-    var removeOld: Bool = false
-    
-    func transitionDuration(using transitionContext: UIViewControllerContextTransitioning?) -> TimeInterval {
-        return TimeInterval(duration) // duration
-    }
-    
-    func animateTransition(using transitionContext: UIViewControllerContextTransitioning) {
-        var fromViewController = transitionContext.viewController(forKey: UITransitionContextViewControllerKey.from)!
-        var toViewController = transitionContext.viewController(forKey: UITransitionContextViewControllerKey.to)!
-        if !entering {
-            swap(&fromViewController, &toViewController)
-        } else {
-            if removeOld {
-                //                if let vc = fromViewController as? ZViewController {
-                //                    fadeSubView = vc.transitioner!.fadeSubView
-                //                }
-            }
-        }
-        let finalFrameForVC = transitionContext.finalFrame(for: toViewController)
-        let containerView = transitionContext.containerView
-        let bounds = UIScreen.main.bounds
-        if entering {
-            setTransitionFrame(toViewController, transition:transition, frame:finalFrameForVC, bounds:bounds)
-            if transition == .fade {
-                toViewController.view.alpha = 0
-            }
-            containerView.addSubview(toViewController.view)
-        } else {
-            if self.fadeSubView != nil {
-                self.fadeSubView!.alpha = 0
-                self.fadeSubView!.isHidden = false
-            }
-        }
-        UIView.animate(withDuration: transitionDuration(using: transitionContext), delay:0.0, usingSpringWithDamping:1.0, initialSpringVelocity: 0.0, options:.curveLinear, animations: {
-            if self.fadeSubView != nil {
-                self.fadeSubView!.alpha = self.entering ? 0.0 : 1.0
-            }
-            //            fromViewController.view.alpha = self.entering ? 0.5 : 1.0
-            //            toViewController.view.alpha = 1
-            if self.entering {
-                toViewController.view.frame = finalFrameForVC
-                if self.fadeSubView == nil {
-                    setTransitionFrame(fromViewController, transition:flippedTransition(self.transition), frame:finalFrameForVC, bounds:bounds)
-                }
-            } else {
-                if self.fadeSubView == nil {
-                    fromViewController.view.frame = finalFrameForVC
-                }
-                setTransitionFrame(toViewController, transition:self.transition, frame:finalFrameForVC, bounds:bounds)
-                if self.transition == .fade {
-                    //                    fromViewController.view.alpha = 0
-                }
-            }
-        }, completion: { finished in
-            //                fromViewController.view.alpha = 1.0
-            transitionContext.completeTransition(true)
-            if self.fadeSubView != nil {
-                self.fadeSubView!.isHidden = self.entering
-            }
-            if false && self.removeOld && self.entering {
-                //                fromViewController.viewWillDisappear(false)
-                //                fromViewController.didMoveToParentViewController((nil))
-                fromViewController.removeFromParentViewController()
-                fromViewController.view.removeFromSuperview()
-            }
-        })
-    }
-}
-*/
-
 class ZViewController : UIViewController, UIViewControllerTransitioningDelegate, // FBSDKSharingDelegate
                         UIImagePickerControllerDelegate, UINavigationControllerDelegate { // MKMapViewDelegate
     
@@ -171,52 +70,6 @@ class ZViewController : UIViewController, UIViewControllerTransitioningDelegate,
         }
     }
 
-    /*
-    var transitioner: Transitioner? = nil
-    
-    func setupTransition() {
-        self.transitioningDelegate = self
-        self.modalPresentationStyle = UIModalPresentationStyle.OverCurrentContext // CurrentContext // Custom
-    }
-    
-    func animationControllerForPresentedController(presented:UIViewController, presentingController presenting:UIViewController, sourceController source: UIViewController) -> UIViewControllerAnimatedTransitioning? {
-        return transitioner
-    }
-    
-    func animationControllerForDismissedController(dismissed:UIViewController) -> UIViewControllerAnimatedTransitioning? {
-        if transitioner != nil {
-            transitioner!.entering = false
-        }
-        return transitioner
-    }
-    
-    override func viewDidLoad() {
-        if let vc = self.view as? ZContainerView {
-            vc.RangeChildren(subViews:true) { (v:ZView) in
-                ZDebug.Print("expose:", v.objectName)
-                v.Expose()
-                return true
-            }
-        }
-    }
-    */
-    /*
-    func sharer(_ sharer: FBSDKSharing!, didFailWithError error: Error!) {
-        facebookShareDone?(false)
-        facebookShareDone = nil
-    }
-    
-    func sharerDidCancel(_ sharer: FBSDKSharing!) {
-        facebookShareDone?(false)
-        facebookShareDone = nil
-    }
-
-    func sharer(_ sharer: FBSDKSharing!, didCompleteWithResults results: [AnyHashable: Any]!) {
-        facebookShareDone?(true)
-        facebookShareDone = nil
-    }
-*/
-    
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingImage image: UIImage, editingInfo: [String : AnyObject]?) {
         dismiss(animated: true, completion:nil)
     }
@@ -296,7 +149,7 @@ func setTransition(_ view:UIView, transition:ZTransitionType, screen:ZRect, fade
 }
 
 struct Attributes {
-    var duration:Float = 0
+    var duration:Double = 0
     var transition:ZTransitionType = .none
     var oldTransition:ZTransitionType = .none
     var lightContent: Bool = true
@@ -305,7 +158,7 @@ struct Attributes {
 }
 
 var stack = [Attributes]()
-func ZPresentView(_ view:ZView, duration:Float = 0.5, transition:ZTransitionType = .none, fadeToo:Bool = false, oldTransition:ZTransitionType = .reverse, makeFull:Bool = true, useableArea:Bool = false, deleteOld:Bool = false, lightContent:Bool = true, portraitOnly:Bool? = nil, done:(()->Void)? = nil) {
+func ZPresentView(_ view:ZView, duration:Double = 0.5, transition:ZTransitionType = .none, fadeToo:Bool = false, oldTransition:ZTransitionType = .reverse, makeFull:Bool = true, useableArea:Bool = false, deleteOld:Bool = false, lightContent:Bool = true, portraitOnly:Bool? = nil, done:(()->Void)? = nil) {
     view.View().isUserInteractionEnabled = false
     var oldView:UIView? = nil
     let win = UIApplication.shared.keyWindow
@@ -393,7 +246,7 @@ func poptop(_ s: inout Attributes) -> UIView? {
 
 weak var lastView:UIView? = nil
 
-func ZPopTopView(namedView:String = "", animated:Bool = true, overrideDuration:Float = -1, overrideTransition:ZTransitionType = .none, done:(()->Void)? = nil) {
+func ZPopTopView(namedView:String = "", animated:Bool = true, overrideDuration:Double = -1, overrideTransition:ZTransitionType = .none, done:(()->Void)? = nil) {
     var s = Attributes()
     let topView = poptop(&s)
     let popView = topView!.subviews.last

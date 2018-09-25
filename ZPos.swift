@@ -16,7 +16,7 @@ import UIKit
 import kotlin.math.*
 */
 
-struct ZPos : Equatable, Codable
+struct ZPos : ZCopy, Equatable, Codable
 {
     var x: Double = 0.0
     var y: Double = 0.0

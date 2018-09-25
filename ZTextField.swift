@@ -15,6 +15,7 @@ typealias ZKeyboardType = UIKeyboardType
 typealias ZAutocapitalizationType = UITextAutocapitalizationType
 typealias ZReturnKeyType = UIReturnKeyType
 typealias ZTextPosition = UITextPosition
+typealias ZTextClearButtonMode = UITextFieldViewMode
 
 protocol ZTextBase {
     var assumedLangCode: String { get }
@@ -45,7 +46,7 @@ extension ZTextBase {
     }
 }
 
-struct ZKeyboardInfo {
+struct ZKeyboardInfo : ZCopy {
     var keyboardType: ZKeyboardType? = nil
     var autoCapType: ZAutocapitalizationType? = nil
     var returnType: ZReturnKeyType? = nil
@@ -170,6 +171,14 @@ class ZTextField : UITextField, UITextFieldDelegate, ZTextBase, ZView {
         }
     }
     
+    func SetTintColor(_ c:ZColor) {
+        tintColor = c.color
+    }
+    
+    func SetClearButtonMode(_ mode:ZTextClearButtonMode) {
+        clearButtonMode = mode
+    }
+    
     func SetAutoCorrect(_ on:Bool) {
         self.autocorrectionType = on ? .yes : .no
     }
@@ -220,7 +229,7 @@ class ZTextField : UITextField, UITextFieldDelegate, ZTextBase, ZView {
     func newDocument(_ sender: AnyObject) {
     }
 
-    func SetTarget(_ target: ZTextEditDelegate) {
+func SetTarget(_ target: ZTextEditDelegate) {
         self.target = target
         NotificationCenter.default.addObserver(self, selector:#selector(ZTextField.textFieldDidChange(_:)), name:NSNotification.Name.UITextFieldTextDidChange, object:nil)
     }

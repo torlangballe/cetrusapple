@@ -112,8 +112,10 @@ class ZStackView: ZContainerView {
         var cs = CalculateSize(r.size)[vertical]
         cs += margin.size[vertical] // subtracts margin, since we've already indented for that
         let diff = r.size[vertical] - cs
-        for c3 in cells {
+        var lastNoFreeIndex = -1
+        for (i, c3) in cells.enumerated() {
             if !c3.collapsed && !c3.free {
+                lastNoFreeIndex = i
                 let tot = getCellFitSizeInTotal(total:r.size, cell:c3)
                 var s = zConvertViewSizeThatFitstToZSize(view:c3.view!, sizeIn:tot)
                 if decs > 0 && (c3.alignment & ashrink) && diff != 0.0 {
@@ -126,10 +128,13 @@ class ZStackView: ZContainerView {
         }
         var centerDim = 0.0
         var firstCenter = true
-        for c4 in cells {
+        for (i, c4) in cells.enumerated() {
             if !c4.collapsed && !c4.free {
                 if (c4.alignment & (amore|aless)) {
-                    let a = c4.alignment.Subtracted(ZAlignment.Expand[vertical])
+                    var a = c4.alignment
+                    if i != lastNoFreeIndex {
+                        a = a.Subtracted(ZAlignment.Expand[vertical])
+                    }
                     let vr = handleAlign(size:sizes[c4.view!]!, inRect:r, a:a, cell:c4)
                     //                ZDebug.Print("alignx:", (c4.view as! ZView).objectName, vr)
                     if onlyChild == nil || onlyChild!.View() == c4.view {

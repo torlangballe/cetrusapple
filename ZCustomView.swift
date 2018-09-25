@@ -267,7 +267,7 @@ protocol ZCustomViewDelegate {
         }
     }
     
-    func AddGestureTo(_ view:ZView, type:ZGestureType, taps:Int = 1, touches:Int = 1, duration:Float = 0.8, movement:Float = 10, dir:ZAlignment = .None) {
+    func AddGestureTo(_ view:ZView, type:ZGestureType, taps:Int = 1, touches:Int = 1, duration:Double = 0.8, movement:Double = 10, dir:ZAlignment = .None) {
         view.View().isUserInteractionEnabled = true
         
         switch type {

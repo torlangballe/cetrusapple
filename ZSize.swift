@@ -9,7 +9,7 @@
 
 import UIKit
 
-struct ZSize {
+struct ZSize : ZCopy {
     var w:Double = 0.0
     var h:Double = 0.0
 

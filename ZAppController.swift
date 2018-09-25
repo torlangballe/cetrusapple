@@ -14,7 +14,7 @@ import UserNotifications
 
 // https://www.raywenderlich.com/123862/push-notifications-tutorial
 
-// @UIApplicationMain // this adds a main function that sets UIApplicationDelegate and runs event loop I think
+// // @UIApplicationMain // this adds a main function that sets UIApplicationDelegate and runs event loop I think
 class ZAppController : UIResponder, UIApplicationDelegate, UNUserNotificationCenterDelegate {
     var window: UIWindow? = nil
     
@@ -187,7 +187,7 @@ class ZAppController : UIResponder, UIApplicationDelegate, UNUserNotificationCen
         ZApp.appFile = ZFileUrl(filePath:CommandLine.arguments[0])
         let args = Array(CommandLine.arguments[1..<CommandLine.arguments.count])
 
-        ZApp.Main(args) // don't use mainZApp before this!!!
+        ZApp.MainFunc?(args) // don't use mainZApp before this!!!
 
 //        if let notification = launchOptions?[UIApplicationLaunchOptionsKey.localNotification] as? ZNotification {
 //            mainZApp!.HandleAppNotification(notification, action:"")
@@ -303,8 +303,8 @@ class ZAppController : UIResponder, UIApplicationDelegate, UNUserNotificationCen
 //        AWSS3TransferUtility.interceptApplication(application, handleEventsForBackgroundURLSession: identifier, completionHandler: completionHandler)
     }
 
-    static func RunApp(delegateClass:Swift.AnyClass) {
-        UIApplicationMain(CommandLine.argc, convertArgs(CommandLine.unsafeArgv), nil, NSStringFromClass(delegateClass.self))
+    static func RunApp() {
+        UIApplicationMain(CommandLine.argc, convertArgs(CommandLine.unsafeArgv), nil, NSStringFromClass(ZAppController.self))
     }
     
     func applicationDidReceiveMemoryWarning(_ application: UIApplication) {

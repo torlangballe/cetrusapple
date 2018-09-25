@@ -95,7 +95,7 @@ class ZAudioMixer : AVMutableAudioMix {
         let (composition, mixer) = getMixerAndComponentsForMediaItems(&vmediaItems)
         //        ZDebug.Print("MixMediaItemsToFile comps:", composition.tracks.count)
         if composition.tracks.count == 0 {
-            let file = ZFolders.GetFileInFolderType(.resources, addPath:"sound/silence.caf")
+            let file = ZGetResourceFileUrl("sound/silence.caf")
             if file.Exists() {
                 var err:Error? = nil
                 if !outFile.Exists() {

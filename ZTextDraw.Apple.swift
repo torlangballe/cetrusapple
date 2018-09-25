@@ -9,7 +9,7 @@ import UIKit
 enum ZTextDrawType { case fill, stroke, clip }
 enum ZTextWrapType { case `default`, word, char, clip, headTruncate, tailTruncate, middleTruncate }
 
-struct ZTextDraw {
+struct ZTextDraw : ZCopy {
     var type = ZTextDrawType.fill
     var wrap = ZTextWrapType.default
     //    var AText: NSAttributedString

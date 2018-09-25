@@ -7,14 +7,14 @@
 //
 // #package com.github.torlangballe.CetrusAndroid
 
-struct ZHSBA {
+struct ZHSBA : ZCopy {
     var h:Double = 0.0
     var s:Double = 0.0
     var b:Double = 0.0
     var a:Double = 0.0
 }
 
-struct ZRGBA {
+struct ZRGBA : ZCopy {
     var r:Double = 0.0
     var g:Double = 0.0
     var b:Double = 0.0

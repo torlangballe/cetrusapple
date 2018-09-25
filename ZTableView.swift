@@ -23,7 +23,7 @@ protocol ZTableViewDelegate : class {
 
 typealias ZTableViewRowAnimation = UITableViewRowAnimation
 
-struct ZTableIndex {
+struct ZTableIndex : ZCopy {
     var row = 0
     var section = 0
     init(row:Int = 0, section:Int = 0) {

@@ -156,7 +156,7 @@ class ZGLShaderProgram {
     }
 
     func getIncludedText(_ name:String) -> String {
-        let file = ZFolders.GetFileInFolderType(.resources, addPath:"zglshadersinludes/" + name + ".glsl");
+        let file = ZGetResourceFileUrl("zglshadersinludes/" + name + ".glsl");
         let (str ,_) = ZStr.LoadFromFile(file)
         return str
     }

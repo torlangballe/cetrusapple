@@ -12,7 +12,7 @@
 
 import UIKit
 
-struct ZRect {
+struct ZRect : ZCopy {
     var pos: ZPos = ZPos()
     var size: ZSize = ZSize()
     
@@ -38,7 +38,7 @@ struct ZRect {
         set {
             size.w += (pos.x - newValue.x)
             size.h += (pos.y - newValue.y)
-            pos = newValue
+            pos = newValue.copy()
         }
     }
     mutating func SetMaxX(_ x:Double) {
@@ -273,8 +273,8 @@ struct ZRect {
     mutating func UnionWith(rect:ZRect) {
         if !rect.IsNull {
             if IsNull {
-                pos = rect.pos
-                size = rect.size
+                pos = rect.pos.copy()
+                size = rect.size.copy()
             } else {
                 if rect.Min.x < Min.x { Min.x = rect.Min.x }
                 if rect.Min.y < Min.y { Min.y = rect.Min.y }
@@ -300,7 +300,7 @@ struct ZRect {
     mutating func vminusAssign(_ a:ZPos)          { pos -= a }
     
     // #swift-only:
-    init(pos:ZPos = ZPos(), size:ZSize = ZSize()) { self.pos = pos; self.size = size }
+    init(pos:ZPos = ZPos(), size:ZSize = ZSize()) { self.pos = pos.copy(); self.size = size.copy() }
     init(_ r: CGRect)                             { pos = ZPos(r.origin); size = ZSize(r.size) }
     func GetCGRect() -> CGRect                    { return CGRect(origin: pos.GetCGPoint(), size:size.GetCGSize())  }
     // #end

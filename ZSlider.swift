@@ -1,10 +1,10 @@
 //
 //  ZSlider.swift
-//  Zed
 //
 //  Created by Tor Langballe on /24/10/15.
-//  Copyright © 2015 Capsule.fm. All rights reserved.
 //
+
+// #package com.github.torlangballe.CetrusAndroid
 
 import UIKit
 
@@ -13,10 +13,10 @@ class ZSlider: UISlider, ZView, ZControl {
     var vertical: Bool = false
     var minLength: Int = 140
     var ticks = [String:Float]()
+    var ValueString: ((_ v:Float) -> String) = { (v) in return "\(v)" }
+    var handleValueChanged: (() -> Void)? = nil
     func View() -> UIView { return self }
     func Control() -> UIControl { return self }
-    var ValueString: ((_ val:Float) -> String)
-    var handleValueChanged: (() -> Void)? = nil
 
     override func sizeThatFits(_ size: CGSize) -> CGSize {
         return calculateSize(vertical, minLength:minLength, hasTicks:ticks.count > 0)
@@ -25,9 +25,6 @@ class ZSlider: UISlider, ZView, ZControl {
     init(vertical:Bool = false, minLength:Int = 100) {
         self.vertical = vertical
         self.minLength = minLength
-        ValueString = { (val) in
-            return "\(val)"
-        }
         super.init(frame:CGRect(origin:CGPoint(), size:calculateSize(vertical, minLength:minLength, hasTicks:ticks.count > 0)))
         if !vertical {
             contentMode = ZViewContentMode.bottom
@@ -43,7 +40,7 @@ class ZSlider: UISlider, ZView, ZControl {
         handleValueChanged?()
     }
     
-    func SetValue(_ value:Float, animationDuration:Float=0.0) {
+    func SetValue(_ value:Float, animationDuration:Double = 0.0) {
         if animationDuration != 0.0 {
             UIView.animate(withDuration: TimeInterval(animationDuration), animations: { [weak self] () in
                 self?.setValue(value, animated:true)

@@ -1,14 +1,14 @@
 //
 //  ZScrollView.swift
-//  Zed
 //
 //  Created by Tor Langballe on /13/11/15.
-//  Copyright © 2015 Capsule.fm. All rights reserved.
 //
 
 import UIKit
 
-class ZScrollView : UIScrollView, ZView, UIScrollViewDelegate { // Add single child. Stack or something
+// Add single child. Stack or something
+
+class ZScrollView : UIScrollView, ZView, UIScrollViewDelegate {
     var objectName = "scrollview"
     var child: ZContainerView? = nil
     var margin = ZRect()

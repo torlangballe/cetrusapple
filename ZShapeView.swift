@@ -138,7 +138,7 @@ import UIKit
             }
         }
         if(text.text != "") {
-            var t = text
+            var t = text.copy()
             t.color = getStateColor(t.color)
             t.rect = r.Expanded(-(strokeWidth + 2.0)).Expanded(ZSize(-textXMargin, 0.0))
             t.rect.pos.y += 2

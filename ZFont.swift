@@ -21,7 +21,7 @@ extension ZFont {
         self.init(name:vfontName, size:CGFloat(pointsize))
     }
     
-    static func Nice(_ size:Double, style:Style = .normal) -> ZFont {
+static func Nice(_ size:Double, style:Style = .normal) -> ZFont {
         return ZFont(name:"Helvetica", size, style:style)!
     }
     

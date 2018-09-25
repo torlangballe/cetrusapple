@@ -12,10 +12,10 @@ private let ztsLangCodeOverrideKey = "/ZOverrideTransLangCode" // make this abso
 private var translations = Translations()
 private var mainLoaded = false;
 
-func ZTS(_ str:String, langCode:String = "", filePath:String = #file, args:CVarArg...) -> String {
+func ZTS(_ str:String, langCode:String = "", filePath:String = #file, args:[CVarArg] = [CVarArg]()) -> String {
     var trans: Translations
     if langCode == "en" {
-        return ZStr.Format(str, args)
+        return NSString(format:str, arguments:getVaList(args)) as String
     }
     if langCode != "" {
         trans = Translations()
@@ -27,9 +27,8 @@ func ZTS(_ str:String, langCode:String = "", filePath:String = #file, args:CVarA
         trans = translations
     }
     let fileName = ZStr.TailUntil(filePath, sep:"/")
-    var r = trans.Find(str, fileName:fileName)
-    r = ZStr.Format(r, args)
-    return r
+    let r = trans.Find(str, fileName:fileName)
+    return NSString(format:r, arguments:getVaList(args)) as String
 }
 
 func ZSetTranslationLangCode(_ code:String) {
@@ -81,7 +80,7 @@ class Translations {
         if lang == "en" || lang.isEmpty {
             return
         }
-        let file = ZFolders.GetFileInFolderType(.resources, addPath:"translations/" + lang + ".pot")
+        let file = ZGetResourceFileUrl("translations/" + lang + ".pot")
         if !file.Exists() {
             ZDebug.Print("Error loading translation:", lang)
         } else {

@@ -81,7 +81,6 @@ class ZApp : ZObject {
     func HandleAudioRemote(_ command:ZAudioRemoteCommand) {}
     func HandleRemoteAudioSeekTo(posSecs:Double) {}
     func HandleVoiceOverStatusChanged() { }
-    func Main(_ args:[String]) { }
     func HandleBackgrounded(_ background:Bool) { }
     func HandleActivated(_ activated:Bool) { }
     func HandleOpenedFiles(_ files: [ZFileUrl], modifiers:Int) { }
@@ -91,7 +90,13 @@ class ZApp : ZObject {
     func HandleAppWillTerminate() { }
     func HandleShake() { }
 
+    static var MainFunc:((_ args:[String])->Void)? = nil
+
     @discardableResult func HandleOpenUrl(_ url:ZUrl, showMessage:Bool = true, done:(()->Void)? = nil) -> Bool { return false }
+}
+
+class ZLauncher {
+    func Start(args:[String]) { }
 }
 
 var mainZApp : ZApp? = nil

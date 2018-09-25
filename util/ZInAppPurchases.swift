@@ -1,10 +1,10 @@
 //
 //  ZInAppPurchases.swift
-//  capsulefm
 //
 //  Created by Tor Langballe on /3/9/16.
-//  Copyright © 2016 Capsule.fm. All rights reserved.
 //
+
+// #package com.github.torlangballe.CetrusAndroid
 
 // test with:
 // torlangballe+test1@gmail.com
@@ -13,7 +13,7 @@
 import Foundation
 import StoreKit
 
-struct ZInAppProduct {
+struct ZInAppProduct : ZCopy {
     var sid = ""
     var name = ""
     var price = ""

@@ -1,10 +1,10 @@
 //
 //  ZDevice.swift
-//  capsulefm
 //
 //  Created by Tor Langballe on /24/11/15.
-//  Copyright © 2015 Capsule.fm. All rights reserved.
 //
+
+// #package com.github.torlangballe.CetrusAndroid
 
 import Foundation
 import UIKit
@@ -32,10 +32,6 @@ struct ZDevice {
         return UIDevice.current.userInterfaceIdiom == UIUserInterfaceIdiom.phone
     }
 
-//    static func SetDisableIdleSleep(_ disable:Bool) { this is done in ZScreen
-//        UIApplication.shared.isIdleTimerDisabled = disable
-//    }
-//
     static var DeviceName: String {
         return UIDevice.current.name
         //mac:    nsstr = [(NSString *)SCDynamicStoreCopyComputerName(NULL, NULL) autorelease];  //  NSString *localHostname = [(NSString *)SCDynamicStoreCopyLocalHostName(NULL) autorelease];
