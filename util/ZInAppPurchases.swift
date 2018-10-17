@@ -4,7 +4,7 @@
 //  Created by Tor Langballe on /3/9/16.
 //
 
-// #package com.github.torlangballe.CetrusAndroid
+// #package com.github.torlangballe.cetrusandroid
 
 // test with:
 // torlangballe+test1@gmail.com

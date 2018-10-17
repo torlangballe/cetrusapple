@@ -11,7 +11,7 @@ enum ZTextWrapType { case `default`, word, char, clip, headTruncate, tailTruncat
 
 struct ZTextDraw : ZCopy {
     var type = ZTextDrawType.fill
-    var wrap = ZTextWrapType.default
+    var wrap = ZTextWrapType.word
     //    var AText: NSAttributedString
     var text = ""
     var color = ZColor.Black()

@@ -120,7 +120,7 @@ class ZPath {
         return path
     }
     
-    func forEach(_ handle: @convention(block) (CGPathElement) -> Void) {
+    func forEach(_ handle: @escaping @convention(block) (CGPathElement) -> Void) {
         typealias Handle = @convention(block) (CGPathElement) -> Void
         let unsafeHandle = unsafeBitCast(handle, to:UnsafeMutableRawPointer.self)
         path.apply(info:unsafeHandle) { info, unsafeElement in
@@ -131,7 +131,7 @@ class ZPath {
     }
     
     
-    func ForEachPart(_ forPart:(_ part:PartType, _ coords:ZPos...)->Void) {
+    func ForEachPart(_ forPart: @escaping (_ part:PartType, _ coords:ZPos...)->Void) {
         forEach { element in
             switch (element.type) {
             case CGPathElementType.moveToPoint:

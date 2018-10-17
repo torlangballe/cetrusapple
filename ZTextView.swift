@@ -119,6 +119,7 @@ class ZTextView : UITextView, UITextViewDelegate, ZTextBase, ZView {
         var tinfo = ZTextDraw()
         tinfo.text = self.text
         tinfo.font = self.font!
+        tinfo.wrap = .word
         var vsize = size
         vsize.height = 9999
         tinfo.rect = ZRect(size:ZSize(vsize))
@@ -131,7 +132,6 @@ class ZTextView : UITextView, UITextViewDelegate, ZTextBase, ZView {
         
         s.h *= 1.1
         s.h += 12
-        
         
         return s.GetCGSize()
     }

@@ -4,7 +4,7 @@
 //  Created by Tor Langballe on /2/11/15.
 //
 
-// #package com.github.torlangballe.CetrusAndroid
+// #package com.github.torlangballe.cetrusandroid
 
 import UIKit
 

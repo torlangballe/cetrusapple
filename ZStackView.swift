@@ -3,7 +3,7 @@
 //
 //  Created by Tor Langballe on /20/10/15.
 //
-// #package com.github.torlangballe.CetrusAndroid
+// #package com.github.torlangballe.cetrusandroid
 
 import UIKit
 

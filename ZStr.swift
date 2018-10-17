@@ -6,7 +6,7 @@
 //  Copyright (c) 2014 Capsule.fm. All rights reserved.
 //
 
-// #package com.github.torlangballe.CetrusAndroid
+// #package com.github.torlangballe.cetrusandroid
 
 import Foundation
 

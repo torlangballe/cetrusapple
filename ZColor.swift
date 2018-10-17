@@ -5,7 +5,7 @@
 //  Created by Tor Langballe on /23/9/14.
 //  Copyright (c) 2014 Capsule.fm. All rights reserved.
 //
-// #package com.github.torlangballe.CetrusAndroid
+// #package com.github.torlangballe.cetrusandroid
 
 struct ZHSBA : ZCopy {
     var h:Double = 0.0

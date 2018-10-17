@@ -4,7 +4,7 @@
 //  Created by Tor Langballe on /14/12/17.
 //
 
-// #package com.github.torlangballe.CetrusAndroid
+// #package com.github.torlangballe.cetrusandroid
 
 import Foundation
 

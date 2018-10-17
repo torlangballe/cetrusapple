@@ -27,7 +27,19 @@ fileprivate func > <T : Comparable>(lhs: T?, rhs: T?) -> Bool {
     }
 }
 
-class ZImageView: UIImageView, ZView, ZImageLoader {
+class ZImageView: UIImageView, ZView, ZControl, ZImageLoader {
+    func Control() -> UIControl {
+        return UIControl()
+    }
+    var High: Bool {
+        get {
+            return isHighlighted
+        }
+        set {
+            isHighlighted = newValue
+        }
+    }
+
     // use contentMode for aspect fill etc
     var objectName: String
     var maxSize = ZSize()

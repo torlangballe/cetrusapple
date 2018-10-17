@@ -11,7 +11,7 @@ protocol ZCustomViewDelegate {
     func DrawInRect(_ rect: ZRect, canvas: ZCanvas)
 }
 
-/* #k: open */ class ZCustomView: UIControl, ZView, UIGestureRecognizerDelegate {
+class ZCustomView: UIControl, ZView, ZControl, UIGestureRecognizerDelegate {
     var objectName = ""
     var minSize = ZSize(0, 0)
     var drawHandler:((_ rect: ZRect, _ canvas: ZCanvas, _ view:ZCustomView)->Void)? = nil

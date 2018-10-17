@@ -4,7 +4,7 @@
 //  Created by Tor Langballe on /23/9/14.
 //  Copyright (c) 2014 Capsule.fm. All rights reserved.
 
-// #package com.github.torlangballe.CetrusAndroid
+// #package com.github.torlangballe.cetrusandroid
 
 // https://github.com/seivan/VectorArithmetic/blob/master/VectorArithmetic/VectorArithmetic.swift
 // http://practicalswift.com/2014/06/14/the-swift-standard-library-list-of-built-in-functions/
