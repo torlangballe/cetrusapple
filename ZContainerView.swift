@@ -238,6 +238,10 @@ class ZContainerView: ZCustomView {
         }
     }
 
+    func HandleRotation() {
+        
+    }
+
     func DetachChild(_ subView:UIView) {
         for (i, c) in cells.enumerated() {
             if c.view == subView {

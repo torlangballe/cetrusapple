@@ -49,37 +49,39 @@ struct ZSize : ZCopy {
         let m = max(w, h)
         return ZSize(m, m)
     }
+
     func Area() -> Double {
         return w * h
     }
+
     func compareTo(s:ZSize) -> Int {
         return Int((Area() - s.Area() * 1000)) // will loose presision so half-ass * 1000 hack
     }
+
     mutating func Maximize(_ a:ZSize) {
         w = max(w, a.w)
         h = max(h, a.h)
     }
-/*
-    mutating func operator_plusAssign(_ a:ZSize) {
-        w += a.w
-        h += a.h
+
+    mutating func Minimize(_ a:ZSize) {
+        w = min(w, a.w)
+        h = min(h, a.h)
     }
-    mutating func operator_minusAssign(_ a:ZSize) {
-        w -= a.w
-        h -= a.h
-    }
- */
+
     mutating func operator_timesAssign(_ a:Double) {
         w *= a
         h *= a
     }
+    
     mutating func operator_timesAssign(_ a:Float) {
         w *= Double(a)
         h *= Double(a)
     }
+    
     func operator_unaryMinus() -> ZSize {
         return ZSize(-w, -h)
     }
+    
     func equals(_ a:ZSize) -> Bool {
         return w == a.w && h == a.h
     }

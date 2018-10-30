@@ -28,10 +28,10 @@ class ZInAppPurchases : NSObject, SKProductsRequestDelegate, SKPaymentTransactio
     var productsRequest: SKProductsRequest?
     var gotProductsRequestHandler: ((_ products:[ZInAppProduct], _ error:ZError?)->Void)?
 
-    func RequestProducts(_ ids:Set<String>, got:@escaping (_ products:[ZInAppProduct], _ error:ZError?)->Void) {
+    func RequestProducts(_ ids:[String], got:@escaping (_ products:[ZInAppProduct], _ error:ZError?)->Void) {
         productsRequest?.cancel()
         gotProductsRequestHandler = got
-        productsRequest = SKProductsRequest(productIdentifiers:ids)
+        productsRequest = SKProductsRequest(productIdentifiers:Set(ids))
         productsRequest!.delegate = self
         productsRequest!.start()
     }

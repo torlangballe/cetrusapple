@@ -22,7 +22,7 @@ class ZSlider: UISlider, ZView, ZControl {
         return calculateSize(vertical, minLength:minLength, hasTicks:ticks.count > 0)
     }
     
-    init(vertical:Bool = false, minLength:Int = 100) {
+    init(vertical:Bool = false, minLength:Int = 100, dark:Bool = false) {
         self.vertical = vertical
         self.minLength = minLength
         super.init(frame:CGRect(origin:CGPoint(), size:calculateSize(vertical, minLength:minLength, hasTicks:ticks.count > 0)))

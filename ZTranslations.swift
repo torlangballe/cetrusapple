@@ -14,8 +14,9 @@ private var mainLoaded = false;
 
 func ZTS(_ str:String, langCode:String = "", filePath:String = #file, args:[CVarArg] = [CVarArg]()) -> String {
     var trans: Translations
+    let vstr = str.replacingOccurrences(of:"%S", with:"%@") // need something better than this replacement %%S etc
     if langCode == "en" {
-        return NSString(format:str, arguments:getVaList(args)) as String
+        return NSString(format:vstr, arguments:getVaList(args)) as String
     }
     if langCode != "" {
         trans = Translations()
@@ -27,7 +28,7 @@ func ZTS(_ str:String, langCode:String = "", filePath:String = #file, args:[CVar
         trans = translations
     }
     let fileName = ZStr.TailUntil(filePath, sep:"/")
-    let r = trans.Find(str, fileName:fileName)
+    let r = trans.Find(vstr, fileName:fileName)
     return NSString(format:r, arguments:getVaList(args)) as String
 }
 

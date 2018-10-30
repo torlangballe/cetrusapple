@@ -94,13 +94,14 @@ class ZViewController : UIViewController, UIViewControllerTransitioningDelegate,
         }
         super.viewWillTransition(to: size, with:coordinator)
         coordinator.animate(alongsideTransition: { (context) in
-            for (i, v) in self.view.subviews.enumerated() {
+            for (i, v) in self.view.subviews.enumerated() { // make this use stack, better for portraitOnly too
                 if var cv = v as? ZContainerView {
                     if i < self.view.subviews.count - 1 && cv.portraitOnly {
                         continue
                     }
                     let uArea = stack[i].useableArea
                     cv.SetAsFullView(useableArea:uArea)
+                    cv.HandleRotation()
                     cv.Rect = ZRect(size:ZSize(size))
                     cv.RangeChildren() { (view) in
                         if let tv = view as? ZTableView {

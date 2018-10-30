@@ -11,6 +11,10 @@ import Foundation
 typealias ZObject = NSObject
 typealias ZAnyObject = AnyObject
 
+func ZIsIOS() -> Bool {
+    return true // for now
+}
+
 extension Dictionary where Value : Equatable {
     func oneKeyForValue(_ val : Value) -> Key? {
         for (k, v) in self {

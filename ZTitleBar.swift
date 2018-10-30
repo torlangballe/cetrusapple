@@ -40,6 +40,10 @@ class ZTitleBar : ZStackView {
         Add(closeButton, align:closeAlignX | ZAlignment.Bottom)
         Add(title, align:ZAlignment.HorCenter | ZAlignment.Bottom, marg:ZSize(0, 5))
         SetBackgroundColor(ZTitleBar.Color)
+        minSize.h = 44.0
+        if ZIsIOS() {
+            minSize.h += ZScreen.StatusBarHeight
+        }
     }
 
     // #swift-only:
@@ -68,7 +72,6 @@ class ZTitleBar : ZStackView {
                 return true
             }
         }
-        minSize.h = 44 + ZScreen.StatusBarHeight
     }
     
     func ShowActivity(_ show:Bool = true) {

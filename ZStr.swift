@@ -18,7 +18,8 @@ struct ZStr {
     }
 
     static func Format(_ format:String, _ args:CVarArg...) -> String {
-        return NSString(format:format, arguments: getVaList(args)) as String
+        let vformat = format.replacingOccurrences(of:"%S", with:"%@") // need something better than this replacement %%S etc
+        return NSString(format:vformat, arguments: getVaList(args)) as String
     }
     
     @discardableResult static func SaveToFile(_ str:String, file:ZFileUrl) -> ZError? {

@@ -148,7 +148,7 @@ class ZWebView : UIWebView, ZView, UIWebViewDelegate {
         resourcecount = 0
         let nsRequest = NSMutableURLRequest(url:URL(string:url)!)
         if makeUserAgentDesktopBrowser {
-            nsRequest.setValue("%@ Safari/528.16", forHTTPHeaderField:"User_Agent")
+            nsRequest.setValue("%s Safari/528.16", forHTTPHeaderField:"User_Agent")
         }
         if useCookies {
             copyCookies(nsRequest)

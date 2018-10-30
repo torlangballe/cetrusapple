@@ -43,6 +43,7 @@ class ZTableView : UITableView, ZView, UITableViewDelegate, UITableViewDataSourc
     var scrolling = false
     var drawHandler:((_ rect: ZRect, _ canvas: ZCanvas)->Void)!
     var margins = ZSize(0, 0)
+    var spacing = 0.0
     
     func View() -> UIView { return self }
     
@@ -235,7 +236,8 @@ class ZTableView : UITableView, ZView, UITableViewDelegate, UITableViewDataSourc
         
         let customView = owner!.TableViewSetupCell(ZSize(cell.frame.size), index:index)
         customView?.frame = cell.frame
-        customView?.frame.size.height = CGFloat(customView!.minSize.h)
+        customView!.minSize.h -= spacing
+        customView?.frame.size.height = CGFloat(customView!.minSize.h)        
         if let cv = customView as? ZContainerView {
             cv.ArrangeChildren()
         }

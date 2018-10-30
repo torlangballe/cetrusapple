@@ -62,6 +62,7 @@ struct ZRect : ZCopy {
     }
     
     static var Null: ZRect { get { return ZRect(0.0, 0.0, 0.0, 0.0) } }
+
     static func MergeAll(_ rects:[ZRect]) -> [ZRect] {
         var merged = true
         var rold = rects
@@ -269,6 +270,15 @@ struct ZRect : ZCopy {
         MaxPos.x = min(MaxPos.x, rect.MaxPos.x)
         MaxPos.y = min(MaxPos.y, rect.MaxPos.y)
     }
+    
+    /* #kotlin-raw:
+    fun copy() : ZRect {
+        var r = ZRect()
+        r.pos = pos.copy()
+        r.size = size.copy()
+        return r
+    }
+    */
     
     mutating func UnionWith(rect:ZRect) {
         if !rect.IsNull {

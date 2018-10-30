@@ -21,7 +21,7 @@ class ZLabel: UILabel, ZView {
         get { return ZColor(color:textColor) }
         set { textColor = newValue.color }
     }
-    
+
     init(text:String="", minWidth:Double=0, maxWidth:Double=0, lines:Int=1, font:ZFont? = nil, align:ZAlignment = .Left, color:ZColor = ZColor.White()) {
         self.minWidth = minWidth
         self.maxWidth = maxWidth
