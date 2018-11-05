@@ -8,9 +8,9 @@
 import UIKit
 
 class zUITableViewCell : UITableViewCell {
-//    deinit {
-//        print("UITableViewCell deinit")
-//    }
+    //    deinit {
+    //        print("UITableViewCell deinit")
+    //    }
 }
 
 protocol ZTableViewDelegate : class {
@@ -18,6 +18,7 @@ protocol ZTableViewDelegate : class {
     func TableViewGetHeightOfItem(_ index: ZTableIndex)  -> Double
     func TableViewSetupCell(_ cellSize:ZSize, index:ZTableIndex) -> ZCustomView?
     func HandleRowSelected(_ index:ZTableIndex)
+    func UpdateRow(index: Int)
     func GetAccessibilityForCell(_ index:ZTableIndex, prefix:String) -> [ZAccessibilty]
 }
 
@@ -66,7 +67,7 @@ class ZTableView : UITableView, ZView, UITableViewDelegate, UITableViewDataSourc
     }
     
     required init?(coder aDecoder: NSCoder) { fatalError("init(coder:) has not been implemented") }
-
+    
     override func layoutSubviews() {
         if first {
             allowsSelection = true // selectable
@@ -102,6 +103,10 @@ class ZTableView : UITableView, ZView, UITableViewDelegate, UITableViewDataSourc
     }
     
     func ReloadData(row:Int? = nil, animate:Bool = false) {
+        if row != nil {
+            owner?.UpdateRow(index:row!)
+            return
+        }
         if animate {
             self.reloadSections([0], with:UITableViewRowAnimation.fade)
         } else {
@@ -115,7 +120,7 @@ class ZTableView : UITableView, ZView, UITableViewDelegate, UITableViewDataSourc
         //        let indexSet = NSIndexSet(indexesInRange:range)
         //        reloadSections(indexSet, withRowAnimation:UITableViewRowAnimation.Automatic)
     }
-
+    
     func MoveRow(fromIndex:Int, toIndex:Int) {
         let from = makeIndexPathFromIndex(ZTableIndex(row:fromIndex, section:0))
         let to = makeIndexPathFromIndex(ZTableIndex(row:toIndex, section:0))
@@ -154,7 +159,7 @@ class ZTableView : UITableView, ZView, UITableViewDelegate, UITableViewDataSourc
         }
         return nil
     }
-
+    
     static func GetParentTableViewFromRow(_ child:ZContainerView) -> ZTableView {
         var p:UIView? = child.View()
         while p != nil {
@@ -165,9 +170,9 @@ class ZTableView : UITableView, ZView, UITableViewDelegate, UITableViewDataSourc
         }
         fatalError("ZTableView.GetParentTableViewFromRow failed!")
     }
-
+    
     static func GetIndexFromRowView(_ view:ZContainerView) -> Int {
-        let v = GetParentTableViewFromRow(view) 
+        let v = GetParentTableViewFromRow(view)
         return v.GetIndexFromRowView(view) ?? -1 // -1 should never happen
     }
     
@@ -189,7 +194,7 @@ class ZTableView : UITableView, ZView, UITableViewDelegate, UITableViewDataSourc
         let ipath = makeIndexPathFromIndex(ZTableIndex(row:index, section:0))
         self.deleteRows(at:[ipath], with: .left)
     }
-
+    
     func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
         scrolling = true
     }
@@ -218,12 +223,12 @@ class ZTableView : UITableView, ZView, UITableViewDelegate, UITableViewDataSourc
     func numberOfSections(in tableView: UITableView) -> Int {
         return 1
     }
-
+    
     func tableView(_ tableView:UITableView, numberOfRowsInSection section:Int) -> Int {
         let c = owner!.TableViewGetRowCount()
         return c
     }
-
+    
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         //        let cell : UITableViewCell = self.dequeueReusableCellWithIdentifier("ZTableView", forIndexPath:indexPath) as UITableViewCell
         let cell = zUITableViewCell()
@@ -237,7 +242,7 @@ class ZTableView : UITableView, ZView, UITableViewDelegate, UITableViewDataSourc
         let customView = owner!.TableViewSetupCell(ZSize(cell.frame.size), index:index)
         customView?.frame = cell.frame
         customView!.minSize.h -= spacing
-        customView?.frame.size.height = CGFloat(customView!.minSize.h)        
+        customView?.frame.size.height = CGFloat(customView!.minSize.h)
         if let cv = customView as? ZContainerView {
             cv.ArrangeChildren()
         }
@@ -296,6 +301,7 @@ extension ZTableViewDelegate {
     //    func TableViewGetHeightOfItem(index: ZTableIndex) -> Double { return 52 }
     func HandleRowSelected(_ index:ZTableIndex) { }
     func GetAccessibilityForCell(_ index:ZTableIndex, prefix:String) -> [ZAccessibilty] { return [] }
+    func UpdateRow(index: Int) { }
 }
 
 private func exposeAll(_ view:UIView) {
@@ -304,3 +310,5 @@ private func exposeAll(_ view:UIView) {
         exposeAll(s)
     }
 }
+
+

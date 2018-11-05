@@ -25,3 +25,16 @@ class ZActivityIndicator: UIActivityIndicatorView, ZView {
         self.performSelector(onMainThread: Selector(method), with:nil, waitUntilDone:true)
     }
 }
+
+func ZAddActivityToContainer(on:Bool, container:ZContainerView, align:ZAlignment, marg:ZSize = ZSize(0.0, 0.0)) {
+    if on {
+        let v = ZActivityIndicator(big:false)
+        container.Add(v, align:ZAlignment.Right | ZAlignment.Top, marg:ZSize(0.0, 0.0))
+        v.Start()
+    } else {
+        container.RemoveNamedChild("activity")
+    }
+    container.ArrangeChildren()
+}
+
+
