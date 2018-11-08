@@ -90,9 +90,10 @@ class ZTime {
         }
     }
     
-    func GetGregorianTimeParts(useAm:Bool = false) -> (Int,Int,Int,Int,Bool) { // hour, min, sec, nano, isam
+    func GetGregorianTimeParts(useAm:Bool = false, timezone:ZTimeZone? = nil) -> (Int,Int,Int,Int,Bool) { // hour, min, sec, nano, isam
         let cal = Calendar(identifier:Calendar.Identifier.gregorian)
         let comps = (cal as NSCalendar).components([.hour, .minute, .second, .nanosecond], from:self.date)
+        (comps as NSDateComponents).timeZone = timezone as TimeZone?
         var hour = comps.hour!
         let minute = comps.minute!
         let second = comps.second!
