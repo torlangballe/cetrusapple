@@ -10,7 +10,7 @@ import UIKit
 
 class ZTitleBar : ZStackView {
     enum CloseButtons: String { case left = "arrow.left", down = "arrow.down", cross = "cross", none = "" }
-    var closeButton: ZImageView
+    var closeButton: ZImageView? = nil
     let notchInc = 16
     let title: ZLabel
     var sizeCalculated = false
@@ -34,10 +34,12 @@ class ZTitleBar : ZStackView {
 //        if ZScreen.HasNotch() {
 //            minSize.h += 88
 //        }
-        closeButton.AddTarget(self, forEventType:ZControlEventType.pressed)
-        closeButton.accessibilityLabel = ZWords.GetClose()
+        closeButton?.AddTarget(self, forEventType:ZControlEventType.pressed)
+        closeButton?.accessibilityLabel = ZWords.GetClose()
         AddTarget(self, forEventType:ZControlEventType.pressed)
-        Add(closeButton, align:closeAlignX | ZAlignment.Bottom)
+        if closeButton != nil {
+            Add(closeButton!, align:closeAlignX | ZAlignment.Bottom)
+        }
         Add(title, align:ZAlignment.HorCenter | ZAlignment.Bottom, marg:ZSize(0, 5))
         SetBackgroundColor(ZTitleBar.Color)
         minSize.h = 44.0
