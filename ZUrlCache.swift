@@ -142,7 +142,7 @@ class ZUrlCache {
         req.SetUrl(url)
         req.SetType(.Get)
         if persistent {
-            let t = ZUrlSession.DownloadPersistantlyToFileInThread(req, onCellular:onCellular, makeStatusCodeError:true) { [weak self] (response, furl, error) in
+            let t = ZInternet.DownloadPersistantlyToFileInThread(req, onCellular:onCellular, makeStatusCodeError:true) { [weak self] (response, furl, error) in
                 self?.listMutex.Lock()
                 self?.addingList[url] = nil
                 self?.listMutex.Unlock()
@@ -160,7 +160,7 @@ class ZUrlCache {
             listMutex.Unlock()
             return  nil
         }
-        let t = ZUrlSession.Send(req, onMain:false, makeStatusCodeError:true) { [weak self] (response, data, error, sessionCount) in
+        let t = ZInternet.Send(req, onMain:false, makeStatusCodeError:true) { [weak self] (response, data, error, sessionCount) in
             self?.listMutex.Lock()
             self?.addingList[url] = nil
             self?.listMutex.Unlock()

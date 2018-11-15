@@ -38,7 +38,7 @@ class ZBackblazeB2 {
         str = "Basic" + ZStr.Base64Encode(str)
         req.SetHeaderForKey("Authorization", value:str)
         
-        ZUrlSession.SendGetJson(req, debug:true) { (response, json, error) in
+        ZInternet.SendGetJson(req, debug:true) { (response, json, error) in
             if error == nil {
                 self.apiUrl = json["apiUrl"].stringValue + "/b2api/v1/"
                 self.authorizationToken = json["authorizationToken"].stringValue
@@ -53,7 +53,7 @@ class ZBackblazeB2 {
         var json = ZJSON.JDict()
         json["bucketId"] = ZJSON(bucketId)
         req.SetJsonBody(json)
-        ZUrlSession.SendGetJson(req, debug:true) { (response, json, error) in
+        ZInternet.SendGetJson(req, debug:true) { (response, json, error) in
             if error == nil {
                 let uploadUrl = json["uploadUrl"].stringValue
                 let uploadToken = json["authorizationToken"].stringValue
@@ -74,7 +74,7 @@ class ZBackblazeB2 {
         req.SetHeaderForKey("X-Bz-Content-Sha1", value:sha1)
         
         req.httpBody = fileData
-        ZUrlSession.SendGetJson(req, debug:true) { (response, json, error) in
+        ZInternet.SendGetJson(req, debug:true) { (response, json, error) in
             if error == nil {
                 //                let uploadUrl = json["uploadUrl"].stringValue
                 done(nil, "")

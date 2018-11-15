@@ -16,7 +16,7 @@ class ZTitleBar : ZStackView {
     var sizeCalculated = false
     weak var closeHandler:ZViewHandler? = nil
     
-    static var Color = ZColor(r:0.2, g:0.3, b:1)
+    static var Color = ZColor(r:0.2, g:0.3, b:1.0)
     
     init(text:String = "", closeType:CloseButtons = CloseButtons.cross, closeAlignX:ZAlignment = ZAlignment.Left) {
         closeButton = ZImageView(namedImage:closeType.rawValue + ".png")
@@ -28,7 +28,7 @@ class ZTitleBar : ZStackView {
         super.init(name:"titlebar")
         
         space = 0.0
-        margin = ZRect(0.0, 0.0, 0.0, -4.0)
+        margin = ZRect(0.0, 8.0, 0.0, -4.0)
         accessibilityLabel = text
         minSize = ZSize(100, 60)
 //        if ZScreen.HasNotch() {
