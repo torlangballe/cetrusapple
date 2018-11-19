@@ -42,15 +42,18 @@ extension ZNotification {
         }
         let trigger = UNTimeIntervalNotificationTrigger(timeInterval:secs, repeats:info.repeats)
         let c = UNMutableNotificationContent()
+        
+        c.userInfo = info.userInfo
+        #if os(iOS)
         c.title = info.title
         c.body = info.body
-        c.userInfo = info.userInfo
         if !info.soundName.isEmpty {
             c.sound = UNNotificationSound(named:info.soundName)
         }
         if !info.categoryId.isEmpty {
             c.categoryIdentifier = info.categoryId
         }
+        #endif
         self.init(identifier:suid, content:c, trigger:trigger)
     }
     
@@ -94,6 +97,7 @@ extension ZNotification {
             }
         }
 
+        #if os(iOS)
         if categoryId.isEmpty {
             return
         }
@@ -122,6 +126,7 @@ extension ZNotification {
                                       intentIdentifiers:[], options:UNNotificationCategoryOptions())
         registeredCategories.update(with:category)
         center.setNotificationCategories(registeredCategories)
+        #endif
     }
     
     static func RegisterForPushNotifications() {
@@ -138,6 +143,7 @@ extension ZNotification {
     }
 }
 
-
+#if os(iOS)
 var registeredCategories = Set<UNNotificationCategory>()
+#endif
 

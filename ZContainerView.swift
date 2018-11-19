@@ -1,7 +1,7 @@
 //  ZContainerView.swift
 //  Created by Tor Langballe on /23/9/14.
 
-import UIKit
+// import UIKit
 
 struct ZContainerCell : ZCopy {
     var alignment: ZAlignment
@@ -63,12 +63,14 @@ class ZContainerView: ZCustomView {
     
     func SetAsFullView(useableArea: Bool) {
         frame = UIScreen.main.bounds
+        #if os(iOS)
         let h = UIApplication.shared.statusBarFrame.size.height
         if h > 20 && !ZScreen.HasNotch() {
             frame.size.height -= h
         } else if useableArea {
             margin.SetMinY(Double(h))
         }
+        #endif
     }
     
     func Sort(_ sorter:(_ a:ZContainerCell, _ b:ZContainerCell) -> Bool) {

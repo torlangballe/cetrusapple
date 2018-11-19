@@ -12,9 +12,6 @@ typealias ZUrlRequest = NSMutableURLRequest
 typealias ZUrlResponse = URLResponse
 typealias ZURLSessionTask = URLSessionTask
 
-class ZIPAddress {
-}
-
 extension ZURLSessionTask {
     func FractionCompleted() -> Double {
         if #available(iOS 11.0, *) {
@@ -107,7 +104,7 @@ private func checkStatusCode(_ response:ZUrlResponse!, check:Bool, error:inout Z
     }
 }
 
-class ZInternet {
+class ZUrlSession {
     // transactions are debugging list for listing all transactions
     static var transactionMutex = ZMutex()
     static var transactions = [(String, Int, Bool)]() // url, length, upload
@@ -125,9 +122,9 @@ class ZInternet {
             }
         }
         let task = URLSession.shared.dataTask(with:(request as URLRequest)) { (data, response, error) in
-//            ZDebug.Print("ZInternet.Sent", data?.count, error?.localizedDescription, request.url?.absoluteString)
+//            ZDebug.Print("ZUrlSession.Sent", data?.count, error?.localizedDescription, request.url?.absoluteString)
             if error != nil {
-                ZDebug.Print("ZInternet.Send dataTask err:", error!.localizedDescription, request.url?.absoluteString)
+                ZDebug.Print("ZUrlSession.Send dataTask err:", error!.localizedDescription, request.url?.absoluteString)
             }
             var verror = error
             checkStatusCode(response, check:makeStatusCodeError, error:&verror)
@@ -226,36 +223,6 @@ class ZInternet {
             }
         }
         return (nil, nil)
-    }
-    
-    func ResolveAddress(address:String, got:(_ a:ZIPAddress )->Unit) {
-        let ip = ZIPAddress()
-        // TODO: do this
-        got(ip)
-    }
-    
-    func SendWithUDP(address:ZIPAddress, port:Int, data:ZData, done:(_ e:ZError?)->Unit) {
-        // TODO: do this
-    }
-}
-
-class ZRateLimiter {
-    let max:Int
-    let durationSecs:Double
-    
-    var timeStamps = [ZTime]()
-    init(max:Int, durationSecs:Double) {
-        self.max = max
-        self.durationSecs = durationSecs
-    }
-    
-    func Add() {
-        timeStamps.append(ZTime.Now())
-    }
-    
-    func IsExceded() -> Bool {
-        timeStamps.removeIf { $0.Since() > durationSecs  }
-        return timeStamps.count >= max
-    }
+    }    
 }
 

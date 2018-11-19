@@ -107,6 +107,10 @@ import UIKit
             canvas.SetColor(getStateColor(strokeColor), opacity:o)
             canvas.StrokePath(path, width:strokeWidth)
         }
+        var imarg = imageMargin
+        if ZIsTVBox() {
+            imarg.Maximize(ZSize(5.0, 5.0))
+        }
         if(image != nil) {
             var drawImage = image
             if isHighlighted {
@@ -129,12 +133,12 @@ import UIKit
                 var corner:Double? = nil
                 if roundImage {
                     if type == ZShapeView.ShapeType.roundRect {
-                        corner = min(15.0, min(r.size.w, r.size.h) * ratio) - imageMargin.Min()
+                        corner = min(15.0, min(r.size.w, r.size.h) * ratio) - imarg.Min()
                     } else if type == ZShapeView.ShapeType.circle {
                         corner = image!.Size.Max()
                     }
                 }
-                canvas.DrawImage(drawImage!, destRect:r, align:a, opacity:o, corner:corner, margin:imageMargin)
+                canvas.DrawImage(drawImage!, destRect:r, align:a, opacity:o, corner:corner, margin:imarg)
             }
         }
         if(text.text != "") {
@@ -149,6 +153,9 @@ import UIKit
             if imageFill {
                 canvas.SetDropShadowOff()
             }
+        }
+        if isFocused {
+            ZFocus.Draw(canvas, rect:rect, corner:5.0)
         }
     }
 

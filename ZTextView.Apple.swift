@@ -138,11 +138,13 @@ class ZTextView : UITextView, UITextViewDelegate, ZTextBase, ZView {
     
     
     override func canPerformAction(_ action:Selector, withSender sender:Any?) -> Bool {
+        #if os(iOS)
         if !useMenu {
             ZMainQue.async { () in
                 UIMenuController.shared.setMenuVisible(false, animated:false)
             }
         }
+        #endif
         return super.canPerformAction(action, withSender:sender)
     }
 
@@ -284,6 +286,7 @@ class ZTextView : UITextView, UITextViewDelegate, ZTextBase, ZView {
     }
     
     func AddMenuItemAndShow(_ items:[String:String]) {
+        #if os(iOS)
         let menuController = UIMenuController.shared
         menuController.setTargetRect(self.frame, in:self.superview!)
         menuController.arrowDirection = UIMenuControllerArrowDirection.left;
@@ -292,6 +295,7 @@ class ZTextView : UITextView, UITextViewDelegate, ZTextBase, ZView {
             menuController.menuItems?.append(menuItem)
         }
         menuController.setMenuVisible(true, animated:true)
+        #endif
     }
     
     func ReplaceSelectedText(_ replaceText:String, positionAfter:Bool = false) {

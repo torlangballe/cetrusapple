@@ -5,7 +5,7 @@
 //
 
 import UIKit
-import SafariServices
+//import SafariServices
 import MobileCoreServices
 
 class ZUrl : Hashable  {
@@ -61,11 +61,13 @@ class ZUrl : Hashable  {
                 }
             }
         }
+        #if os(iOS)
         if inApp && !out {
             let c = SFSafariViewController(url:url!)
             ZGetTopViewController()!.present(c, animated:true, completion:nil)
             return
         }
+        #endif
         UIApplication.shared.open(url!, options:[:]) // can have completion handler too
     }
 

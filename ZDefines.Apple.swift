@@ -15,6 +15,14 @@ func ZIsIOS() -> Bool {
     return true // for now
 }
 
+func ZIsTVBox() -> Bool {
+    #if os(tvOS)
+    return true
+    #else
+    return false
+    #endif
+}
+
 extension Dictionary where Value : Equatable {
     func oneKeyForValue(_ val : Value) -> Key? {
         for (k, v) in self {
@@ -24,6 +32,10 @@ extension Dictionary where Value : Equatable {
         }
         return nil
     }
+}
+
+protocol DummyProtocol {
+    
 }
 
 protocol ZCopy {

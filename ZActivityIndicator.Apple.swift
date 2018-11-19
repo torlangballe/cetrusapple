@@ -14,7 +14,11 @@ class ZActivityIndicator: UIActivityIndicatorView, ZView {
     var objectName = "activity"
 
     init(big:Bool = true, dark:Bool = false) {
-        let uistyle = big ? UIActivityIndicatorViewStyle.whiteLarge : (dark ? UIActivityIndicatorViewStyle.gray : UIActivityIndicatorViewStyle.white)
+        let gray = UIActivityIndicatorViewStyle.white
+        #if os(iOS)
+        gray = UIActivityIndicatorViewStyle.gray
+        #endif
+        let uistyle = big ? UIActivityIndicatorViewStyle.whiteLarge : (dark ? gray : UIActivityIndicatorViewStyle.white)
         super.init(activityIndicatorStyle:uistyle)
     }
     

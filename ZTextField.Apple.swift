@@ -273,11 +273,13 @@ func SetTarget(_ target: ZTextEditDelegate) {
     }
 
     override func canPerformAction(_ action:Selector, withSender sender:Any?) -> Bool {
+        #if os(iOS)
         if !useMenu {
             ZMainQue.async { () in
                 UIMenuController.shared.setMenuVisible(false, animated:false)
             }
         }
+        #endif
         return super.canPerformAction(action, withSender:sender)
     }
     

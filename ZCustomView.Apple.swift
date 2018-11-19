@@ -18,7 +18,25 @@ class ZCustomView: UIControl, ZView, ZControl, UIGestureRecognizerDelegate {
     var foregroundColor = ZColor.Black()
     var canFocus = false
     var touchInfo = ZTouchInfo()
+    var IsFocused: Bool {
+        return isFocused
+    }
+    var HandlePressedInPosFunc: ((_ pos: ZPos)->Void)? {
+        get {
+            return touchInfo.handlePressedInPosFunc
+        }
+        set {
+            touchInfo.handlePressedInPosFunc = newValue
+            isUserInteractionEnabled = true
+            isAccessibilityElement = true
+            accessibilityTraits |= UIAccessibilityTraitButton
+            if ZIsTVBox() {
+                AddGestureTo(self, type:ZGestureType.tap)
+            }
+        }
+    }
     
+
     private var handleValueChangedFunc: (()->Void)? = nil
     
     weak var valueTarget: ZCustomView? = nil
@@ -106,6 +124,24 @@ class ZCustomView: UIControl, ZView, ZControl, UIGestureRecognizerDelegate {
         return (false, "")
     }
     
+    override var canBecomeFocused: Bool {
+        return canFocus
+    }
+    
+    override func didUpdateFocus(in context: UIFocusUpdateContext, with coordinator: UIFocusAnimationCoordinator) {
+        Expose()
+//        if context.nextFocusedView == self {
+//            coordinator.addCoordinatedAnimations({ () -> Void in
+//                self.layer.backgroundColor = UIColor.blue.withAlphaComponent(0.2).cgColor
+//            }, completion: nil)
+//
+//        } else if context.previouslyFocusedView == self {
+//            coordinator.addCoordinatedAnimations({ () -> Void in
+//                self.layer.backgroundColor = UIColor.clear.cgColor
+//            }, completion: nil)
+//        }
+    }
+
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         if isUserInteractionEnabled {
             touchInfoBeginTracking(touchInfo:touchInfo, view:self, touch:touches.first!, event:event)
@@ -274,27 +310,34 @@ class ZCustomView: UIControl, ZView, ZControl, UIGestureRecognizerDelegate {
         case .tap:
             let gtap = UITapGestureRecognizer(target:self, action:#selector(self.handleGesture(_:)))
             gtap.numberOfTapsRequired = taps
+            #if os(iOS)
             gtap.numberOfTouchesRequired = touches
+            #endif
+            #if os(tvOS)
+            gtap.allowedPressTypes = [NSNumber(value:UIPressType.select.rawValue)] // only this for now
+            #endif
             gtap.cancelsTouchesInView = true
             addGesture(gtap, view:view, handler:self)
             view.View().addGestureRecognizer(gtap)
-            for g in view.View().gestureRecognizers ?? [] {
-                if let tg = g as? UITapGestureRecognizer, tg != gtap {
-                    tg.require(toFail:gtap)
-                }
-            }
-            if view.View().superview != nil {
-                for g in view.View().superview?.gestureRecognizers ?? [] {
-                    if let tg = g as? UITapGestureRecognizer, tg != gtap {
-                        tg.require(toFail:gtap)
-                    }
-                }
-            }
+//            for g in view.View().gestureRecognizers ?? [] {
+//                if let tg = g as? UITapGestureRecognizer, tg != gtap {
+//                    tg.require(toFail:gtap)
+//                }
+//            }
+//            if view.View().superview != nil {
+//                for g in view.View().superview?.gestureRecognizers ?? [] {
+//                    if let tg = g as? UITapGestureRecognizer, tg != gtap {
+//                        tg.require(toFail:gtap)
+//                    }
+//                }
+//            }
             
         case .longpress:
             let glong = UILongPressGestureRecognizer(target:self, action:#selector(self.handleGesture(_:)))
             glong.numberOfTapsRequired = taps - 1
+            #if os(iOS)
             glong.numberOfTouchesRequired = touches
+            #endif
             glong.allowableMovement = CGFloat(movement)
             glong.minimumPressDuration = CFTimeInterval(duration)
             addGesture(glong, view:view, handler:self)
@@ -302,18 +345,24 @@ class ZCustomView: UIControl, ZView, ZControl, UIGestureRecognizerDelegate {
 
         case .pan:
             let gpan = UIPanGestureRecognizer(target:self, action:#selector(self.handleGesture(_:)))
+            #if os(iOS)
             gpan.minimumNumberOfTouches = touches
+            #endif
             addGesture(gpan, view:view, handler:self)
             view.View().addGestureRecognizer(gpan)
 
         case .pinch:
+            #if os(iOS)
           let gpinch = UIPinchGestureRecognizer(target:self, action:#selector(self.handleGesture(_:)))
             addGesture(gpinch, view:view, handler:self)
             view.View().addGestureRecognizer(gpinch)
+            #endif
             
         case .swipe:
             let gswipe = UISwipeGestureRecognizer(target:self, action:#selector(self.handleGesture(_:)))
+            #if os(iOS)
             gswipe.numberOfTouchesRequired = touches
+            #endif
             switch dir {
             case ZAlignment.Left  : gswipe.direction = UISwipeGestureRecognizerDirection.left
             case ZAlignment.Right : gswipe.direction = UISwipeGestureRecognizerDirection.right
@@ -326,9 +375,11 @@ class ZCustomView: UIControl, ZView, ZControl, UIGestureRecognizerDelegate {
             view.View().addGestureRecognizer(gswipe)
             
         case .rotation:
+            #if os(iOS)
             let grot = UIRotationGestureRecognizer(target:self, action:#selector(self.handleGesture(_:)))
             addGesture(grot, view:view, handler:self)
             view.View().addGestureRecognizer(grot)
+            #endif
         }
     }
     
@@ -353,24 +404,40 @@ class ZCustomView: UIControl, ZView, ZControl, UIGestureRecognizerDelegate {
         case UIGestureRecognizerState.cancelled: state = .canceled
         case UIGestureRecognizerState.failed: state = .failed
         }
+        #if os(iOS)
         if state == .began && UIMenuController.shared.isMenuVisible {
             g.isEnabled = false // hides popup text menu?
             g.isEnabled = true
             UIMenuController.shared.isMenuVisible = false
-        } else  if let gtap = g as? UITapGestureRecognizer {
+        }
+        #endif
+        if let gtap = g as? UITapGestureRecognizer {
             type = .tap
             taps = gtap.numberOfTapsRequired
+            #if os(iOS)
             touches = gtap.numberOfTouchesRequired
+            #endif
+            #if os(tvOS)
+            if let vc = g.view as? ZCustomView {
+                vc.touchInfo.handlePressedInPosFunc?(ZPos(0, 0))
+            }
+            #endif
         } else if let glong = g as? UILongPressGestureRecognizer {
             type = .longpress
             taps = glong.numberOfTapsRequired
+            #if os(iOS)
             touches = glong.numberOfTouchesRequired
+            #endif
         } else if let gpan = g as? UIPanGestureRecognizer {
             type = .pan
+            #if os(iOS)
             touches = gpan.maximumNumberOfTouches
+            #endif
             delta = ZPos(gpan.translation(in: g.view))
             velocity = ZPos(gpan.velocity(in: g.view))
-        } else if let gpinch = g as? UIPinchGestureRecognizer {
+        }
+        #if os(iOS)
+        if let gpinch = g as? UIPinchGestureRecognizer {
             type = .pinch
             gvalue = Float(gpinch.scale)
             velocity.x = Double(gpinch.velocity)
@@ -380,9 +447,13 @@ class ZCustomView: UIControl, ZView, ZControl, UIGestureRecognizerDelegate {
             gvalue = Float(grot.rotation)
             velocity.x = Double(grot.velocity)
             velocity.y = velocity.x
-        } else if let gswipe = g as? UISwipeGestureRecognizer {
+        }
+        #endif
+        if let gswipe = g as? UISwipeGestureRecognizer {
             type = .swipe
+            #if os(iOS)
             touches = gswipe.numberOfTouchesRequired
+            #endif
             switch gswipe.direction {
             case UISwipeGestureRecognizerDirection.right:
                 delta = ZPos(1, 0)
@@ -417,12 +488,12 @@ class ZCustomView: UIControl, ZView, ZControl, UIGestureRecognizerDelegate {
     
     @objc(gestureRecognizer:shouldRecognizeSimultaneouslyWithGestureRecognizer:) func gestureRecognizer(_ gestureRecognizer:UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
         return true
-    }
+    }    
 }
 
 private func addGesture(_ g: UIGestureRecognizer, view:ZView, handler:ZCustomView) {
     view.View().isUserInteractionEnabled = true
-    g.delaysTouchesEnded = true
+//    g.delaysTouchesEnded = true
     g.delegate = handler
 }
 

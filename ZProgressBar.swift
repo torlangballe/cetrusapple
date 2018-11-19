@@ -6,7 +6,7 @@
 
 // #package com.github.torlangballe.cetrusandroid
 
-import Foundation
+// import Foundation
 
 class ZProgressBar: ZCustomView {
     var height:Double

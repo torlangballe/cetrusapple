@@ -61,7 +61,9 @@ class ZTableView : UITableView, ZView, UITableViewDelegate, UITableViewDataSourc
         dataSource = self
         sectionFooterHeight = 3;
         backgroundView = nil
+        #if os(iOS)
         separatorStyle = UITableViewCellSeparatorStyle.none
+        #endif
         //        self.registerClass(UallITableViewCell.self, forCellReuseIdentifier:"ZTableView")
         allowsSelection = true // selectable
     }

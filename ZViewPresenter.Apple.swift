@@ -48,12 +48,16 @@ func ZGetTopZViewController(base: UIViewController? = UIApplication.shared.keyWi
 
 enum ZTransitionType: Int { case none, fromLeft, fromRight, fromTop, fromBottom, fade, reverse }
 
-class ZViewController : UIViewController, UIViewControllerTransitioningDelegate, // FBSDKSharingDelegate
-                        UIImagePickerControllerDelegate, UINavigationControllerDelegate { // MKMapViewDelegate
-    
-    var facebookShareDone:((_ sent:Bool) -> Void)? = nil // stupid shit needs to be here since share assums controller is delegate
-    var imagePickerDone:((_ image:ZImage?)->Void)? = nil
+#if os(tvOS)
+typealias UIImagePickerControllerDelegate = DummyProtocol
+#endif
 
+class ZViewController : UIViewController, UIViewControllerTransitioningDelegate, // FBSDKSharingDelegate
+                        UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+    var facebookShareDone:((_ sent:Bool) -> Void)? = nil // stupid shit needs to be here since share assums controller is delegate
+
+    #if os(iOS)
+    var imagePickerDone:((_ image:ZImage?)->Void)? = nil
     @objc func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
         imagePickerDone?(nil)
         picker.dismiss(animated: true, completion:nil)
@@ -73,7 +77,6 @@ class ZViewController : UIViewController, UIViewControllerTransitioningDelegate,
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingImage image: UIImage, editingInfo: [String : AnyObject]?) {
         dismiss(animated: true, completion:nil)
     }
-
     open override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
         if stack.last?.portraitOnly ?? true {
             return .portrait
@@ -87,7 +90,8 @@ class ZViewController : UIViewController, UIViewControllerTransitioningDelegate,
         }
         return !(stack.last?.portraitOnly ?? false)
     }
-
+    #endif
+    
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
         if forcingRotationForPortraitOnly {
             return
@@ -232,6 +236,13 @@ func ZPresentView(_ view:ZView, duration:Double = 0.5, transition:ZTransitionTyp
         ZAccessibilty.SendScreenUpdateNotification()
         view.View().isUserInteractionEnabled = true
         done?()
+        oldView?.isUserInteractionEnabled = false
+        if let ov = oldView as? ZContainerView { // we need to unset it here first for some reason
+            setFocusInView(ov)
+        }
+        if let cv = view as? ZContainerView {
+            setFocusInView(cv)
+        }
     })
 }
 
@@ -279,12 +290,15 @@ func ZPopTopView(namedView:String = "", animated:Bool = true, overrideDuration:D
         dur = overrideDuration
     }
     oldView.isHidden = false
+    oldView.isUserInteractionEnabled = true
     if let cv = oldView as? ZContainerView {
         if cv.portraitOnly {
             forcingRotationForPortraitOnly = true
+            #if os(iOS)
             let value = UIInterfaceOrientation.portrait.rawValue
-            UIDevice.current.setValue(value, forKey:"orientation")
             UIViewController.attemptRotationToDeviceOrientation()
+            UIDevice.current.setValue(value, forKey:"orientation")
+            #endif
             forcingRotationForPortraitOnly = false
             let uArea = stack.last!.useableArea
             cv.SetAsFullView(useableArea:uArea)
@@ -303,6 +317,12 @@ func ZPopTopView(namedView:String = "", animated:Bool = true, overrideDuration:D
             if lastView != nil {
                 ZDebug.Print("View not deinited:", lastView)
             }
+        }
+//        if let pv = popView as? ZContainerView { // we need to unset it here first for some reason
+//            setFocusInView(pv)
+//        }
+        if let ov = oldView as? ZContainerView {
+            setFocusInView(ov)
         }
         done?()
     })
@@ -329,3 +349,17 @@ func ZRecusivelyHandleActivation(activated:Bool) {
     }
 }
 
+private func setFocusInView(_ view:ZContainerView) {
+    view.setNeedsFocusUpdate()
+//    view.updateFocusIfNeeded()
+
+    //    view.RangeChildren(subViews:true) { (view) in
+//        if let v = view as? ZCustomView {
+//            if v.canFocus {
+//                view.Focus()
+//                return false
+//            }
+//        }
+//        return true
+//    }
+}

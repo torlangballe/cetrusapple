@@ -24,7 +24,11 @@ class ZScreen {
 
     static var StatusBarHeight : Double {
         get {
+            #if os(iOS)
             return Double(UIApplication.shared.statusBarFrame.size.height)
+            #else
+            return 0
+            #endif
         }
     }
     
@@ -47,7 +51,9 @@ class ZScreen {
     }
 
     static func ShowNetworkActivityIndicator(_ show:Bool) {
+        #if os(iOS)
         UIApplication.shared.isNetworkActivityIndicatorVisible = show
+        #endif
     }
     
     static var HasSleepButtonOnSide : Bool {
@@ -62,15 +68,23 @@ class ZScreen {
     
     static var StatusBarVisible : Bool {
         get {
+            #if os(iOS)
             return !UIApplication.shared.isStatusBarHidden
+            #else
+            return false
+            #endif
         }
         set {
+            #if os(iOS)
             UIApplication.shared.isStatusBarHidden = !newValue
+            #endif
         }
     }
     
     static func SetStatusBarForLightContent(_ light:Bool = true) {
+        #if os(iOS)
         UIApplication.shared.statusBarStyle = light ? .lightContent : .default
+        #endif
     }
     
     static func EnableIdle(_ on:Bool = true) {
@@ -78,6 +92,7 @@ class ZScreen {
     }
     
     static func Orientation() -> ZScreenLayout {
+        #if os(iOS)
         switch UIDevice.current.orientation {
         case .landscapeLeft:
             return .landscapeLeft
@@ -90,6 +105,9 @@ class ZScreen {
         default:
             return .portrait
         }
+        #else
+        return .landscapeLeft
+        #endif
     }
     
     static func HasNotch() -> Bool {

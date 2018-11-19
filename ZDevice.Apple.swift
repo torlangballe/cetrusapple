@@ -43,17 +43,25 @@ struct ZDevice {
     }
     
     static var BatteryLevel: Float {
+        #if os(iOS)
         UIDevice.current.isBatteryMonitoringEnabled = true
         return UIDevice.current.batteryLevel
+        #else
+        return 1
+        #endif
     }
     
     static var IsDeviceCharging: Int { // return's -1 if unknown
+        #if os(iOS)
         switch UIDevice.current.batteryState {
             case UIDeviceBatteryState.unplugged  : return 0
             case UIDeviceBatteryState.charging   : return 1
             case UIDeviceBatteryState.full       : return 1
             default                              : return -1
         }
+        #else
+        return 0
+        #endif
     }
     
     static var FreeAndUsedDiskSpace: (Int, Int) {
@@ -112,6 +120,7 @@ struct ZDevice {
     }
 
     static func GetNetworkSSIDs() -> [String] {
+        #if os(iOS)
         guard let interfaceNames = CNCopySupportedInterfaces() as? [String] else {
             return []
         }
@@ -124,5 +133,8 @@ struct ZDevice {
             }
             return ssid
         }
+        #else
+        return []
+        #endif
     }
 }
