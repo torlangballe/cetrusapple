@@ -5,9 +5,9 @@
 //
 // #package com.github.torlangballe.cetrusandroid
 
-// import UIKit
+import Foundation
 
-class ZStackView: ZContainerView {
+open class ZStackView: ZContainerView {
     var space = 6.0
     var vertical = false
     
@@ -17,7 +17,7 @@ class ZStackView: ZContainerView {
     }
 
     // #swift-only:
-    required init?(coder aDecoder: NSCoder) { fatalError("init(coder:) has not been implemented") }
+    required public init?(coder aDecoder: NSCoder) { fatalError("init(coder:)") }
     // #end
     
     private func getCellFitSizeInTotal(total:ZSize, cell:ZContainerCell) -> ZSize {
@@ -31,12 +31,23 @@ class ZStackView: ZContainerView {
         return tot
     }
     
-    @discardableResult override func CalculateSize(_ total: ZSize) -> ZSize { // can force size calc without needed result
+    @discardableResult override public func CalculateSize(_ total: ZSize) -> ZSize {
+        var s = nettoCalculateSize(total)
+        s.Maximize(minSize)
+        return s
+    }
+
+    func nettoCalculateSize(_ total: ZSize) -> ZSize { // can force size calc without needed result
         var s = ZSize(0, 0)
         for c1 in cells {
             if !c1.collapsed && !c1.free {
                 let tot = getCellFitSizeInTotal(total:total, cell:c1)
-                var fs = zConvertViewSizeThatFitstToZSize(view:c1.view!, sizeIn:tot)
+                let cv = c1.view as? ZView
+                var fs = ZSize(50, 50)
+                if (cv != nil) {
+                    fs = cv!.CalculateSize(tot)
+                }
+//                var fs = zConvertViewSizeThatFitstToZSize(c1.view!, sizeIn:tot)
                 var m = c1.margin
                 if (c1.alignment & ZAlignment.MarginIsOffset) {
                     m = ZSize(0, 0)
@@ -64,10 +75,10 @@ class ZStackView: ZContainerView {
         return vr
     }
     
-    override func ArrangeChildren(onlyChild:ZView? = nil) {
+    override open func ArrangeChildren(onlyChild:ZView? = nil) {
         var incs = 0
         var decs = 0
-        var sizes = [UIView: ZSize]()
+        var sizes = [ZNativeView: ZSize]()
         var ashrink = ZAlignment.HorShrink
         var aexpand = ZAlignment.HorExpand
         var aless = ZAlignment.Left
@@ -117,7 +128,7 @@ class ZStackView: ZContainerView {
             if !c3.collapsed && !c3.free {
                 lastNoFreeIndex = i
                 let tot = getCellFitSizeInTotal(total:r.size, cell:c3)
-                var s = zConvertViewSizeThatFitstToZSize(view:c3.view!, sizeIn:tot)
+                var s = zConvertViewSizeThatFitstToZSize(c3.view!, sizeIn:tot)
                 if decs > 0 && (c3.alignment & ashrink) && diff != 0.0 {
                     s[vertical] += diff / Double(decs)
                 } else if incs > 0 && (c3.alignment & aexpand) && diff != 0.0 {
@@ -138,7 +149,7 @@ class ZStackView: ZContainerView {
                     let vr = handleAlign(size:sizes[c4.view!]!, inRect:r, a:a, cell:c4)
                     //                ZDebug.Print("alignx:", (c4.view as! ZView).objectName, vr)
                     if onlyChild == nil || onlyChild!.View() == c4.view {
-                        zSetViewFrame(c4.view!, frame:vr)
+                        zSetViewFrame(c4.view!, frame:vr, layout:true)
                     }
                     if (c4.alignment & aless) {
                         let m = max(r.Min[vertical], vr.Max[vertical] + space)
@@ -182,10 +193,10 @@ class ZStackView: ZContainerView {
         }
         for c5 in cells {
             if !c5.collapsed && (c5.alignment & amid) && !c5.free { // .reversed()
-                let a = ZAlignment(rawValue:(c5.alignment.rawValue & ZBitwiseInvert(amid.rawValue)) | aless.rawValue)
+                let a = c5.alignment.Subtracted(amid) | aless
                 let vr = handleAlign(size:sizes[c5.view!]!, inRect:r, a:a, cell:c5)
                 if onlyChild == nil || onlyChild!.View() == c5.view {
-                    zSetViewFrame(c5.view!, frame:vr)
+                    zSetViewFrame(c5.view!, frame:vr, layout:true)
                 }
                 //                ZDebug.Print("alignm:", (c5.view as! ZView).objectName, vr)
                 r.pos[vertical] = vr.Max[vertical] + space
@@ -213,7 +224,7 @@ func ZVStackView(_ name:String="ZVStackView", space:Double = 6.0) -> ZStackView 
     return v
 }
 
-class ZColumnStack : ZStackView {
+open class ZColumnStack : ZStackView {
     var vstack: ZStackView? = nil
     var max:Int = 0
     
@@ -225,10 +236,10 @@ class ZColumnStack : ZStackView {
     }
 
     // #swift-only:
-    required init?(coder aDecoder: NSCoder) { fatalError("init(coder:) has not been implemented") }
+    required public init?(coder aDecoder: NSCoder) { fatalError("init(coder:)") }
     // #end
     
-    @discardableResult override func Add(_ view: UIView, align:ZAlignment, marg: ZSize = ZSize(), maxSize:ZSize = ZSize(), index:Int = -1, free:Bool = false) -> Int {
+    @discardableResult override open func Add(_ view: ZNativeView, align:ZAlignment, marg: ZSize = ZSize(), maxSize:ZSize = ZSize(), index:Int = -1, free:Bool = false) -> Int {
         if vstack == nil || vstack!.cells.count == max {
             vstack = ZVStackView(space:space)
             return super.Add(vstack!, align:ZAlignment.Left | ZAlignment.Bottom, marg:ZSize(), maxSize:ZSize(), index:-1, free:false)

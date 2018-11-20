@@ -14,7 +14,7 @@ class ZActivityIndicator: UIActivityIndicatorView, ZView {
     var objectName = "activity"
 
     init(big:Bool = true, dark:Bool = false) {
-        let gray = UIActivityIndicatorViewStyle.white
+        var gray = UIActivityIndicatorViewStyle.white
         #if os(iOS)
         gray = UIActivityIndicatorViewStyle.gray
         #endif

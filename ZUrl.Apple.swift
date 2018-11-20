@@ -5,8 +5,11 @@
 //
 
 import UIKit
-//import SafariServices
 import MobileCoreServices
+
+#if os(iOS)
+import SafariServices
+#endif
 
 class ZUrl : Hashable  {
     var url: URL?

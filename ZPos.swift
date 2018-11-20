@@ -16,7 +16,7 @@ import UIKit
 import kotlin.math.*
 */
 
-struct ZPos : ZCopy, Equatable, Codable
+public struct ZPos : ZCopy, Equatable, Codable
 {
     var x: Double = 0.0
     var y: Double = 0.0
@@ -113,7 +113,7 @@ func /(me: ZPos, a: ZPos) -> ZPos     { return me.operator_div(a)       }
 prefix func -(me: ZPos) -> ZPos       { return me.operator_unaryMinus() }
 func +(me: ZPos, s: ZSize) -> ZPos    { return me.operator_plus(s)      }
 func !=(me:ZPos, a: ZPos) -> Bool     { return !me.equals(a)            }
-func ==(me:ZPos, a: ZPos) -> Bool     { return me.equals(a)             }
+public func ==(me:ZPos, a: ZPos) -> Bool     { return me.equals(a)             }
 // #end
 
 struct ZFPos

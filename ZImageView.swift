@@ -6,6 +6,8 @@
 //  Copyright © 2015 Capsule.fm. All rights reserved.
 //
 
+// #package com.github.torlangballe.cetrusandroid
+
 import UIKit
 
 class ZImageView: ZCustomView, ZImageLoader {
@@ -48,9 +50,9 @@ class ZImageView: ZCustomView, ZImageLoader {
         }
     }
     
-    required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
+    // #swift-only:
+    required init?(coder aDecoder: NSCoder) { fatalError("init(coder:) has not been implemented") }
+    // #end
     
     override func sizeThatFits(_ size: CGSize) -> CGSize {
         if !maxSize.IsNull(){
@@ -71,7 +73,7 @@ class ZImageView: ZCustomView, ZImageLoader {
         return s
     }
 
-    func SetImage(_ image:ZImage?, _ downloadUrl:String = "") {
+    /* raw-kotlin: override */ func SetImage(_ image:ZImage?, _ downloadUrl:String = "") {
         self.downloadUrl = downloadUrl
         self.image = image
 //        if minSize != nil && image != nil {

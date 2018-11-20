@@ -12,7 +12,7 @@ import UIKit
 import ImageIO
 import AVFoundation
 
-typealias ZImage = UIImage
+public typealias ZImage = UIImage
 
 struct ZFaceInfo {
     var hasSmile = false

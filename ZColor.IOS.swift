@@ -9,9 +9,9 @@ import Foundation
 
 import UIKit
 
-class ZColor : Hashable {
-    static func ==(lhs: ZColor, rhs: ZColor) -> Bool { return lhs.color == rhs.color }
-    var hashValue: Int { get { return color.hashValue } }
+open class ZColor : Hashable {
+    static public func ==(lhs: ZColor, rhs: ZColor) -> Bool { return lhs.color == rhs.color }
+    public var hashValue: Int { get { return color.hashValue } }
     
     var undefined: Bool
     var color: UIColor
@@ -86,13 +86,13 @@ class ZColor : Hashable {
 
     var rawColor: UIColor { return color }
     
-    class func White() -> ZColor  { return ZColor(color: UIColor.white)   }
-    class func Black() -> ZColor  { return ZColor(color: UIColor.black)   }
-    class func Gray() -> ZColor   { return ZColor(color: UIColor.gray)    }
-    class func Clear() -> ZColor  { return ZColor(white:0, a:0)                  }
-    class func Blue() -> ZColor   { return ZColor(color: UIColor.blue)    }
-    class func Red() -> ZColor    { return ZColor(color: UIColor.red)     }
-    class func Yellow() -> ZColor { return ZColor(color: UIColor.yellow)  }
-    class func Green() -> ZColor  { return ZColor(color: UIColor.green)   }
-    class func Orange() -> ZColor { return ZColor(color: UIColor.orange)  }
+    class public func White() -> ZColor  { return ZColor(color: UIColor.white)   }
+    class public func Black() -> ZColor  { return ZColor(color: UIColor.black)   }
+    class public func Gray() -> ZColor   { return ZColor(color: UIColor.gray)    }
+    class public func Clear() -> ZColor  { return ZColor(white:0, a:0)                  }
+    class public func Blue() -> ZColor   { return ZColor(color: UIColor.blue)    }
+    class public func Red() -> ZColor    { return ZColor(color: UIColor.red)     }
+    class public func Yellow() -> ZColor { return ZColor(color: UIColor.yellow)  }
+    class public func Green() -> ZColor  { return ZColor(color: UIColor.green)   }
+    class public func Orange() -> ZColor { return ZColor(color: UIColor.orange)  }
 }

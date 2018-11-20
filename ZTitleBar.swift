@@ -49,7 +49,7 @@ class ZTitleBar : ZStackView {
     }
 
     // #swift-only:
-    required init?(coder aDecoder: NSCoder) { fatalError("init(coder:) has not been implemented") }
+    required init(coder aDecoder: NSCoder) { fatalError("init(coder:) has not been implemented") }
     // #end
     
     override func HandlePressed(_ sender: ZView, pos:ZPos) {

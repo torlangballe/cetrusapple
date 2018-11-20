@@ -9,13 +9,13 @@
 
 import UIKit
 
-struct ZSize : ZCopy {
+public struct ZSize : ZCopy {
     var w:Double = 0.0
     var h:Double = 0.0
 
-    init()                           { self.init(0, 0) }
-    init(_ aw:Int, _ ah:Int)         { self.init(Double(aw), Double(ah)) }
-    init(_ aw:Float, _ ah:Float)     { self.init(Double(aw), Double(ah)) }
+    public init()                           { self.init(0, 0) }
+    public init(_ aw:Int, _ ah:Int)         { self.init(Double(aw), Double(ah)) }
+    public init(_ aw:Float, _ ah:Float)     { self.init(Double(aw), Double(ah)) }
 
     func GetPos() -> ZPos            { return ZPos(w, h) }
     func IsNull() -> Bool            { return w == 0.0 && h == 0.0 }

@@ -9,9 +9,9 @@
 
 import Foundation
 
-struct ZAlignment : OptionSet, CustomDebugStringConvertible, CustomStringConvertible {
+public struct ZAlignment : OptionSet, CustomDebugStringConvertible, CustomStringConvertible {
     
-    var rawValue: Int
+    public var rawValue: Int
     
     static let None = ZAlignment(rawValue: 0)
     static let Left = ZAlignment(rawValue: 1)
@@ -42,7 +42,7 @@ struct ZAlignment : OptionSet, CustomDebugStringConvertible, CustomStringConvert
     static let Horizontal = Left|HorCenter|Right|HorExpand|HorShrink|HorOut
     
     // #swift-only:
-    init(rawValue: Int) { self.rawValue = rawValue }
+    public init(rawValue: Int) { self.rawValue = rawValue }
     // #end
     
     init(str:String) {
@@ -77,7 +77,7 @@ struct ZAlignment : OptionSet, CustomDebugStringConvertible, CustomStringConvert
         return self.Subtracted(ZAlignment.Vertical | ZAlignment.VertExpand | ZAlignment.VertShrink | ZAlignment.VertOut)
     }
     
-    var description: String {
+    public var description: String {
         get { return StringStorage }
     }
     
@@ -100,7 +100,7 @@ struct ZAlignment : OptionSet, CustomDebugStringConvertible, CustomStringConvert
         return ZStr.Join(parts, sep:" ")
     }
     
-    var debugDescription: String { //
+    public var debugDescription: String { //
         return StringStorage
     }
     

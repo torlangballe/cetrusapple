@@ -40,7 +40,7 @@ class ZConfirmStack : ZStackView {
     }
     
     // #swift-only:
-    required init?(coder aDecoder: NSCoder) { fatalError("init(coder:) has not been implemented") }
+    required init(coder aDecoder: NSCoder) { fatalError("init(coder:) has not been implemented") }
     // #end
     
     fileprivate func createShape(_ name:String, strokeColor:ZColor, align:ZAlignment) -> ZShapeView {

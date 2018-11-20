@@ -11,8 +11,8 @@ protocol ZCustomViewDelegate {
     func DrawInRect(_ rect: ZRect, canvas: ZCanvas)
 }
 
-class ZCustomView: UIControl, ZView, ZControl, UIGestureRecognizerDelegate {
-    var objectName = ""
+open class ZCustomView: UIControl, ZView, ZControl, UIGestureRecognizerDelegate {
+    public var objectName = ""
     var minSize = ZSize(0, 0)
     var drawHandler:((_ rect: ZRect, _ canvas: ZCanvas, _ view:ZCustomView)->Void)? = nil
     var foregroundColor = ZColor.Black()
@@ -47,7 +47,7 @@ class ZCustomView: UIControl, ZView, ZControl, UIGestureRecognizerDelegate {
         self.AddTarget(self, forEventType:.valueChanged)
     }
     
-    func AddTarget(_ t: ZCustomView?, forEventType:ZControlEventType) {
+    public func AddTarget(_ t: ZCustomView?, forEventType:ZControlEventType) {
         switch forEventType {
         case .pressed:
             touchInfo.tapTarget = t
@@ -57,7 +57,7 @@ class ZCustomView: UIControl, ZView, ZControl, UIGestureRecognizerDelegate {
         isUserInteractionEnabled = true
     }
     
-    var Usable: Bool {
+    public var Usable: Bool {
         get { return isEnabled }
         set {
             isEnabled = newValue
@@ -66,11 +66,11 @@ class ZCustomView: UIControl, ZView, ZControl, UIGestureRecognizerDelegate {
         }
     }
     
-    func View() -> UIView {
+    public func View() -> UIView {
         return self
     }
     
-    func Control() -> UIControl {
+    public func Control() -> UIControl {
         return self
     }
     
@@ -85,17 +85,19 @@ class ZCustomView: UIControl, ZView, ZControl, UIGestureRecognizerDelegate {
         Expose()
     }
     
-    required init?(coder aDecoder: NSCoder) { fatalError("init(coder:)") }
+    // #swift-only:
+    required public init?(coder aDecoder: NSCoder) { fatalError("init(coder:)") }
+    // #end
     
-    func CalculateSize(_ total: ZSize) -> ZSize {
+    public func CalculateSize(_ total: ZSize) -> ZSize {
         return minSize
     }
     
-    override func sizeThatFits(_ size: CGSize) -> CGSize {
+    open override func sizeThatFits(_ size: CGSize) -> CGSize {
         return CalculateSize(ZSize(size)).GetCGSize()
     }
     
-    override func accessibilityScroll(_ direction: UIAccessibilityScrollDirection) -> Bool {
+    open override func accessibilityScroll(_ direction: UIAccessibilityScrollDirection) -> Bool {
         var a: ZAlignment
         switch direction {
         case .down:
@@ -124,11 +126,11 @@ class ZCustomView: UIControl, ZView, ZControl, UIGestureRecognizerDelegate {
         return (false, "")
     }
     
-    override var canBecomeFocused: Bool {
+    open override var canBecomeFocused: Bool {
         return canFocus
     }
     
-    override func didUpdateFocus(in context: UIFocusUpdateContext, with coordinator: UIFocusAnimationCoordinator) {
+    open override func didUpdateFocus(in context: UIFocusUpdateContext, with coordinator: UIFocusAnimationCoordinator) {
         Expose()
 //        if context.nextFocusedView == self {
 //            coordinator.addCoordinatedAnimations({ () -> Void in
@@ -142,25 +144,25 @@ class ZCustomView: UIControl, ZView, ZControl, UIGestureRecognizerDelegate {
 //        }
     }
 
-    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+    override open func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         if isUserInteractionEnabled {
             touchInfoBeginTracking(touchInfo:touchInfo, view:self, touch:touches.first!, event:event)
         }
     }
     
-    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
+    override open func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         if isUserInteractionEnabled {
             touchInfoEndTracking(touchInfo:touchInfo, view:self, touch:touches.first!, event:event)
         }
     }
     
-    override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
+    override open func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
         if isUserInteractionEnabled {
             touchInfoContinueTracking(touchInfo:touchInfo, view:self, touch:touches.first!, event:event)
         }
     }
     
-    override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
+    override open func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
         if isUserInteractionEnabled {
             touchInfoTrackingCanceled(touchInfo:touchInfo, view:self, touch:touches.first!, event:event)
         }
@@ -170,7 +172,7 @@ class ZCustomView: UIControl, ZView, ZControl, UIGestureRecognizerDelegate {
         drawHandler?(rect, canvas, self)
     }
     
-    override func draw(_ rect: CGRect) {
+    override open func draw(_ rect: CGRect) {
         DrawInRect(ZRect(rect), canvas: ZCanvas(context: UIGraphicsGetCurrentContext()!))
     }
     
@@ -242,20 +244,20 @@ class ZCustomView: UIControl, ZView, ZControl, UIGestureRecognizerDelegate {
      timers.append(timerBase)
      }
      */
-    override func layoutSubviews() {
+    override open func layoutSubviews() {
         super.layoutSubviews()
         HandleAfterLayout()
     }
     
-    func HandleBeforeLayout() {
+    open func HandleBeforeLayout() {
         Expose()
     }
     
-    func HandleAfterLayout() {
+    open func HandleAfterLayout() {
         Expose()
     }
     
-    func HandleTransitionedToSize() {
+    open func HandleTransitionedToSize() {
     }
     
     func HandleClosing() {
@@ -278,11 +280,11 @@ class ZCustomView: UIControl, ZView, ZControl, UIGestureRecognizerDelegate {
         }
     }
     
-    func HandleOpening() {
+    open func HandleOpening() {
         Focus()
     }
     
-    func HandleRevealedAgain() {
+    open func HandleRevealedAgain() {
         Focus()
     }
     
@@ -293,11 +295,11 @@ class ZCustomView: UIControl, ZView, ZControl, UIGestureRecognizerDelegate {
     func Activate(_ activate:Bool) { // like being activated/deactivated for first time
     }
     
-    override var canBecomeFirstResponder : Bool {
+    override open var canBecomeFirstResponder : Bool {
         return canFocus
     }
     
-    override func motionEnded(_ motion: UIEventSubtype, with event: UIEvent?) {
+    override open func motionEnded(_ motion: UIEventSubtype, with event: UIEvent?) {
         if motion == .motionShake {
             mainZApp?.HandleShake()
         }
@@ -497,7 +499,7 @@ private func addGesture(_ g: UIGestureRecognizer, view:ZView, handler:ZCustomVie
     g.delegate = handler
 }
 
-func zConvertViewSizeThatFitstToZSize(view:UIView, sizeIn:ZSize) -> ZSize {
+func zConvertViewSizeThatFitstToZSize(_ view:UIView, sizeIn:ZSize) -> ZSize {
     return ZSize(view.sizeThatFits(sizeIn.GetCGSize()))
 }
 

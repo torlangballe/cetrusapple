@@ -70,7 +70,7 @@ class ZTimeField : ZShapeView {
         valueTarget?.HandleValueChanged(self)
     }
     
-    required init?(coder aDecoder: NSCoder) { fatalError("init(coder:) has not been implemented") }
+    required init(coder aDecoder: NSCoder) { fatalError("init(coder:) has not been implemented") }
     required init(name: String) { fatalError("init(name:) has not been implemented") }
 }
 

@@ -34,7 +34,7 @@ class ZWebPageView: ZStackView, ZWebViewDelegate {
         Add(titleBar, align:.Bottom | .HorCenter | .HorExpand | .NonProp)
     }
 
-    required init?(coder aDecoder: NSCoder) { fatalError("init(coder:) has not been implemented") }
+    required init(coder aDecoder: NSCoder) { fatalError("init(coder:) has not been implemented") }
     
     deinit {
         ZWebPageView.current = nil

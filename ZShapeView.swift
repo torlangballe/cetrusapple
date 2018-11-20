@@ -42,7 +42,7 @@ import UIKit
         isAccessibilityElement = true
     }
     // #swift-only:
-    required init?(coder aDecoder: NSCoder) { fatalError("init(coder:)") }
+    convenience required init(coder aDecoder: NSCoder) { self.init(type:.circle, minSize:ZSize(0, 0)) }
     // #end
     
     override func CalculateSize(_ total: ZSize) -> ZSize {

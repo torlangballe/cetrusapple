@@ -10,7 +10,7 @@
 #import <UIKit/UILocalNotification.h>
 
 #import "notify.h"
-#import "ZObjC.h"
+#import "ZObjC.Apple.h"
 
 /*
 @implementation GeneralNSObject

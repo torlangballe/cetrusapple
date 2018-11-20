@@ -12,7 +12,7 @@
 
 import UIKit
 
-struct ZRect : ZCopy {
+public struct ZRect : ZCopy {
     var pos: ZPos = ZPos()
     var size: ZSize = ZSize()
     
@@ -332,7 +332,7 @@ func -=(me:inout ZRect, a:ZRect)         { me.Min -= a.pos; me.Max -= a.Max }
 func +=(me:inout ZRect, a:ZPos)          { me.operator_plusAssign(a)        }
 func /(me:ZRect, a:ZSize) -> ZRect       { return me.operator_div(a)        }
 extension ZRect: CustomStringConvertible {
-    var description: String {
+    public var description: String {
         return "[\(Min.x),\(Min.y) \(size.w)x\(size.h)]"
     }
 }

@@ -1,19 +1,21 @@
 //  ZContainerView.swift
 //  Created by Tor Langballe on /23/9/14.
 
-// import UIKit
+// #package com.github.torlangballe.cetrusandroid
+
+import Foundation
 
 struct ZContainerCell : ZCopy {
     var alignment: ZAlignment
     var margin: ZSize
-    var view: UIView? = nil
-    var maxSize = ZSize(0, 0)
-    var collapsed = false
-    var free = false
+    var view: ZNativeView? = nil
+    var maxSize:ZSize = ZSize(0.0, 0.0)
+    var collapsed:Bool = false
+    var free:Bool = false
     var handleTransition:((_ size:ZSize, _ layout:ZScreenLayout, _ inRect:ZRect, _ alignRect:ZRect)->ZRect?)? = nil
 }
 
-class ZContainerView: ZCustomView {
+open class ZContainerView: ZCustomView {
     var cells:[ZContainerCell]
     var margin = ZRect()
     var liveArrange = false
@@ -26,29 +28,31 @@ class ZContainerView: ZCustomView {
         //        backgroundColor = UIColor.redColor()
     }
     
-    required init?(coder aDecoder: NSCoder) { fatalError("init(coder:) has not been implemented") }
+    // #swift-only:
+    required public init?(coder aDecoder: NSCoder) { fatalError("init(coder:)") }
+    // #end
     
 //    deinit {
 //        print("ZContainerView.DeInit()")
 //    }
     
-    @discardableResult func AddCell(_ cell: ZContainerCell, index:Int = -1) -> Int {
+    @discardableResult func AddCell(_ cell: ZContainerCell, index:Int? = nil) -> Int {
         if index == -1 {
             cells.append(cell)
-            self.addSubview(cell.view!)
+            zAddNativeView(cell.view!, toParent: self)
             return cells.count - 1
         } else {
-            cells.insert(cell, at:index)
-            insertSubview(cell.view!, at:index)
-            return index
+            cells.insert(cell, at:index!)
+            zAddNativeView(cell.view!, toParent: self, index: index)
+            return index!
         }
     }
     
-    @discardableResult open func Add(_ view: UIView, align:ZAlignment, marg: ZSize = ZSize(), maxSize:ZSize = ZSize(), index:Int = -1, free:Bool = false) -> Int {
+    @discardableResult open func Add(_ view: ZNativeView, align:ZAlignment, marg: ZSize = ZSize(), maxSize:ZSize = ZSize(), index:Int = -1, free:Bool = false) -> Int {
         return AddCell(ZContainerCell(alignment:align, margin:marg, view:view, maxSize:maxSize, collapsed:false, free:free, handleTransition:nil), index:index)
     }
 
-    func Contains(_ view: UIView) -> Bool {
+    func Contains(_ view: ZNativeView) -> Bool {
         for c in cells {
             if c.view == view {
                 return true
@@ -57,29 +61,32 @@ class ZContainerView: ZCustomView {
         return false
     }
     
-    override func CalculateSize(_ total: ZSize) -> ZSize {
+    override public func CalculateSize(_ total: ZSize) -> ZSize {
         return minSize
     }
     
     func SetAsFullView(useableArea: Bool) {
-        frame = UIScreen.main.bounds
-        #if os(iOS)
-        let h = UIApplication.shared.statusBarFrame.size.height
-        if h > 20 && !ZScreen.HasNotch() {
-            frame.size.height -= h
-        } else if useableArea {
-            margin.SetMinY(Double(h))
+        ZViewSetRect(self, rect:ZScreen.Main)
+        minSize = ZScreen.Main.size
+        if !ZIsTVBox() {
+            let h = ZScreen.StatusBarHeight
+            var r = Rect
+            if h > 20 && !ZScreen.HasNotch() {
+                r.size.h -= h
+                ZViewSetRect(self, rect:r)
+            } else if useableArea {
+                margin.SetMinY(Double(h))
+            }
         }
-        #endif
     }
     
-    func Sort(_ sorter:(_ a:ZContainerCell, _ b:ZContainerCell) -> Bool) {
-        cells.sort(by: sorter)
-        ArrangeChildren()
-        Expose()
-    }
-    
-    func ArrangeChildrenAnimated(onlyChild:ZView? = nil) {
+//    func Sort(_ sorter:(_ a:ZContainerCell, _ b:ZContainerCell) -> Bool) {
+//        cells.sort(by: sorter)
+//        ArrangeChildren()
+//        Expose()
+//    }
+//
+    open func ArrangeChildrenAnimated(onlyChild:ZView? = nil) {
         ZAnimation.Do(duration:0.6, animations: { [weak self] () in
             self?.ArrangeChildren(onlyChild:onlyChild)
         })
@@ -87,28 +94,30 @@ class ZContainerView: ZCustomView {
     
     func arrangeChild(_ c:ZContainerCell, r:ZRect) {
         let ir = r.Expanded(c.margin * -2.0)
-        let s = ZSize(c.view!.sizeThatFits(ir.GetCGRect().size))
+        let s = zConvertViewSizeThatFitstToZSize(c.view!, sizeIn:ir.size)
         var rv = r.Align(s, align:c.alignment, marg:c.margin, maxSize:c.maxSize)
         if c.handleTransition != nil {
             if let r = c.handleTransition!(s, ZScreen.Orientation(), r, rv) {
                 rv = r
             }
         }
-        c.view!.frame = rv.GetCGRect()
+        zSetViewFrame(c.view!, frame:rv)
     }
     
-    func ArrangeChildren(onlyChild:ZView? = nil) {
+    open func ArrangeChildren(onlyChild:ZView? = nil) {
         HandleBeforeLayout()
         let r = ZRect(size:Rect.size) + margin
         for c in cells {
             (c.view as? ZCustomView)?.HandleBeforeLayout()
         }
-        for c in cells where c.alignment != .None {
-            if onlyChild == nil || c.view == onlyChild!.View() {
-                arrangeChild(c, r:r)
-            }
-            if let v = c.view as? ZContainerView {
-                v.ArrangeChildren(onlyChild:onlyChild)
+        for c in cells {
+            if c.alignment != ZAlignment.None {
+                if onlyChild == nil || c.view == onlyChild!.View() {
+                    arrangeChild(c, r:r)
+                }
+                if let v = c.view as? ZContainerView {
+                    v.ArrangeChildren(onlyChild:onlyChild)
+                }
             }
         }
         HandleAfterLayout()
@@ -122,9 +131,9 @@ class ZContainerView: ZCustomView {
             let changed = (cells[i].collapsed != collapse)
             if changed {
                 if collapse {
-                    cells[i].view!.removeFromSuperview()
+                    zRemoveNativeViewFromParent(cells[i].view!, detachFromContainer:false)
                 } else {
-                    addSubview(cells[i].view!)
+                    zAddNativeView(cells[i].view!, toParent:self)
                 }
             }
             cells[i].collapsed = collapse
@@ -143,13 +152,6 @@ class ZContainerView: ZCustomView {
         return false
     }
 
-    override func didAddSubview(_ subview: UIView) {
-        super.didAddSubview(subview)
-        if liveArrange {
-            ArrangeChildren()
-        }
-    }
-    
     func RangeChildren(subViews:Bool = false, foreach: (ZView)->Bool) {
         for c in cells {
             if let v = c.view as? ZView {
@@ -228,32 +230,32 @@ class ZContainerView: ZCustomView {
         return nil
     }
 
-    func RemoveChild(_ subView:UIView) {
-        subView.removeFromSuperview()
+    func RemoveChild(_ subView:ZNativeView) {
+        zRemoveNativeViewFromParent(subView, detachFromContainer:false)
         DetachChild(subView)
     }
 
     func RemoveAllChildren() {
         for c in cells {
             DetachChild(c.view!)
-            c.view!.removeFromSuperview()
+            zRemoveNativeViewFromParent(c.view!, detachFromContainer:false)
         }
     }
 
-    func HandleRotation() {
+    open func HandleRotation() {
         
     }
 
-    func DetachChild(_ subView:UIView) {
+    func DetachChild(_ subView:ZNativeView) {
         for (i, c) in cells.enumerated() {
             if c.view == subView {
-                cells.remove(at: i)
+                cells.removeAt(i)
                 break
             }
         }
     }
     
-    func HandleBackButton() { // only android has hardware back button...
+    open func HandleBackButton() { // only android has hardware back button...
         
     }
 }

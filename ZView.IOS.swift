@@ -13,10 +13,11 @@ enum ZGestureType:Int { case tap = 1, longpress = 2, pan = 4, pinch = 8, swipe =
 enum ZGestureState:Int { case began = 1, ended = 2, changed = 4, possible = 8, canceled = 16, failed = 32 }
 
 typealias ZViewContentMode = UIViewContentMode
+public typealias ZNativeView = UIView
 
 var collapsedViews = [UIView:ZContainerView]()
 
-protocol ZView {
+public protocol ZView {
     var  objectName: String { get set }
     var  Usable: Bool { get set }
     var  Alpha: Double { get }
@@ -40,38 +41,39 @@ protocol ZView {
     func GetContainer() -> ZContainerView?
     func CollapseInParent(collapse:Bool, arrange:Bool)
     func GetContainerAndCellIndex() -> (ZContainerView, Int)?
+    func CalculateSize(_ total: ZSize) -> ZSize
 }
 
 extension ZView {
-    var Rect: ZRect {
+    public var Rect: ZRect {
         get { return ZRect(View().frame) }
         set { View().frame = newValue.GetCGRect() }
     }
-    var LocalRect: ZRect {
+    public var LocalRect: ZRect {
         return ZRect(size:Rect.size)
     }
-    func SetOpaque(_ opaque:Bool) {
+    public func SetOpaque(_ opaque:Bool) {
         View().isOpaque = opaque 
     }
-    func Pop(animated:Bool = true, done:(()->Void)? = nil) {
+    public func Pop(animated:Bool = true, done:(()->Void)? = nil) {
         ZPopTopView(animated:animated, done:done)
     }
-    func Show(_ show:Bool = true) {
+    public func Show(_ show:Bool = true) {
         View().isHidden = !show
     }
-    func IsVisible() -> Bool {
+    public func IsVisible() -> Bool {
         return !View().isHidden
     }
-    func GetBoundsRect() -> ZRect {
+    public func GetBoundsRect() -> ZRect {
         return ZRect(View().bounds)
     }
-    func Child(_ path: String) -> UIView? {
+    public func Child(_ path: String) -> UIView? {
         return getUIViewChild(View(), path: path);
     }
-    func DumpTree() {
+    public func DumpTree() {
         dumpUIViewTree(View(), padding: "")
     }
-    var Usable: Bool {
+    public var Usable: Bool {
         get {
             return View().isUserInteractionEnabled
         }
@@ -80,62 +82,62 @@ extension ZView {
             View().alpha = newValue ? 1.0 : 0.3
         }
     }
-    func SetAlpha(_ a: Double) {
+    public func SetAlpha(_ a: Double) {
         View().alpha = CGFloat(a)
     }
-    var Alpha: Double {
+    public var Alpha: Double {
         return Double(View().alpha)
     }
-    func RemoveFromParent() {
+    public func RemoveFromParent() {
         if let s = View().superview as? ZContainerView {
             s.DetachChild(View())
         }
         View().removeFromSuperview()
     }
-    func Unfocus() {
+    public func Unfocus() {
         View().resignFirstResponder()
     }
-    func Focus() {
+    public func Focus() {
         View().becomeFirstResponder()
     }
-    func Parent() -> ZView? {
+    public func Parent() -> ZView? {
         if let v = View().superview as? ZView {
             return v
         }
         return nil
     }
-    func SetBackgroundColor(_ color:ZColor) {
+    public func SetBackgroundColor(_ color:ZColor) {
         View().backgroundColor = color.color
     }
-    func SetDropShadow(_ delta:ZSize = ZSize(3, 3), blur:Float32 = 3, color:ZColor = ZColor.Black()) {
+    public func SetDropShadow(_ delta:ZSize = ZSize(3, 3), blur:Float32 = 3, color:ZColor = ZColor.Black()) {
         View().layer.shadowOffset = delta.GetCGSize()
         View().layer.shadowColor = color.color.cgColor
         View().layer.shadowRadius = CGFloat(blur)
         View().layer.shadowOpacity = 1
         View().layer.masksToBounds = false
     }
-    func SetDropShadowOff() {
+    public func SetDropShadowOff() {
         View().layer.shadowOffset = CGSize.zero
         View().layer.shadowRadius = 0
         View().layer.shadowOpacity = 0
     }
-    func SetCornerRadius(_ radius:Double) {
+    public func SetCornerRadius(_ radius:Double) {
         View().layer.masksToBounds = true
         View().layer.cornerRadius = CGFloat(radius)
     }
-    func SetStroke(width:Double, color:ZColor) {
+    public func SetStroke(width:Double, color:ZColor) {
         View().layer.borderWidth = CGFloat(width)
         View().layer.borderColor = color.rawColor.cgColor
     }
-    func Expose(_ fadeIn:Float = 0) {
+    public func Expose(_ fadeIn:Float = 0) {
         View().setNeedsDisplay()
     }
     
-    func Scale(_ scale:Double) {
+    public func Scale(_ scale:Double) {
         View().transform = CGAffineTransform.identity.scaledBy(x: CGFloat(scale), y: CGFloat(scale))
     }
     
-    func GetContainer() -> ZContainerView? {
+    public func GetContainer() -> ZContainerView? {
         if let c = View().superview as? ZContainerView {
             return c
         }
@@ -145,7 +147,7 @@ extension ZView {
         return nil
     }
     
-    func CollapseInParent(collapse:Bool = true, arrange:Bool = false) {
+    public func CollapseInParent(collapse:Bool = true, arrange:Bool = false) {
         if let c = GetContainer() {
             if collapse {
                 collapsedViews[self.View()] = c
@@ -156,7 +158,7 @@ extension ZView {
         }
     }
     
-    func GetContainerAndCellIndex() -> (ZContainerView, Int)? {
+    public func GetContainerAndCellIndex() -> (ZContainerView, Int)? {
         if let container = GetContainer() {
             for (i, c) in container.cells.enumerated() {
                 if c.view == View() {
@@ -167,7 +169,7 @@ extension ZView {
         return nil
     }
     
-    func GetViewRenderedAsImage() -> ZImage? {
+    public func GetViewRenderedAsImage() -> ZImage? {
         UIGraphicsBeginImageContextWithOptions(View().bounds.size, View().isOpaque, 0.0);
         View().layer.render(in: UIGraphicsGetCurrentContext()!)
         let image = UIGraphicsGetImageFromCurrentImageContext()
@@ -176,6 +178,28 @@ extension ZView {
         return image
     }
     
+    public func CalculateSize(_ total: ZSize) -> ZSize {
+        return ZSize(10, 10)
+    }
+}
+
+func zRemoveNativeViewFromParent(_ view:ZNativeView, detachFromContainer:Bool) {
+    view.removeFromSuperview()
+    if detachFromContainer, let p = view.superview as? ZContainerView {
+        p.DetachChild(view)
+    }
+}
+
+func zAddNativeView(_ view:ZNativeView, toParent:ZNativeView, index:Int? = nil) {
+    if index != nil {
+        toParent.insertSubview(view, at:index!)
+    } else {
+        toParent.addSubview(view)
+    }
+}
+
+func ZViewSetRect(_ view:ZView, rect:ZRect) { // this is needed as setting Rect = xxx gives "Cannot assign to property: 'self' is immutable" sometimes, since above is extension?
+    view.View().frame = rect.GetCGRect()
 }
 
 func dumpUIViewTree(_ view: UIView, padding: String) {
