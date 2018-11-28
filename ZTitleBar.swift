@@ -34,9 +34,16 @@ class ZTitleBar : ZStackView {
 //        if ZScreen.HasNotch() {
 //            minSize.h += 88
 //        }
-        closeButton?.AddTarget(self, forEventType:ZControlEventType.pressed)
+//      closeButton?.AddTarget(self, forEventType:ZControlEventType.pressed)
         closeButton?.accessibilityLabel = ZWords.GetClose()
-        AddTarget(self, forEventType:ZControlEventType.pressed)
+        closeButton!.HandlePressedInPosFunc = { [weak self] (pos) in
+            if self!.closeHandler != nil {
+                self!.closeHandler!.HandleClose(sender:self!)
+            } else {
+                ZPopTopView()
+            }
+        }
+//        AddTarget(self, forEventType:ZControlEventType.pressed)
         if closeButton != nil {
             Add(closeButton!, align:closeAlignX | ZAlignment.Bottom)
         }
@@ -52,17 +59,12 @@ class ZTitleBar : ZStackView {
     required init(coder aDecoder: NSCoder) { fatalError("init(coder:) has not been implemented") }
     // #end
     
-    override func HandlePressed(_ sender: ZView, pos:ZPos) {
-        if sender.View() == closeButton {
-            if closeHandler != nil {
-                closeHandler!.HandleClose(sender:self)
-            } else {
-                ZPopTopView() //overrideDuration:0) //, overrideTransition:.fade)
-            }
-        } else {
-            ZTextDismissKeyboard()
-        }
-    }
+//    override func HandlePressed(_ sender: ZView, pos:ZPos) {
+//        if sender.View() == closeButton {
+//        } else {
+//            ZTextDismissKeyboard()
+//        }
+//    }
 
     override func HandleBeforeLayout() {
         if !sizeCalculated {

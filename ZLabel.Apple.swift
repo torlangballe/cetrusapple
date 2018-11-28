@@ -54,13 +54,17 @@ class ZLabel: UILabel, ZView {
     }
 
     override func sizeThatFits(_ size: CGSize) -> CGSize {
+        return CalculateSize(ZSize(size)).GetCGSize()
+    }
+    
+    func CalculateSize(_ total:ZSize) -> ZSize {
         var box = ZSize()
         if maxWidth != 0 {
             box.w = maxWidth
         }
-        box.w = max(box.w, Double(size.width))
+        box.w = max(box.w, total.w)
         if self.numberOfLines > 1 {
-            box = ZSize(Double(size.width), Double(font.lineHeight) * Double(self.numberOfLines) * 1.1)
+            box = ZSize(total.w, Double(font.lineHeight) * Double(self.numberOfLines) * 1.1)
         } else {
             box.h = 99999;
         }
@@ -77,7 +81,7 @@ class ZLabel: UILabel, ZView {
         if maxHeight != nil {
             gs.height = min(gs.height, CGFloat(maxHeight!))
         }
-        return gs
+        return ZSize(gs)
     }
 
     func View() -> UIView {
@@ -128,12 +132,12 @@ class ZLabel: UILabel, ZView {
         }
     }
     
-    func AddTarget(_ t: ZCustomView?, forEventType:ZControlEventType) {
-        tapTarget = t
-        assert(forEventType == .pressed)
-        self.isUserInteractionEnabled = true
-    }
-
+//    func AddTarget(_ t: ZCustomView?, forEventType:ZControlEventType) {
+//        tapTarget = t
+//        assert(forEventType == .pressed)
+//        self.isUserInteractionEnabled = true
+//    }
+//
     required init?(coder aDecoder: NSCoder) { fatalError("init(coder:) has not been implemented") }
 }
 

@@ -21,7 +21,11 @@ extension ZDebug {
             if i != 0 {
                 str += separator
             }
-            str += "\(item ?? "<nil>")"
+            if item == nil {
+                str += "<nil>"
+            } else {
+                str += "\(item!)"
+            }
         }
         ZDebug.mutex.Lock()
         if ZDebug.storePrintLines != 0 {

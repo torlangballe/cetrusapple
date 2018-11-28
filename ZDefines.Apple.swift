@@ -56,6 +56,12 @@ func ZBitwiseInvert<T : BinaryInteger>(_ v:T) -> T {
     return ~v
 }
 
+extension String {
+    func removedLast(n:Int = 1) -> String {
+        return String(dropLast(n))
+    }
+}
+
 extension Dictionary where Value : Comparable {
     func keysSortedByValue() -> [Key] {
         return self.sorted{$0.1 > $1.1}.map{$0.0}

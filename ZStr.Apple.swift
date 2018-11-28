@@ -460,23 +460,41 @@ struct ZStr {
         return pointer
     }
     
-    static func NiceDouble(_ d:Double, maxSig:Int = 8) -> String {
+    static func NiceDouble(_ d:Double, maxSig:Int = 8, separator:String = ",") -> String {
+        var n = Int64(d)
+        let f = ZMath.Fraction(d)
         let format = "%.\(maxSig)lf"
-        var str = ZStr.Format(format, d)
-        if str.contains(".") {
+        var fstr = ZStr.Format(format, f)
+        if fstr.contains(".") {
             while true {
-                switch ZStr.Tail(str) {
-                case "0":
-                    str.removeLast()
-                case ".":
-                    str.removeLast()
-                    return str
-                default:
-                    return str
+                let s = ZStr.Tail(fstr)
+                if s == "0" {
+                    fstr = fstr.removedLast()
+                } else if s == "." {
+                    fstr = fstr.removedLast()
+                    break
+                } else {
+                    break
                 }
             }
         }
-        return str
+        if fstr == "0" {
+            fstr = ""
+        }
+        var str = ""
+        while true {
+            if n / 1000 > 0 {                
+                str = ZStr.Format("%03ld", n % 1000) + str
+            } else {
+                str = "\(n % 1000)" + str
+            }
+            n /= 1000
+            if n == Int64(0) {
+                break
+            }
+            str = separator + str
+        }
+        return str + fstr
     }
     
     static func ToDouble(str:String, def:Double = -1.0) -> Double {

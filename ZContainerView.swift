@@ -19,7 +19,7 @@ open class ZContainerView: ZCustomView {
     var cells:[ZContainerCell]
     var margin = ZRect()
     var liveArrange = false
-    var portraitOnly = true
+    var singleOrientation = true
     
     override init(name: String = "ZContainerView") { // required 
         cells = [ZContainerCell]()

@@ -89,6 +89,7 @@ class ZApp : ZObject {
     func HandleLanguageBCPChanged(_ bcp:String) { }
     func HandleAppWillTerminate() { }
     func HandleShake() { }
+    func HandleExit() { }
 
     static var MainFunc:((_ args:[String])->Void)? = nil
 

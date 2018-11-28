@@ -1,8 +1,6 @@
 //  ZCustomView.swift
-//  Zed
 //
 //  Created by Tor Langballe on /21/10/15.
-//  Copyright © 2015 Capsule.fm. All rights reserved.
 //
 
 import UIKit
@@ -18,6 +16,7 @@ open class ZCustomView: UIControl, ZView, ZControl, UIGestureRecognizerDelegate 
     var foregroundColor = ZColor.Black()
     var canFocus = false
     var touchInfo = ZTouchInfo()
+
     var IsFocused: Bool {
         return isFocused
     }
@@ -27,6 +26,7 @@ open class ZCustomView: UIControl, ZView, ZControl, UIGestureRecognizerDelegate 
         }
         set {
             touchInfo.handlePressedInPosFunc = newValue
+            canFocus = true
             isUserInteractionEnabled = true
             isAccessibilityElement = true
             accessibilityTraits |= UIAccessibilityTraitButton
@@ -36,7 +36,6 @@ open class ZCustomView: UIControl, ZView, ZControl, UIGestureRecognizerDelegate 
         }
     }
     
-
     private var handleValueChangedFunc: (()->Void)? = nil
     
     weak var valueTarget: ZCustomView? = nil
@@ -49,8 +48,8 @@ open class ZCustomView: UIControl, ZView, ZControl, UIGestureRecognizerDelegate 
     
     public func AddTarget(_ t: ZCustomView?, forEventType:ZControlEventType) {
         switch forEventType {
-        case .pressed:
-            touchInfo.tapTarget = t
+//        case .pressed:
+//            touchInfo.tapTarget = t
         case .valueChanged:
             valueTarget = t
         }
@@ -215,9 +214,9 @@ open class ZCustomView: UIControl, ZView, ZControl, UIGestureRecognizerDelegate 
         return true
     }
     
-    @objc func handlePressed(_ sender:UIView?) { // this is for special ZControl views to send press to parent
-        touchInfo.doPressed?(LocalRect.Center)
-    }
+//    @objc func handlePressed(_ sender:UIView?) { // this is for special ZControl views to send press to parent
+//        touchInfo.doPressed?(LocalRect.Center)
+//    }
     
     @objc func handleValueChanged(_ sender:UIView?) {
         if handleValueChangedFunc != nil {
@@ -227,8 +226,8 @@ open class ZCustomView: UIControl, ZView, ZControl, UIGestureRecognizerDelegate 
         }
     }
     
-    func HandlePressed(_ sender: ZView, pos:ZPos) {
-    }
+//    func HandlePressed(_ sender: ZView, pos:ZPos) {
+//    }
 
     @discardableResult func HandleTouched(_ sender:ZView, state:ZGestureState, pos:ZPos, inside:Bool) -> Bool {
         return false
@@ -487,10 +486,10 @@ open class ZCustomView: UIControl, ZView, ZControl, UIGestureRecognizerDelegate 
         let r = ZMath.DegToRad(degrees)
         self.transform = CGAffineTransform(rotationAngle:CGFloat(r))
     }
-    
-    @objc(gestureRecognizer:shouldRecognizeSimultaneouslyWithGestureRecognizer:) func gestureRecognizer(_ gestureRecognizer:UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
+
+    private func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
         return true
-    }    
+    }
 }
 
 private func addGesture(_ g: UIGestureRecognizer, view:ZView, handler:ZCustomView) {
@@ -503,7 +502,7 @@ func zConvertViewSizeThatFitstToZSize(_ view:UIView, sizeIn:ZSize) -> ZSize {
     return ZSize(view.sizeThatFits(sizeIn.GetCGSize()))
 }
 
-func zSetViewFrame(_ view:UIView, frame:ZRect) {
+func zSetViewFrame(_ view:UIView, frame:ZRect, layout:Bool = false) { // layout only used on android
     view.frame = frame.GetCGRect()
 }
 

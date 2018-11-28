@@ -100,7 +100,7 @@ struct ZDevice {
         return (identifier, version, name, knownAs)
     }
     
-    static func GetMemoryUsedAndFree() -> (Int64, Int64) {
+    static func GetMemoryFreeAndUsed() -> (Int64, Int64) {
         var pagesize: vm_size_t = 0
         let host_port: mach_port_t = mach_host_self()
         var host_size: mach_msg_type_number_t = mach_msg_type_number_t(MemoryLayout<vm_statistics_data_t>.stride / MemoryLayout<integer_t>.stride)
@@ -116,7 +116,7 @@ struct ZDevice {
         let mused = Int64(vm_stat.active_count + vm_stat.inactive_count + vm_stat.wire_count) * Int64(pagesize)
         let mfree = Int64(vm_stat.free_count) * Int64(pagesize)
         
-        return (mused, mfree)
+        return (mfree, mused)
     }
 
     static func GetNetworkSSIDs() -> [String] {

@@ -29,8 +29,10 @@ class ZTimerBase : NSObject {
 
 class ZRepeater : ZTimerBase {
     var closure:(()->Bool)? = nil
-
-    func Set(_ secs:Double, now:Bool = false, done:@escaping ()->Bool) {
+    var onMainThread:Bool = true
+    
+    func Set(_ secs:Double, now:Bool = false, onMainThread:Bool = true, done:@escaping ()->Bool) {
+        self.onMainThread = onMainThread
         Stop()
         if now {
             if !done() {

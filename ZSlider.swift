@@ -133,7 +133,6 @@ class ZSlider: UISlider, ZView, ZControl {
         
         let oldHandle = parent.touchInfo.handlePressedInPosFunc
         
-        AddTarget(parent, forEventType:.pressed)
         parent.touchInfo.handlePressedInPosFunc = { (pos) in
             done(self.value)
             parent.RemoveChild(w)

@@ -11,15 +11,15 @@ import UIKit
 class ZConfirmStack : ZStackView {
     var done:((_ result:Bool)->Void)? = nil
     
-    @discardableResult static func PushViewWithTitleBar(_ view:ZView, title:String) -> ZStackView {
+    @discardableResult static func PushViewWithTitleBar(_ view:ZView, title:String, deleteOld:Bool = false) -> ZStackView {
         let v1 = ZVStackView(space:0.0)
         if let cv = view as? ZContainerView {
-            v1.portraitOnly = cv.portraitOnly
+            v1.singleOrientation = cv.singleOrientation
         }
         let titleBar = ZTitleBar(text:title, closeType:ZTitleBar.CloseButtons.cross)
         v1.Add(titleBar, align:ZAlignment.Top | ZAlignment.HorCenter | ZAlignment.HorExpand | ZAlignment.NonProp)
         v1.Add(view.View(), align:ZAlignment.HorCenter | ZAlignment.Bottom | ZAlignment.Expand | ZAlignment.NonProp)
-        ZPresentView(v1)
+        ZPresentView(v1, deleteOld:deleteOld)
         
         return v1
     }
@@ -49,21 +49,20 @@ class ZConfirmStack : ZStackView {
         shape.objectName = name
         shape.strokeColor = strokeColor
         shape.strokeWidth = 2.0
-        shape.AddTarget(self, forEventType:ZControlEventType.pressed)
+        shape.HandlePressedInPosFunc = { [weak self] (pos) in
+            if shape.objectName == "check" {
+                self?.done?(true)
+            } else if shape.objectName == "cross" {
+                self?.done?(false)
+                if self!.FindCellWithName("check") == nil {
+                    ZPopTopView()
+                }
+            }
+        }
+//        AddTarget(self, forEventType:ZControlEventType.pressed)
         Add(shape, align:align | ZAlignment.VertCenter)
         
         return shape
-    }
-    
-    override func HandlePressed(_ sender: ZView, pos: ZPos) {
-        if sender.objectName == "check" {
-            done?(true)
-        } else if sender.objectName == "cross" {
-            done?(false)
-            if FindCellWithName("check") == nil {
-                ZPopTopView()
-            }
-        }
     }
     
     func WrapForPushWithView(_ view:ZView) -> ZCustomView {

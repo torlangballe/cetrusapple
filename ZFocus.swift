@@ -12,9 +12,9 @@ import UIKit
 
 struct ZFocus {
     static var color = ZColor(r:0.5, g:0.5, b:1.0)
-    static func Draw(_ canvas:ZCanvas, rect:ZRect, corner:Double = 5.0) {
+    static func Draw(_ canvas:ZCanvas, rect:ZRect, corner:Double = 7.0) {
         var w = 5.0
-        let r = rect.Expanded(-2.0)
+        let r = rect.Expanded(-3.0)
         var opacity = 0.4
         let path = ZPath(rect:r, corner:ZSize(corner, corner))
         while w > 0 {

@@ -15,8 +15,8 @@ class ZDebug {
     static var lastStampTime = ZTimeNull
     static var printHooks = [(String)->()]()
     
-    static func basePrint(_ items: Any?..., separator: String = " ", terminator: String = "\n") {
-        print(items, separator:separator, terminator:terminator)
+    static func basePrint(_ str: String, separator: String = " ", terminator: String = "\n") {
+        print(str, separator:separator, terminator:terminator)
     }
     
     static func IsRelease() -> Bool {

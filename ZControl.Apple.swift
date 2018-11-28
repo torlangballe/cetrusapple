@@ -11,8 +11,8 @@ import UIKit
 typealias ZControlEvents = UIControlEvents
 
 public enum ZControlEventType: Int {
-    case pressed = 1
-    case valueChanged = 2
+//    case pressed = 1
+    case valueChanged = 1
 }
 
 public protocol ZControl {
@@ -32,10 +32,10 @@ extension ZControl {
     }
     public func AddTarget(_ target: AnyObject?, forEventType: ZControlEventType) {
         switch forEventType {
-            case .pressed:
-                Control().addTarget(target,
-                    action:#selector(ZCustomView.handlePressed(_:)),
-                    for:UIControlEvents.touchUpInside)
+//            case .pressed:
+//                Control().addTarget(target,
+//                    action:#selector(ZCustomView.handlePressed(_:)),
+//                    for:UIControlEvents.touchUpInside)
             
             case ZControlEventType.valueChanged:
                 Control().addTarget(target,

@@ -100,7 +100,7 @@ class ZViewController : UIViewController, UIViewControllerTransitioningDelegate,
         coordinator.animate(alongsideTransition: { (context) in
             for (i, v) in self.view.subviews.enumerated() { // make this use stack, better for portraitOnly too
                 if var cv = v as? ZContainerView {
-                    if i < self.view.subviews.count - 1 && cv.portraitOnly {
+                    if i < self.view.subviews.count - 1 && cv.singleOrientation {
                         continue
                     }
                     let uArea = stack[i].useableArea
@@ -163,6 +163,7 @@ struct Attributes {
 }
 
 var stack = [Attributes]()
+
 func ZPresentView(_ view:ZView, duration:Double = 0.5, transition:ZTransitionType = .none, fadeToo:Bool = false, oldTransition:ZTransitionType = .reverse, makeFull:Bool = true, useableArea:Bool = false, deleteOld:Bool = false, lightContent:Bool = true, portraitOnly:Bool? = nil, done:(()->Void)? = nil) {
     view.View().isUserInteractionEnabled = false
     var oldView:UIView? = nil
@@ -172,7 +173,7 @@ func ZPresentView(_ view:ZView, duration:Double = 0.5, transition:ZTransitionTyp
     }
     var po = false
     if let cv = view as? ZContainerView {
-        po = portraitOnly ?? cv.portraitOnly
+        po = portraitOnly ?? cv.singleOrientation
     }
     stack.append(Attributes(duration:duration, transition:transition, oldTransition:oldTransition, lightContent:lightContent, useableArea:useableArea, portraitOnly:po))
     let topView = win?.subviews.first
@@ -292,7 +293,7 @@ func ZPopTopView(namedView:String = "", animated:Bool = true, overrideDuration:D
     oldView.isHidden = false
     oldView.isUserInteractionEnabled = true
     if let cv = oldView as? ZContainerView {
-        if cv.portraitOnly {
+        if cv.singleOrientation {
             forcingRotationForPortraitOnly = true
             #if os(iOS)
             let value = UIInterfaceOrientation.portrait.rawValue
@@ -351,9 +352,8 @@ func ZRecusivelyHandleActivation(activated:Bool) {
 
 private func setFocusInView(_ view:ZContainerView) {
     view.setNeedsFocusUpdate()
-//    view.updateFocusIfNeeded()
 
-    //    view.RangeChildren(subViews:true) { (view) in
+//    view.RangeChildren(subViews:true) { (view) in
 //        if let v = view as? ZCustomView {
 //            if v.canFocus {
 //                view.Focus()

@@ -33,7 +33,7 @@ class ZImageView: ZCustomView, ZImageLoader {
         objectName = namedImage
         self.maxSize = maxSize
         
-        if var im = ZImage(named:namedImage) {
+        if let im = ZImage(named:namedImage) {
             if !scaleInsets.IsNull {
                 image = im.Make9PatchImage(capInsets:scaleInsets)
             } else {
@@ -97,15 +97,15 @@ class ZImageView: ZCustomView, ZImageLoader {
             }
         }
     }
-    
-
-    override func AddTarget(_ t: ZCustomView?, forEventType:ZControlEventType) {
-        touchInfo.tapTarget = t
-        assert(forEventType == .pressed)
-        isUserInteractionEnabled = true
-        isAccessibilityElement = true
-        accessibilityTraits |= UIAccessibilityTraitButton
-    }
+//    
+//
+//    override func AddTarget(_ t: ZCustomView?, forEventType:ZControlEventType) {
+//        touchInfo.tapTarget = t
+//        assert(forEventType == .pressed)
+//        isUserInteractionEnabled = true
+//        isAccessibilityElement = true
+//        accessibilityTraits |= UIAccessibilityTraitButton
+//    }
 }
 
 protocol ZImageLoader: class {

@@ -262,7 +262,7 @@ func getUIViewChild(_ view: UIView, path: String) -> UIView? {
 }
 
 struct ZTouchInfo : ZCopy {
-    weak var tapTarget: ZCustomView? = nil
+//    weak var tapTarget: ZCustomView? = nil
     var touchDownRepeatSecs = 0.0
     var touchDownRepeats = 0
     let touchDownRepeatTimer = ZRepeater()
@@ -271,13 +271,13 @@ struct ZTouchInfo : ZCopy {
 }
 
 @discardableResult func touchInfoBeginTracking(touchInfo:ZTouchInfo, view:ZView, touch: UITouch, event: UIEvent?) -> Bool {
-    if touchInfo.tapTarget != nil || touchInfo.handlePressedInPosFunc != nil {
+    if touchInfo.handlePressedInPosFunc != nil { // touchInfo.tapTarget != nil ||
         if var c = view as? ZControl {
             c.High = true
         }
         view.Expose()
         let pos = ZPos(touch.location(in:view.View()))
-        touchInfo.tapTarget?.HandleTouched(view, state:.began, pos:pos, inside:true)
+//        touchInfo.tapTarget?.HandleTouched(view, state:.began, pos:pos, inside:true)
         if touchInfo.touchDownRepeatSecs != 0 {
             touchInfo.touchDownRepeatTimer.Set(touchInfo.touchDownRepeatSecs) { () in
                 touchInfo.doPressed?(pos)
@@ -289,10 +289,10 @@ struct ZTouchInfo : ZCopy {
 }
 
 @discardableResult func touchInfoContinueTracking(touchInfo:ZTouchInfo, view:ZView, touch: UITouch, event: UIEvent?) -> Bool {
-    if touchInfo.tapTarget != nil || touchInfo.handlePressedInPosFunc != nil {
-        let pos = ZPos(touch.location(in: view.View()))
-        let inside = view.Rect.Contains(pos)
-        touchInfo.tapTarget?.HandleTouched(view, state:.changed, pos:pos, inside:inside)
+    if touchInfo.handlePressedInPosFunc != nil { // touchInfo.tapTarget != nil ||
+//        let pos = ZPos(touch.location(in: view.View()))
+//        let inside = view.Rect.Contains(pos)
+//        touchInfo.tapTarget?.HandleTouched(view, state:.changed, pos:pos, inside:inside)
         touchInfo.touchDownRepeatTimer.Stop()
     }
     return false
@@ -305,32 +305,22 @@ func touchInfoEndTracking(touchInfo:ZTouchInfo, view:ZView, touch: UITouch?, eve
     if var c = view as? ZControl {
         c.High = false
     }
-    if touchInfo.tapTarget != nil || touchInfo.handlePressedInPosFunc != nil {
+    if touchInfo.handlePressedInPosFunc != nil { // touchInfo.tapTarget != nil ||
         let pos = ZPos((touch?.location(in: view.View()))!)
         let inside = view.LocalRect.Contains(pos)
-        if let h = touchInfo.handlePressedInPosFunc {
-            h(pos)
-        } else if touchInfo.tapTarget == nil || !touchInfo.tapTarget!.HandleTouched(view, state:.ended, pos:pos, inside:inside) {
-            ZPerformAfterDelay(0.05) { () in
-                view.Expose()
+        if inside {
+            if let h = touchInfo.handlePressedInPosFunc {
+                h(pos)
             }
-            if inside {
-                if touchInfo.tapTarget != nil {
-                    touchInfo.tapTarget?.HandlePressed(view, pos:pos)
-                } else {
-                    touchInfo.doPressed?(pos)
-                }
-            }
-            return
         }
         touchInfo.touchDownRepeatTimer.Stop()
     }
 }
 
 func touchInfoTrackingCanceled(touchInfo:ZTouchInfo, view:ZView, touch: UITouch?, event: UIEvent?) {
-    if touchInfo.tapTarget != nil {
-        touchInfo.tapTarget?.HandleTouched(view, state:.canceled, pos:ZPos(), inside:false)
-    }
+//    if touchInfo.tapTarget != nil {
+//        touchInfo.tapTarget?.HandleTouched(view, state:.canceled, pos:ZPos(), inside:false)
+//    }
     if var c = view as? ZControl {
         c.High = false
     }

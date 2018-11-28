@@ -86,13 +86,15 @@ open class ZColor : Hashable {
 
     var rawColor: UIColor { return color }
     
-    class public func White() -> ZColor  { return ZColor(color: UIColor.white)   }
-    class public func Black() -> ZColor  { return ZColor(color: UIColor.black)   }
-    class public func Gray() -> ZColor   { return ZColor(color: UIColor.gray)    }
-    class public func Clear() -> ZColor  { return ZColor(white:0, a:0)                  }
-    class public func Blue() -> ZColor   { return ZColor(color: UIColor.blue)    }
-    class public func Red() -> ZColor    { return ZColor(color: UIColor.red)     }
-    class public func Yellow() -> ZColor { return ZColor(color: UIColor.yellow)  }
-    class public func Green() -> ZColor  { return ZColor(color: UIColor.green)   }
-    class public func Orange() -> ZColor { return ZColor(color: UIColor.orange)  }
+    class public func White() -> ZColor   { return ZColor(color: UIColor.white)   }
+    class public func Black() -> ZColor   { return ZColor(color: UIColor.black)   }
+    class public func Gray() -> ZColor    { return ZColor(color: UIColor.gray)    }
+    class public func Clear() -> ZColor   { return ZColor(white:0, a:0)           }
+    class public func Blue() -> ZColor    { return ZColor(color: UIColor.blue)    }
+    class public func Red() -> ZColor     { return ZColor(color: UIColor.red)     }
+    class public func Yellow() -> ZColor  { return ZColor(color: UIColor.yellow)  }
+    class public func Green() -> ZColor   { return ZColor(color: UIColor.green)   }
+    class public func Orange() -> ZColor  { return ZColor(color: UIColor.orange)  }
+    class public func Cyan() -> ZColor    { return ZColor(color: UIColor.cyan)    }
+    class public func Magenta() -> ZColor { return ZColor(color: UIColor.magenta) }
 }
