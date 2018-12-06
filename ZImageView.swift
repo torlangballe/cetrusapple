@@ -1,9 +1,7 @@
 //
 //  ZImageView.swift
-//  Zed
 //
 //  Created by Tor Langballe on /20/10/15.
-//  Copyright © 2015 Capsule.fm. All rights reserved.
 //
 
 // #package com.github.torlangballe.cetrusandroid
@@ -33,7 +31,7 @@ class ZImageView: ZCustomView, ZImageLoader {
         objectName = namedImage
         self.maxSize = maxSize
         
-        if let im = ZImage(named:namedImage) {
+        if let im = ZImage.Named(namedImage) {
             if !scaleInsets.IsNull {
                 image = im.Make9PatchImage(capInsets:scaleInsets)
             } else {
@@ -54,14 +52,14 @@ class ZImageView: ZCustomView, ZImageLoader {
     required init?(coder aDecoder: NSCoder) { fatalError("init(coder:) has not been implemented") }
     // #end
     
-    override func sizeThatFits(_ size: CGSize) -> CGSize {
-        if !maxSize.IsNull(){
-            return maxSize.GetCGSize()
-        }
-        let s = ZSize(super.sizeThatFits(size))
-        return (s + margin * 2.0).GetCGSize()
-    }
-    
+//    override func sizeThatFits(_ size: CGSize) -> CGSize {
+//        if !maxSize.IsNull(){
+//            return maxSize.GetCGSize()
+//        }
+//        let s = ZSize(super.sizeThatFits(size))
+//        return (s + margin * 2.0).GetCGSize()
+//    }
+//    
     override func CalculateSize(_ total: ZSize) -> ZSize {
         var s = minSize
         if image != nil {

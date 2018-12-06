@@ -22,7 +22,7 @@ extension ZFont {
     }
     
 static func Nice(_ size:Double, style:Style = .normal) -> ZFont {
-        return ZFont(name:"Helvetica", size, style:style)!
+        return ZFont(name:"Helvetica", size * ZScreen.SoftScale, style:style)!
     }
     
     func NewWithSize(_ size:Double) -> ZFont? {

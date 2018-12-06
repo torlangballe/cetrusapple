@@ -23,6 +23,17 @@ struct ZFaceInfo {
 
 extension ZImage {
     
+    
+    static func Named(_ name:String) -> ZImage? {
+        if let i = ZImage(named:name) {
+            if i.scale == 2 && ZIsTVBox(), let c = i.cgImage {
+                return ZImage(cgImage: c, scale: 1, orientation: .up)
+            }
+            return i
+        }
+        return nil
+    }
+    
     static func Colored(color:ZColor, size:ZSize) -> ZImage {
         let rect = CGRect(x: 0, y: 0, width: size.w, height: size.h)
         UIGraphicsBeginImageContextWithOptions(size.GetCGSize(), false, 0)
@@ -38,7 +49,11 @@ extension ZImage {
     }
     
     func Make9PatchImage(capInsets:ZRect) -> ZImage {
-        let insets = UIEdgeInsets(top:CGFloat(capInsets.Min.y), left:CGFloat(capInsets.Min.x), bottom:CGFloat(capInsets.Max.y), right:CGFloat(capInsets.Max.x))
+        var s = 1.0
+        if scale == 1 && ZIsTVBox() {
+            s = 2.0
+        }
+        let insets = UIEdgeInsets(top:CGFloat(capInsets.Min.y * s), left:CGFloat(capInsets.Min.x * s), bottom:CGFloat(capInsets.Max.y * s), right:CGFloat(capInsets.Max.x * s))
         return self.resizableImage(withCapInsets:insets, resizingMode:.tile)
     }
     
@@ -426,40 +441,12 @@ extension ZImage {
             canvas.DrawImage(self, destRect:ir)
         }
     }
-/*
-    func ClipToCircle2(fit:ZSize = ZSize(0, 0)) -> ZImage? {
-        let ratio = size.width / size.height
-        var s = fit
-        var r = ZRect(size:ZSize(self.size))
-        if fit.IsNull() {
-            var w = Float(size.width)
-            if ratio > 1 {
-                w = Float(size.height)
-            }
-            s = ZSize(w, w)
-        } else {
-            if ratio > 1 {
-                r = ZRect(size:ZSize(fit.w * Double(ratio), fit.h))
-            } else {
-                r = ZRect(size:ZSize(fit.h, fit.h * Double(ratio)))
-            }
-        }
-        let rIn = r.Align(s, align:.Center)
-        let rDraw = ZRect(pos:-rIn.pos, size:r.size)
-        return ZMakeImageFromDrawFunction(s) { (size, canvas) in
-            let path = ZPath()
-            path.ArcTo(ZRect(size:s))
-            canvas.ClipPath(path)
-            canvas.DrawImage(self, destRect:rDraw)
-        }
-    }
-    */
-    
+
     static func GetNamedImagesFromWildcard(_ wild:String) -> [ZImage] {
         var images = [ZImage]()
         let folder = ZGetResourceFileUrl("")
         folder.Walk(wildcard:wild) { (furl, finfo) in
-            if let image = ZImage(named:furl.GetName()) {
+            if let image = ZImage.Named(furl.GetName()) {
                 images.append(image)
             }
             return true

@@ -62,10 +62,20 @@ class ZPath {
     }
     
     func MoveTo(_ pos: ZPos) {
+        if !ZDebug.IsRelease() {
+            if pos.x.isNaN || pos.y.isNaN {
+                ZDebug.Print("ZMoveToNan")
+            }
+        }
         path.move(to:pos.GetCGPoint())
     }
     
     func LineTo(_ pos: ZPos) {
+        if !ZDebug.IsRelease() {
+            if pos.x.isNaN || pos.y.isNaN {
+                ZDebug.Print("ZLineToNan")
+            }
+        }
         path.addLine(to:pos.GetCGPoint())
     }
     

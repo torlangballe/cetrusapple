@@ -14,7 +14,7 @@ import UIKit
     var strokeWidth:Double = 0.0
     var text: ZTextDraw
     var image: ZImage? = nil
-    var imageMargin = ZSize(4.0, 1.0)
+    var imageMargin = ZSize(4.0, 1.0) * ZScreen.SoftScale
     var textXMargin = 0.0
     var imageFill = false
     var imageOpacity: Float = Float(1)
@@ -71,14 +71,14 @@ import UIKit
         var r = LocalRect
 
         if type == ZShapeView.ShapeType.roundRect {
-            r = r.Expanded(ZSize(-1.0, -1.0))
+            r = r.Expanded(ZSize(-1.0, -1.0) * ZScreen.SoftScale)
         }
         switch type  {
             case ZShapeView.ShapeType.star:
                 path.AddStar(rect:r, points:count, inRatio:ratio)
             
             case ZShapeView.ShapeType.circle:
-                path.ArcDegFromCenter(r.Center, radius:r.size.w / 2.0 - strokeWidth/2.0)
+                path.ArcDegFromCenter(r.Center, radius:(r.size.w / 2.0 - strokeWidth/2.0) * ZScreen.SoftScale)
             
             case ZShapeView.ShapeType.roundRect:
                 var corner = min(r.size.w, r.size.h) * ratio
@@ -109,7 +109,7 @@ import UIKit
         }
         var imarg = imageMargin
         if ZIsTVBox() {
-            imarg.Maximize(ZSize(5.0, 5.0))
+            imarg.Maximize(ZSize(5.0, 5.0) * ZScreen.SoftScale)
         }
         if(image != nil) {
             var drawImage = image
@@ -144,7 +144,7 @@ import UIKit
         if(text.text != "") {
             var t = text.copy()
             t.color = getStateColor(t.color)
-            t.rect = r.Expanded(-(strokeWidth + 2.0)).Expanded(ZSize(-textXMargin, 0.0))
+            t.rect = r.Expanded(-(strokeWidth + 2.0) * ZScreen.SoftScale).Expanded(ZSize(-textXMargin * ZScreen.SoftScale, 0.0))
             t.rect.pos.y += 2
             if imageFill {
                 canvas.SetDropShadow(ZSize(0.0, 0.0), blur:Float(2))

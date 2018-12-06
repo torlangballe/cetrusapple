@@ -88,7 +88,10 @@ class ZAppController : UIResponder, UIApplicationDelegate, UNUserNotificationCen
     }
     
     
-    func applicationDidFinishLaunching(_ application: UIApplication) {
+    func applicationDidFinishLaunching(_ application: UIApplication) {        
+        if ZIsTVBox() {
+            ZScreen.SoftScale = 2.0
+        }
         let launchOptions: [UIApplicationLaunchOptionsKey: Any]? = nil
         UNUserNotificationCenter.current().delegate = self
         

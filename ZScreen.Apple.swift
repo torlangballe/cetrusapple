@@ -13,7 +13,8 @@ enum ZScreenLayout:Int { case portrait, portraitUpsideDown, landscapeLeft, lands
 class ZScreen {
     static var isLocked: Bool = false
     static var MainUsableRect = ZRect(UIScreen.main.bounds)
-    static var Scale = Float(UIScreen.main.scale)
+    static var Scale = Double(UIScreen.main.scale)
+    static var SoftScale = 1.0
     static var KeyboardRect: ZRect? = nil
     
     static var Main: ZRect {

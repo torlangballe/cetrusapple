@@ -329,7 +329,7 @@ func SetTarget(_ target: ZTextEditDelegate) {
                 for view in subviews {
                     if view is UIButton {
                         let button = view as! UIButton
-                        if let image = ZImage(named:"ztextclear.png") {
+                        if let image = ZImage.Named("ztextclear.png") {
                             button.setImage(image, for:.highlighted)
                             button.setImage(image, for:UIControlState())
                         }
