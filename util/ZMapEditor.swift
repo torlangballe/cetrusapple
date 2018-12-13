@@ -28,12 +28,24 @@ class ZMapEditor : ZStackView {
         Add(map, align:.Top | .Left | .Expand | .NonProp)
         let h1 = ZHStackView(space:8)
         h1.Add(deleteButton, align:.Left | .Bottom)
-        deleteButton.AddTarget(self, forEventType:.pressed)
+        deleteButton.HandlePressedInPosFunc = { [weak self] (pos) in
+            self?.isDrawingPolygon = false
+            self?.coordinates.removeAll()
+            self?.updatePolygon()
+            self?.updateButtons()
+        }
         h1.Add(editButton, align:.Right | .Bottom)
-        editButton.AddTarget(self, forEventType:.pressed)
-        h1.Add(backspaceButton, align:.Right | .Bottom)
-        backspaceButton.AddTarget(self, forEventType:.pressed)
         
+        editButton.HandlePressedInPosFunc = { [weak self] (pos) in
+            self?.StartEdit(!self!.isDrawingPolygon)
+        }
+        h1.Add(backspaceButton, align:.Right | .Bottom)
+        backspaceButton.HandlePressedInPosFunc = { [weak self] (pos) in
+            self?.coordinates.removeLast()
+            self?.updatePolygon()
+            self?.updateButtons()
+        }
+
         polygon?.ForEachPart({ [weak self] (part, coords:ZPos...) in
             switch part {
                 case .move, .line:
@@ -88,26 +100,6 @@ class ZMapEditor : ZStackView {
         //      [self didTouchUpInsideDrawButton:nil];
     }
 
-    override func HandlePressed(_ sender: ZView, pos: ZPos) {
-        switch sender.View() {
-            case editButton:
-                StartEdit(!isDrawingPolygon)
-            
-            case deleteButton:
-                isDrawingPolygon = false
-                coordinates.removeAll()
-                updatePolygon()
-                updateButtons()
-            
-            case backspaceButton:
-                coordinates.removeLast()
-                updatePolygon()
-                updateButtons()
-            
-            default:
-                break
-        }
-    }
     fileprivate func addCoordinate(_ coord:CLLocationCoordinate2D, replaceLast:Bool) {
         
         if replaceLast && coordinates.count > 0 {

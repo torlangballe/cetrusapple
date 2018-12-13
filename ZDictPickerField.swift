@@ -29,9 +29,7 @@ class ZDictPickerField : ZShapeView {
         
         popupText = text
         
-        AddTarget(self, forEventType:.pressed)
-        
-        touchInfo.handlePressedInPosFunc = { [weak self] (pos) in
+        HandlePressedInPosFunc = { [weak self] (pos) in
             ZDictPickerField.Pick(dict, selectedKey:selectedKey, textInfo:self!.popupText) { (key, val) in
                 if key != nil {
                     self!.selectedKey = key!
@@ -78,7 +76,9 @@ class ZDictPickerField : ZShapeView {
         Expose()
     }
 
-    required init?(coder aDecoder: NSCoder) { fatalError("init(coder:) has not been implemented") }
-    required init(name: String) { fatalError("init(name:) has not been implemented") }
+    // #swift-only:
+    required init(coder aDecoder: NSCoder) { fatalError("init(coder:) has not been implemented") }
+    init(name: String) { fatalError("init(name:) has not been implemented") }
+    // #end
 }
 

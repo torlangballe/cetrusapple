@@ -38,8 +38,10 @@ class ZBackblazeB2 {
         str = "Basic" + ZStr.Base64Encode(str)
         req.SetHeaderForKey("Authorization", value:str)
         
-        ZInternet.SendGetJson(req, debug:true) { (response, json, error) in
+        ZUrlSession.Send(req) { (response, data, error) in
             if error == nil {
+                var err:Error? = nil
+                let json = ZJSON(zdata:data!, error:&err)!
                 self.apiUrl = json["apiUrl"].stringValue + "/b2api/v1/"
                 self.authorizationToken = json["authorizationToken"].stringValue
             }
@@ -52,15 +54,18 @@ class ZBackblazeB2 {
         req.SetHeaderForKey("Authorization", value:authorizationToken)
         var json = ZJSON.JDict()
         json["bucketId"] = ZJSON(bucketId)
-        req.SetJsonBody(json)
-        ZInternet.SendGetJson(req, debug:true) { (response, json, error) in
+        req.httpBody = json.data!
+        ZUrlSession.Send(req) { (response, data, error) in
             if error == nil {
-                let uploadUrl = json["uploadUrl"].stringValue
-                let uploadToken = json["authorizationToken"].stringValue
-                done(nil, uploadUrl, uploadToken)
-            } else {
-                done(error, "", "")
+                var err:Error? = nil
+                if let json = ZJSON(zdata:data!, error:&err) {
+                    let uploadUrl = json["uploadUrl"].stringValue
+                    let uploadToken = json["authorizationToken"].stringValue
+                    done(nil, uploadUrl, uploadToken)
+                    return
+                }
             }
+            done(error, "", "")
         }
     }
 
@@ -74,9 +79,8 @@ class ZBackblazeB2 {
         req.SetHeaderForKey("X-Bz-Content-Sha1", value:sha1)
         
         req.httpBody = fileData
-        ZInternet.SendGetJson(req, debug:true) { (response, json, error) in
+        ZUrlSession.Send(req) { (response, data, error) in
             if error == nil {
-                //                let uploadUrl = json["uploadUrl"].stringValue
                 done(nil, "")
             } else {
                 done(error, "")

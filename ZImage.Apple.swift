@@ -282,7 +282,7 @@ extension ZImage {
         }
         //        let start = ZTime.Now()
         let req = ZUrlRequest.Make(.Get, url:url)
-        return ZUrlSession.Send(req, onMain:false, makeStatusCodeError:true) { (resp, data, err, code) in
+        return ZUrlSession.Send(req, onMain:false, makeStatusCodeError:true) { (resp, data, err) in
             if err != nil {
                 ZDebug.Print("ZImage.DownloadFromUrl error:", err!.localizedDescription, url)
                 ZMainQue.async {

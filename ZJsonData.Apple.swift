@@ -38,26 +38,30 @@ extension ZJSONData {
 typealias ZJSONSerializer = JSONEncoder
 
 extension Encodable  {
-    func serialiser() -> ZJSONSerializer {
-        return ZJSONSerializer()
+    static func serialiser() -> JSONEncoder {
+        return JSONEncoder()
+    }
+}
+
+extension Decodable  {
+    static func serialiser() -> JSONDecoder {
+        return JSONDecoder()
     }
 }
 
 extension ZData {
-    static func EncodeJson<T : Encodable>(serializer: JSONEncoder, item:T) -> ZData? {
+    static func EncodeJson<T : Encodable>(_ serializer: JSONEncoder, item:T) -> (ZData?, ZError?) {
         do {
             let d = try serializer.encode(item)
-            return d
+            return (d, nil)
         } catch let error {
             ZDebug.Print("ZJSONData Encode err:", error)
-            return nil
+            return (nil, error)
         }
     }
-    
-    func Decode<T:Decodable>(_ serializer: JSONEncoder) -> (T?, ZError?) {
-        let decoder = JSONDecoder()
+    func Decode<T: Decodable>(_ serializer: JSONDecoder, _ t:T) -> (T?, ZError?) {
         do {
-            let v = try decoder.decode(T.self, from:self)
+            let v = try serializer.decode(T.self, from:self)
             return (v, nil)
         } catch let error {
             ZDebug.Print("error trying to convert json to object:", error.localizedDescription)
@@ -66,4 +70,15 @@ extension ZData {
     }
 }
 
-
+//extension Decodable {
+//    static func Decode<T: Decodable>(_ serializer: JSONDecoder, data:ZData) -> T? {
+//        do {
+//            return try serializer.decode(T.self, from:data)
+//        } catch let error {
+//            ZDebug.Print("error trying to convert json to object:", error.localizedDescription)
+//            return nil
+//        }
+//    }
+//}
+//
+//

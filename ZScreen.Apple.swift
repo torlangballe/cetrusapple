@@ -59,7 +59,7 @@ class ZScreen {
     
     static var HasSleepButtonOnSide : Bool {
         get {
-            let (_, version, name, _) = ZDevice.DeviceType
+            let (_, version, name, _) = ZDevice.DeviceCodeNumbered
             if name == "iPhone" && version >= 70 {
                 return true
             }

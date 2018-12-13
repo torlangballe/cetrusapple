@@ -170,7 +170,7 @@ class ZWebView : UIWebView, ZView, UIWebViewDelegate {
     }
     
     func IsLoading() {
-        return self.IsLoading()
+        return //self.IsLoading() infinite call?
     }
     
     func Stop() {

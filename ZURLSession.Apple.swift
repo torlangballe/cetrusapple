@@ -107,9 +107,9 @@ class ZUrlSession {
     static var transactionMutex = ZMutex()
     static var transactions = [(String, Int, Bool)]() // url, length, upload
     
-    @discardableResult static func Send(_ request:ZUrlRequest, onMain:Bool = true, async:Bool = true, sessionCount:Int = -1, makeStatusCodeError:Bool = false, done:@escaping (_ response:ZUrlResponse?, _ data:ZData?, _ error:ZError?, _ sessionCount:Int)->Void) -> ZURLSessionTask? {
+    @discardableResult static func Send(_ request:ZUrlRequest, onMain:Bool = true, async:Bool = true, makeStatusCodeError:Bool = false, done:@escaping (_ response:ZUrlResponse?, _ data:ZData?, _ error:ZError?)->Void) -> ZURLSessionTask? {
         if !async {
-            SendSync(request, sessionCount:sessionCount, makeStatusCodeError:makeStatusCodeError, done:done)
+            SendSync(request, makeStatusCodeError:makeStatusCodeError, done:done)
             return nil
         }
         if request.httpBody != nil {
@@ -133,10 +133,10 @@ class ZUrlSession {
             }
             if onMain {
                 ZMainQue.async {
-                    done(response, data, verror, sessionCount)
+                    done(response, data, verror)
                 }
             } else {
-                done(response, data, verror, sessionCount)
+                done(response, data, verror)
             }
         }
         task.resume()
@@ -166,25 +166,23 @@ class ZUrlSession {
         return task
     }
     
-    static func SendSync(_ request:ZUrlRequest, timeoutSecs:Double = 11, sessionCount:Int = -1, makeStatusCodeError:Bool = false, done:@escaping (_ response:ZUrlResponse?, _ data:ZData?, _ error:ZError?, _ sessionCount:Int)->Void) {
+    static func SendSync(_ request:ZUrlRequest, timeoutSecs:Double = 11, makeStatusCodeError:Bool = false, done:@escaping (_ response:ZUrlResponse?, _ data:ZData?, _ error:ZError?)->Void) {
         print("SendSync:", request.url!)
         let downloadGroup = DispatchGroup()
         downloadGroup.enter()
         var vresponse:ZUrlResponse? = nil
         var vdata:ZData? = nil
         var verror:ZError? = nil
-        var vscount = sessionCount
-        Send(request, onMain:false, sessionCount:sessionCount, makeStatusCodeError:makeStatusCodeError) { (resp, data, err, scount) in
+        Send(request, onMain:false, makeStatusCodeError:makeStatusCodeError) { (resp, data, err) in
             downloadGroup.leave()
             vresponse = resp
             vdata = data
             verror = err
-            vscount = scount
         }
         if downloadGroup.wait(timeout: ZDispatchTimeInSecs(timeoutSecs)) == .timedOut {
             verror = ZNewError("SendSync, timed out: " + (request.url?.absoluteString)!)
         }
-        done(vresponse, vdata as ZData?, verror, vscount)
+        done(vresponse, vdata as ZData?, verror)
     }
     
     static func GetAllCookies() -> [String] {
@@ -210,9 +208,9 @@ class ZUrlSession {
         UserDefaults.standard.synchronize()
     }
     
-    static func CheckError(data:ZJSONData) -> (ZError?, Int?) {
-        var m = ZUrlRequestReturnMessage()
-        if data.Decode(&m) == nil {
+    static func CheckError(data:ZData) -> (ZError?, Int?) {
+        let (m, _) =  data.Decode(ZUrlRequestReturnMessage.serialiser(), ZUrlRequestReturnMessage())
+        if let m = m {
             if m.messages != nil && m.messages!.count != 0 {
                 return (ZNewError(m.messages!.first!), nil)
             }

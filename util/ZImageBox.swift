@@ -35,8 +35,6 @@ class ZImageBox : ZContainerView {
         imageView.contentMode = .scaleAspectFit
         SetCornerRadius(2)
         SetBackgroundColor(ZColor(white:0, a:0.4))
-
-        imageView.AddTarget(self, forEventType:.pressed)
     
         Add(imageView, align:.HorCenter | .Top, marg:ZSize(16, 16))
         Add(imageActivity, align:.HorCenter | .Top, marg:ZSize(0, 4))
@@ -44,14 +42,29 @@ class ZImageBox : ZContainerView {
         if showTools {
             let h1 = ZHStackView(space:7)
             h1.Add(addButton, align:.Right | .Bottom)
-            addButton.AddTarget(self, forEventType:.pressed)
             AddGestureTo(addButton, type:.longpress)
+            addButton.HandlePressedInPosFunc = { [weak self] (pos) in
+                self?.takePhoto(library:true)
+            }
             
             h1.Add(linkButton, align:.Right | .Bottom)
-            linkButton.AddTarget(self, forEventType:.pressed)
-
+            linkButton.HandlePressedInPosFunc = { [weak self] (pos) in
+                ZAlert.GetText(ZTS("set image url:"), content:self!.imageUrl) { [weak self] (text, result) in
+                    if result == .ok {
+                        self?.imageUrl = text
+                        self?.imageActivity.Start()
+                        self?.imageView.DownloadFromUrl(text) { (success) in
+                            self?.imageActivity.Start(false)
+                        }
+                    }
+                }
+            }
             h1.Add(deleteButton, align:.Left | .Bottom)
-            deleteButton.AddTarget(self, forEventType:.pressed)
+            deleteButton.HandlePressedInPosFunc = { [weak self] (pos) in
+                self?.imageUrl = ""
+                self?.imageView.SetImage(nil)
+            }
+            
             Add(h1, align:.Right | .Bottom | .HorExpand | .NonProp, marg:ZSize(6, 4))
         }
         
@@ -114,33 +127,6 @@ class ZImageBox : ZContainerView {
                     }
                 }
             }
-        }
-    }
-    
-    override func HandlePressed(_ sender: ZView, pos: ZPos) {
-        switch sender.View() {
-            case deleteButton:
-                imageUrl = ""
-                imageView.SetImage(nil)
-                return
-            
-            case addButton:
-                takePhoto(library:true)
-                return
-            
-            case linkButton:
-                ZAlert.GetText(ZTS("set image url:"), content:imageUrl) { [weak self] (text, result) in
-                    if result == .ok {
-                        self?.imageUrl = text
-                        self?.imageActivity.Start()
-                        self?.imageView.DownloadFromUrl(text) { (success) in
-                            self?.imageActivity.Start(false)
-                        }
-                    }
-                }
-            
-            default:
-                break
         }
     }
 }

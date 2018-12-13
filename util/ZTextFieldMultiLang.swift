@@ -39,69 +39,54 @@ class ZTextFieldMultiLang : ZStackView, ZTextEditDelegate {
 
         Add(textView, align:.Top | .Left | .HorExpand | .NonProp, marg:ZSize(6, 4))
    
-        addButton.AddTarget(self, forEventType:.pressed)
         h1.Add(addButton, align:.Right | .Bottom)
-        
-        rightButton.AddTarget(self, forEventType:.pressed)
+        addButton.HandlePressedInPosFunc = { [weak self] (pos) in
+            let newLangs = self!.possibleLangs.subtract(self!.langs)
+            self!.getNewLang(newLangs) { (key, val) in
+                if key != nil {
+                    self!.updateStrings()
+                    self!.currentLang = key!
+                    self!.langs.append(key!)
+                    self!.updateButtons()
+                    self!.textView.text = ""
+                }
+            }
+        }
+
         h1.Add(rightButton, align:.Right | .Bottom)
-        
-        flagButton.AddTarget(self, forEventType:.pressed)
+        rightButton.HandlePressedInPosFunc = { [weak self] (pos) in
+            if let i = self!.langs.index(of: currentLang) {
+                self?.updateStrings()
+                self!.currentLang = self!.langs[i+1]
+                self!.textView.text = self!.strings[currentLang]
+                self?.updateButtons()
+            }
+        }
         h1.Add(flagButton, align:.Right | .Bottom)
         
-        leftButton.AddTarget(self, forEventType:.pressed)
         h1.Add(leftButton, align:.Right | .Bottom)
-        
-        deleteButton.AddTarget(self, forEventType:.pressed)
+        leftButton.HandlePressedInPosFunc = { [weak self] (pos) in
+            if let i = self!.langs.index(of: self!.currentLang) {
+                self!.updateStrings()
+                self!.currentLang = self!.langs[i-1]
+                self!.textView.text = self!.strings[currentLang]
+                self!.updateButtons()
+            }
+        }
         h1.Add(deleteButton, align:.Left | .Bottom)
-
+        deleteButton.HandlePressedInPosFunc = { [weak self] (pos) in
+            self!.strings.removeValue(forKey: self!.currentLang)
+            self!.langs.removeIf {$0 == self!.currentLang }
+            self!.currentLang = self!.langs[0]
+            self!.textView.text = self!.strings[currentLang]
+            self!.updateButtons()
+        }
         Add(h1, align:.Right | .Bottom | .HorExpand | .NonProp, marg:ZSize(4, 4))
         
         updateButtons()
     }
     
     required init?(coder aDecoder: NSCoder) { fatalError("init(coder:) has not been implemented") }
-
-    override func HandlePressed(_ sender: ZView, pos: ZPos) {
-        switch sender.View() {
-            case rightButton:
-                if let i = langs.index(of: currentLang) {
-                    updateStrings()
-                    currentLang = langs[i+1]
-                    textView.text = strings[currentLang]
-                    updateButtons()
-                }
-
-            case leftButton:
-                if let i = langs.index(of: currentLang) {
-                    updateStrings()
-                    currentLang = langs[i-1]
-                    textView.text = strings[currentLang]
-                    updateButtons()
-                }
-
-            case deleteButton:
-                strings.removeValue(forKey: currentLang)
-                langs.removeIf {$0 == self.currentLang }
-                currentLang = langs[0]
-                textView.text = strings[currentLang]
-                updateButtons()
-            
-            case addButton:
-                let newLangs = possibleLangs.subtract(langs)
-                getNewLang(newLangs) { [weak self] (key, val) in
-                    if key != nil {
-                        self!.updateStrings()
-                        self!.currentLang = key!
-                        self!.langs.append(key!)
-                        self!.updateButtons()
-                        self!.textView.text = ""
-                    }
-                }
-            
-            default:
-                break
-        }
-    }
 
     fileprivate func getNewLang(_ from:[String], got:@escaping (_ key:String?, _ val:AnyObject?)->Void) {
         var dict = [String:String]()

@@ -30,9 +30,7 @@ class ZDatePartsField : ZShapeView {
         textXMargin = 10
         setTextFromParts()
         
-        AddTarget(self, forEventType:.pressed)
-        
-        touchInfo.handlePressedInPosFunc = { [weak self] (pos) in
+        HandlePressedInPosFunc = { [weak self] (pos) in
             let v1 = ZVStackView(space:2)
             self!.picker = ZDatePartsPicker(useYear:self!.useYear, monthChars:self!.monthChars)
             self!.picker!.optionalYear = self!.optionalYear
@@ -84,7 +82,9 @@ class ZDatePartsField : ZShapeView {
         valueTarget?.HandleValueChanged(self)
     }
     
-    required init?(coder aDecoder: NSCoder) { fatalError("init(coder:) has not been implemented") }
-    required init(name: String) { fatalError("init(name:) has not been implemented") }
+    // #swift-only:
+    required init(coder aDecoder: NSCoder) { fatalError("init(coder:) has not been implemented") }
+    init(name: String) { fatalError("init(name:) has not been implemented") }
+    // #end
 }
 

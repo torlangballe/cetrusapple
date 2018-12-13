@@ -353,13 +353,13 @@ func ZRecusivelyHandleActivation(activated:Bool) {
 private func setFocusInView(_ view:ZContainerView) {
     view.setNeedsFocusUpdate()
 
-//    view.RangeChildren(subViews:true) { (view) in
-//        if let v = view as? ZCustomView {
-//            if v.canFocus {
-//                view.Focus()
-//                return false
-//            }
-//        }
-//        return true
-//    }
+    view.RangeChildren(subViews:true) { (view) in
+        if let v = view as? ZCustomView {
+            if v.canFocus {
+                view.Focus()
+                return false
+            }
+        }
+        return true
+    }
 }

@@ -64,7 +64,7 @@ struct ZDevice {
         #endif
     }
     
-    static var FreeAndUsedDiskSpace: (Int, Int) {
+    static var FreeAndUsedDiskSpace: (Int64, Int64) {
         return (1024 * 1024 * 300, 1024 * 1024 * 32)
     }
     
@@ -76,7 +76,61 @@ struct ZDevice {
         return ZTimeZone.DeviceZone
     }
 
-    static var DeviceType: (String, Int, String, String) { // fullname, version(52), text-only-name, known-as
+    static var FingerPrint: String {
+        return ""
+    }
+
+    static var Manufacturer: String {
+        return ""
+    }
+
+    static var DeviceType: String {
+        let n = DeviceCodeNumbered
+        return n.0
+    }
+
+    static var HardwareModel: String {
+        return ""
+    }
+    
+    static var HardwareType: String {
+        let n = DeviceCodeNumbered
+        return "\(n.0)\(n.1)\(n.2)"
+    }
+    
+    static var HardwareBrand: String {
+        return "Apple"
+    }
+    
+    static func IsWifiEnabled() -> Bool {
+        return false
+    }
+    
+    static func GetIPv4Address() -> String {
+        return ""
+    }
+    
+    static func GetIPv6Address() -> String {
+        return ""
+    }
+    
+    static func GetWifiMAC() -> String {
+        return ""
+    }
+    
+    static func GetLanMAC() -> String {
+        return ""
+    }
+    
+    static func GetNetworkType() -> String {
+        return ""
+    }
+    
+    static func GetWifiLinkSpeed() -> String {
+        return ""
+    }
+
+    static var DeviceCodeNumbered: (String, Int, String, String) { // fullname, version(52), text-only-name, known-as
         var systemInfo = utsname()
         var knownAs = ""
         uname(&systemInfo)

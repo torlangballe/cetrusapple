@@ -160,7 +160,7 @@ class ZUrlCache {
             listMutex.Unlock()
             return  nil
         }
-        let t = ZUrlSession.Send(req, onMain:false, makeStatusCodeError:true) { [weak self] (response, data, error, sessionCount) in
+        let t = ZUrlSession.Send(req, onMain:false, makeStatusCodeError:true) { [weak self] (response, data, error) in
             self?.listMutex.Lock()
             self?.addingList[url] = nil
             self?.listMutex.Unlock()

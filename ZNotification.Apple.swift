@@ -48,7 +48,7 @@ extension ZNotification {
         c.title = info.title
         c.body = info.body
         if !info.soundName.isEmpty {
-            c.sound = UNNotificationSound(namedImage:info.soundName)
+            c.sound = UNNotificationSound(named:info.soundName)
         }
         if !info.categoryId.isEmpty {
             c.categoryIdentifier = info.categoryId

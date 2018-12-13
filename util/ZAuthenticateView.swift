@@ -136,10 +136,15 @@ class ZAuthenticateView: ZStackView, ZTextEditDelegate {
         Add(h1, align:.Center | .HorExpand | .NonProp, marg:ZSize(10, 0))
 
         h1.Add(rightButton, align:.Right | .Top)
-        rightButton.AddTarget(self, forEventType:.pressed)
+        
+        rightButton.HandlePressedInPosFunc = { [weak self] (pos) in
+            self?.authenticate(isRegister:isRegister, userId:self!.emailEditor.text!, password:self!.passwordEditor.text!)
+        }
         if leftButton != nil {
             h1.Add(leftButton!, align:.Left | .Top)
-            leftButton!.AddTarget(self, forEventType:.pressed)
+            leftButton!.HandlePressedInPosFunc = { [weak self] (pos) in
+                self?.Pop()
+            }
         }
         h1.Add(activityView, align:.Right | .VertCenter)
         
@@ -155,14 +160,6 @@ class ZAuthenticateView: ZStackView, ZTextEditDelegate {
     }
 
     required init?(coder aDecoder: NSCoder) { fatalError("init(coder:) has not been implemented") }
-    
-    override func HandlePressed(_ sender: ZView, pos:ZPos) {
-        if leftButton != nil && sender.View() == leftButton! {
-            self.Pop()
-        } else if sender.View() == rightButton {
-            authenticate(isRegister:isRegister, userId:emailEditor.text!, password:passwordEditor.text!)
-        }
-    }
     
     fileprivate func updateButtons() {
 //        let enable = (passwordEditor.text?.count >= minPasswordLength)
