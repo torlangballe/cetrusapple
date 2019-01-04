@@ -37,6 +37,10 @@ class ZApp : ZObject {
         return ("", 0, 0)
     }
 
+    func Quit() {
+        exit(-1)
+    }
+    
     func GetRuntimeSecs() -> Double {
         return ZTime.Now() - activationTime
     }

@@ -288,8 +288,8 @@ public struct ZRect : ZCopy {
             } else {
                 if rect.Min.x < Min.x { Min.x = rect.Min.x }
                 if rect.Min.y < Min.y { Min.y = rect.Min.y }
-                if rect.Max.x > Max.x { Max.x = rect.Max.x }
-                if rect.Max.y > Max.y { Max.y = rect.Max.y }
+                if rect.Max.x > Max.x { SetMaxX(rect.Max.x) }
+                if rect.Max.y > Max.y { SetMaxY(rect.Max.y)}
             }
         }
     }
