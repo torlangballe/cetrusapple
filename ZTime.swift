@@ -125,3 +125,22 @@ let ZTimeMinute = 60.0
 let ZTimeHour = 3600.0
 let ZTimeDay = 86400.0
 
+class ZDeltaTimeGetter {
+    var lastGetTime:ZTime = ZTimeNull
+    var lastGetValue:Double? = nil
+    
+    func Get(get:() -> Double) -> (Double, Double) {
+        var v = get()
+        var delta = 0.0
+        var interval = 0.0
+        let t = ZTime.Now()
+        if lastGetValue != nil {
+            delta = v - lastGetValue!
+            interval = t - lastGetTime
+        }
+        lastGetValue = v
+        lastGetTime = ZTime.Now()
+    
+        return (delta, interval)
+    }
+}

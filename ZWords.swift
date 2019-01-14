@@ -316,28 +316,29 @@ struct ZWords {
         return distance + " " + word
     }
     
-    static func MemorySizeAsString(_ b:Int64, langCode:String = "", maxSignificant:Int = 3) -> String {
+    static func MemorySizeAsString(_ b:Int64, langCode:String = "", maxSignificant:Int = 3, isBits:Bool = false) -> String {
         let kiloByte  = 1024.0
         let megaByte  = kiloByte * 1024
         let gigaByte  = megaByte * 1024
         let terraByte = gigaByte * 1024
-        
-        var word = "TB"
+        var word = "T"
         var n = Double(b) / terraByte
         let d = Double(b)
         if d < kiloByte {
-            word = "B"
+            word = ""
             n = Double(b)
         } else if d < megaByte {
-            word = "KB"
+            word = "K"
             n = Double(b)/kiloByte
         } else if d < gigaByte {
-            word = "MB"
+            word = "M"
             n = Double(b)/megaByte
         } else if d < terraByte {
-            word = "GB"
+            word = "G"
             n = Double(b)/gigaByte
         }
+        word += (isBits ? "b" : "B")
+
         let str = ZStr.NiceDouble(n, maxSig:maxSignificant) + " " + word
         return str
     }

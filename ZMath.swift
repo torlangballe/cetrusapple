@@ -47,10 +47,15 @@ struct ZMath {
         return log10(d)
     }
 
-    static func GetNiceIncsOf(_ d:Double, incCount:Int)  -> Double {
+    static func GetNiceIncsOf(_ d:Double, incCount:Int, isMemory:Bool)  -> Double {
         let l = floor(log10(d))
         var n = Pow(10.0, l)
-        
+        if isMemory {
+            n = Pow(1024.0, ceil(l / 3.0))
+            while d / n > Double(incCount) {
+                n = n * 2.0
+            }
+        }
         while d / n < Double(incCount) {
             n = n / 2.0
         }

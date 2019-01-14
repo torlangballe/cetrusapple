@@ -462,9 +462,12 @@ struct ZStr {
     
     static func NiceDouble(_ d:Double, maxSig:Int = 8, separator:String = ",") -> String {
         var n = Int64(d)
-        let f = ZMath.Fraction(d)
-        let format = "%.\(maxSig)lf"
-        var fstr = ZStr.Format(format, f)
+        var fstr = ""
+        if maxSig > 0 {
+            let f = ZMath.Fraction(d)
+            let format = "%.\(maxSig)lf"
+            fstr = ZStr.Format(format, f)
+        }
         if fstr.contains(".") {
             while true {
                 let s = ZStr.Tail(fstr)
@@ -476,6 +479,9 @@ struct ZStr {
                 } else {
                     break
                 }
+            }
+            if fstr.first! == "0" {
+                fstr = ZStr.Body(fstr, pos:1)
             }
         }
         if fstr == "0" {
