@@ -15,10 +15,10 @@ class ZLayer: CALayer {
     var animation: CAPropertyAnimation? = nil
     func AnimateImageOnPath(_ path:ZPath, image:ZImage) {
         let a = CAKeyframeAnimation(keyPath:"position")
-        a.calculationMode = kCAAnimationPaced
-        a.fillMode = kCAFillModeForwards
+      a.calculationMode = CAAnimationCalculationMode.paced
+      a.fillMode = CAMediaTimingFillMode.forwards
         a.isRemovedOnCompletion = false
-        a.rotationMode = kCAAnimationRotateAuto
+      a.rotationMode = CAAnimationRotationMode.rotateAuto
         a.path = path.path
         animation = a
         self.contents = image.cgImage
@@ -39,7 +39,7 @@ class ZLayer: CALayer {
         animation!.duration = duration
         animation!.beginTime = startAtSecs
         animation!.speed = speed;
-        animation!.timingFunction = CAMediaTimingFunction(name:kCAMediaTimingFunctionLinear)
+      animation!.timingFunction = CAMediaTimingFunction(name:CAMediaTimingFunctionName.linear)
         self.add(animation!, forKey:animation!.keyPath)
     }
     

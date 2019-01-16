@@ -114,8 +114,11 @@ func ZGetBackgroundQue(name:String? = nil, serial:Bool = false) -> DispatchQueue
     if let que = queues[n] {
         return que
     }
-    let (ver, _, _) = ZApp.Version
-    let que = DispatchQueue(label: ver + "." + n, attributes:serial ? [] : .concurrent)
+    var sver = ""
+    if let sbver = Bundle.main.infoDictionary?["CFBundleVersion"] as? String {
+        sver = sbver
+    }
+    let que = DispatchQueue(label: sver + "." + n, attributes:serial ? [] : .concurrent)
     queues[n] = que
     return que
 }

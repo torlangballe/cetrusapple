@@ -32,7 +32,7 @@ class ZSlider: UISlider, ZView, ZControl {
         if vertical {
             transform = CGAffineTransform(rotationAngle: CGFloat(-ZMath.PI))
         }
-        addTarget(self, action:#selector(ZSlider.valueChanged(_:)), for:UIControlEvents.valueChanged)
+        addTarget(self, action:#selector(ZSlider.valueChanged(_:)), for:UIControl.Event.valueChanged)
     }
     
     @objc func valueChanged(_ sender:UISlider) {

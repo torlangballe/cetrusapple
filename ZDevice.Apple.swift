@@ -54,9 +54,9 @@ struct ZDevice {
     static var IsDeviceCharging: Int { // return's -1 if unknown
         #if os(iOS)
         switch UIDevice.current.batteryState {
-            case UIDeviceBatteryState.unplugged  : return 0
-            case UIDeviceBatteryState.charging   : return 1
-            case UIDeviceBatteryState.full       : return 1
+        case UIDevice.BatteryState.unplugged  : return 0
+        case UIDevice.BatteryState.charging   : return 1
+        case UIDevice.BatteryState.full       : return 1
             default                              : return -1
         }
         #else

@@ -22,7 +22,7 @@ protocol ZTableViewDelegate : class {
     func GetAccessibilityForCell(_ index:ZTableIndex, prefix:String) -> [ZAccessibilty]
 }
 
-typealias ZTableViewRowAnimation = UITableViewRowAnimation
+typealias ZTableViewRowAnimation = UITableView.RowAnimation
 
 struct ZTableIndex : ZCopy {
     var row = 0
@@ -62,7 +62,7 @@ class ZTableView : UITableView, ZView, UITableViewDelegate, UITableViewDataSourc
         sectionFooterHeight = 3;
         backgroundView = nil
         #if os(iOS)
-        separatorStyle = UITableViewCellSeparatorStyle.none
+      separatorStyle = UITableViewCell.SeparatorStyle.none
         #endif
         //        self.registerClass(UallITableViewCell.self, forCellReuseIdentifier:"ZTableView")
         allowsSelection = true // selectable
@@ -76,7 +76,7 @@ class ZTableView : UITableView, ZView, UITableViewDelegate, UITableViewDataSourc
             if selectionIndex.row != -1 {
                 Select(selectionIndex.row);
             }
-            contentInset = UIEdgeInsetsMake(CGFloat(margins.h), 0, CGFloat(margins.h), 0)
+          contentInset = UIEdgeInsets(top: CGFloat(margins.h), left: 0, bottom: CGFloat(margins.h), right: 0)
             first = false
         }
         super.layoutSubviews()
@@ -95,7 +95,7 @@ class ZTableView : UITableView, ZView, UITableViewDelegate, UITableViewDataSourc
     }
     
     func UpdateVisibleRows(_ animate:Bool = true) {
-        reloadRows(at: indexPathsForVisibleRows ?? [], with:animate ? UITableViewRowAnimation.automatic : UITableViewRowAnimation.none)
+      reloadRows(at: indexPathsForVisibleRows ?? [], with:animate ? UITableView.RowAnimation.automatic : UITableView.RowAnimation.none)
     }
     
     func ScrollToMakeRowVisible(_ row:Int, animated:Bool = true) {
@@ -110,10 +110,10 @@ class ZTableView : UITableView, ZView, UITableViewDelegate, UITableViewDataSourc
             return
         }
         if animate {
-            self.reloadSections([0], with:UITableViewRowAnimation.fade)
+          self.reloadSections([0], with:UITableView.RowAnimation.fade)
         } else {
             if row != nil {
-                reloadRows(at:[makeIndexPathFromIndex(ZTableIndex(row:row!, section:0))], with:UITableViewRowAnimation.none)
+              reloadRows(at:[makeIndexPathFromIndex(ZTableIndex(row:row!, section:0))], with:UITableView.RowAnimation.none)
             } else {
                 reloadData()
             }
@@ -187,7 +187,7 @@ class ZTableView : UITableView, ZView, UITableViewDelegate, UITableViewDataSourc
                     deselectRow(at: makeIndexPathFromIndex(oldSelection), animated:true)
                 }
             } else {
-                selectRow(at: makeIndexPathFromIndex(selectionIndex), animated:true, scrollPosition:UITableViewScrollPosition.none) // none means least movement
+              selectRow(at: makeIndexPathFromIndex(selectionIndex), animated:true, scrollPosition:UITableView.ScrollPosition.none) // none means least movement
             }
         }
     }

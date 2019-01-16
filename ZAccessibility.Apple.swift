@@ -9,22 +9,22 @@ import UIKit
 
 class ZAccessibilty {
     static var IsOn: Bool {
-        get { return UIAccessibilityIsVoiceOverRunning() }
+      get { return UIAccessibility.isVoiceOverRunning }
     }
 
     static func ConvertRect(_ rect:ZRect, view:ZView) -> ZRect {
-        return ZRect(UIAccessibilityConvertFrameToScreenCoordinates(rect.GetCGRect(), view.View()))
+      return ZRect(UIAccessibility.convertToScreenCoordinates(rect.GetCGRect(), in: view.View()))
     }
 
     static func SayNotification(_ message:String) {
-        UIAccessibilityPostNotification(UIAccessibilityAnnouncementNotification, message)
+      UIAccessibility.post(notification: UIAccessibility.Notification.announcement, argument: message)
     }
 
     static func SayScrollNotification(_ message:String) {
-        UIAccessibilityPostNotification(UIAccessibilityPageScrolledNotification, message)
+      UIAccessibility.post(notification: UIAccessibility.Notification.pageScrolled, argument: message)
     }
     
     static func SendScreenUpdateNotification(_ message:String = "") {
-        UIAccessibilityPostNotification(UIAccessibilityScreenChangedNotification, message)
+      UIAccessibility.post(notification: UIAccessibility.Notification.screenChanged, argument: message)
     }
 }

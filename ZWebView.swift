@@ -83,7 +83,7 @@ class ZWebView : UIWebView, ZView, UIWebViewDelegate {
         zdelegate?.HandleFailedDownload(self, error:didFailLoadWithError as Error)
     }
 
-    func webView(_ webView:UIWebView, shouldStartLoadWith req:URLRequest, navigationType:UIWebViewNavigationType) -> Bool {
+    func webView(_ webView:UIWebView, shouldStartLoadWith req:URLRequest, navigationType:UIWebView.NavigationType) -> Bool {
         let url = req.url!.absoluteString
         return !zdelegate!.HandleShouldNotLoadUrl(self, url:url)
     }

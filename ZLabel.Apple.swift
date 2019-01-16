@@ -38,7 +38,7 @@ class ZLabel: UILabel, ZView {
             touchInfo.handlePressedInPosFunc = newValue
             isUserInteractionEnabled = true
             isAccessibilityElement = true
-            accessibilityTraits |= UIAccessibilityTraitButton
+            accessibilityTraits.formUnion(UIAccessibilityTraits.button)
         }
         get {
             return touchInfo.handlePressedInPosFunc;
@@ -47,7 +47,7 @@ class ZLabel: UILabel, ZView {
 
     override func drawText(in rect: CGRect) {
         let insets = UIEdgeInsets.init(top:CGFloat(margin.Min.y), left:CGFloat(margin.Min.x), bottom:CGFloat(-margin.Max.y), right:CGFloat(-margin.Max.x))
-        super.drawText(in: UIEdgeInsetsInsetRect(rect, insets))
+        super.drawText(in: rect.inset(by: insets))
         if touchInfo.handlePressedInPosFunc != nil { // we hack this in here...
             isUserInteractionEnabled = true
         }
@@ -95,7 +95,7 @@ class ZLabel: UILabel, ZView {
     func SetText(_ newText:String, animationDuration:Float=0) {
         if self.text != newText {
             if animationDuration != 0.0 {
-                UIView.transition(with: self, duration:TimeInterval(animationDuration), options:UIViewAnimationOptions.transitionCrossDissolve, animations:{
+                UIView.transition(with: self, duration:TimeInterval(animationDuration), options:UIView.AnimationOptions.transitionCrossDissolve, animations:{
                     self.text = newText
                 }, completion:nil)
             } else {

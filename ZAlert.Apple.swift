@@ -11,7 +11,7 @@ import UIKit
 class ZAlert {
     enum Result: Int { case ok = 1, cancel = 2, destructive = 3, other = 4 }
     static func Say(_ text:String, ok:String = "🆗", cancel:String = "", other:String = "", destructive:String = "", subText:String = "", pressed:((_ result:Result)->Void)? = nil)  {
-        let view = UIAlertController(title:text, message:subText, preferredStyle:UIAlertControllerStyle.alert)
+        let view = UIAlertController(title:text, message:subText, preferredStyle:UIAlertController.Style.alert)
 
         var vok = ok
         var vcancel = cancel
@@ -54,7 +54,7 @@ class ZAlert {
         var vok = ok
         var vcancel = cancel
         
-        let view = UIAlertController(title:title, message:subText, preferredStyle:UIAlertControllerStyle.alert)
+        let view = UIAlertController(title:title, message:subText, preferredStyle:UIAlertController.Style.alert)
         
         if vok.isEmpty {
             vok = ZWords.GetOk()
@@ -92,7 +92,7 @@ class ZAlert {
                     textField.returnKeyType = keyboardInfo!.returnType!
                 }
             }
-            NotificationCenter.default.addObserver(forName: NSNotification.Name.UITextFieldTextDidChange, object: textField, queue: OperationQueue.main) { (notification) in
+            NotificationCenter.default.addObserver(forName: UITextField.textDidChangeNotification, object: textField, queue: OperationQueue.main) { (notification) in
                 okAction.isEnabled = textField.text != ""
             }
         }

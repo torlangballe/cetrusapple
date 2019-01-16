@@ -66,7 +66,7 @@ struct ZTextDraw : ZCopy {
         return NSTextAlignment.left
     }
 
-    func MakeAttributes() -> [NSAttributedStringKey: Any] {
+  func MakeAttributes() -> [NSAttributedString.Key: Any] {
         let pstyle = NSParagraphStyle.default.mutableCopy() as! NSMutableParagraphStyle
         pstyle.lineBreakMode = ZTextDraw.GetNativeWrapMode(wrap)
         pstyle.alignment = ZTextDraw.GetTextAdjustment(alignment)
@@ -75,9 +75,9 @@ struct ZTextDraw : ZCopy {
             pstyle.maximumLineHeight = font.lineHeight + CGFloat(lineSpacing)
             pstyle.lineSpacing = CGFloat(lineSpacing) // CGFloat(max(0.0, lineSpacing))
         }
-    return [ NSAttributedStringKey.font:font,
-        NSAttributedStringKey.paragraphStyle:pstyle,
-        NSAttributedStringKey.foregroundColor:color.color]
+    return [ NSAttributedString.Key.font:font,
+             NSAttributedString.Key.paragraphStyle:pstyle,
+             NSAttributedString.Key.foregroundColor:color.color]
     }
 
     @discardableResult func Draw(_ canvas: ZCanvas) -> ZRect {
@@ -152,13 +152,13 @@ struct ZTextDraw : ZCopy {
         textLayer.contentsScale = CGFloat(ZScreen.Scale)
         
         if alignment & .HorCenter {
-            textLayer.alignmentMode = kCAAlignmentCenter
+          textLayer.alignmentMode = CATextLayerAlignmentMode.center
         }
         if alignment & .Left {
-            textLayer.alignmentMode = kCAAlignmentLeft
+          textLayer.alignmentMode = CATextLayerAlignmentMode.left
         }
         if alignment & .Right {
-            textLayer.alignmentMode = kCAAlignmentRight
+          textLayer.alignmentMode = CATextLayerAlignmentMode.right
         }
         textLayer.foregroundColor = color.color.cgColor
         let s = (GetBounds().size + margin.size)

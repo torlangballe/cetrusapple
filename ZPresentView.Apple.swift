@@ -63,8 +63,8 @@ class ZViewController : UIViewController, UIViewControllerTransitioningDelegate,
         picker.dismiss(animated: true, completion:nil)
     }
 
-    internal func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info:[String : Any]) {
-        if let image = info[UIImagePickerControllerOriginalImage] as? UIImage {
+    internal func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info:[UIImagePickerController.InfoKey : Any]) {
+      if let image = info[UIImagePickerController.InfoKey.originalImage] as? UIImage {
             let vimage = image.GetRotationAdjusted()
             picker.dismiss(animated: true) { () in
                 self.imagePickerDone?(vimage)

@@ -154,7 +154,7 @@ class ZDatePicker : UIDatePicker, ZView {
         }
         date = time.date
         self.minuteInterval = minuteInterval
-        self.addTarget(self, action:#selector(dateIsChanged(_:)), for:UIControlEvents.valueChanged)
+        self.addTarget(self, action:#selector(dateIsChanged(_:)), for:UIControl.Event.valueChanged)
     }
     
     @objc func dateIsChanged(_ sender:UIView?) {

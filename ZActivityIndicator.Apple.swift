@@ -14,12 +14,12 @@ class ZActivityIndicator: UIActivityIndicatorView, ZView {
     var objectName = "activity"
 
     init(big:Bool = true, dark:Bool = false) {
-        var gray = UIActivityIndicatorViewStyle.white
+        var gray = UIActivityIndicatorView.Style.white
         #if os(iOS)
-        gray = UIActivityIndicatorViewStyle.gray
+        gray = UIActivityIndicatorView.Style.gray
         #endif
-        let uistyle = big ? UIActivityIndicatorViewStyle.whiteLarge : (dark ? gray : UIActivityIndicatorViewStyle.white)
-        super.init(activityIndicatorStyle:uistyle)
+        let uistyle = big ? UIActivityIndicatorView.Style.whiteLarge : (dark ? gray : UIActivityIndicatorView.Style.white)
+        super.init(style:uistyle)
     }
     
     required init(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }

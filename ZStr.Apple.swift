@@ -461,46 +461,27 @@ struct ZStr {
     }
     
     static func NiceDouble(_ d:Double, maxSig:Int = 8, separator:String = ",") -> String {
+        let str = ZStr.Format("%lf", d)
+        var sfract = ZStr.TailUntil(str, sep: ".")
+        sfract = ZStr.Head(sfract, chars: maxSig)
         var n = Int64(d)
-        var fstr = ""
-        if maxSig > 0 {
-            let f = ZMath.Fraction(d)
-            let format = "%.\(maxSig)lf"
-            fstr = ZStr.Format(format, f)
-        }
-        if fstr.contains(".") {
-            while true {
-                let s = ZStr.Tail(fstr)
-                if s == "0" {
-                    fstr = fstr.removedLast()
-                } else if s == "." {
-                    fstr = fstr.removedLast()
-                    break
-                } else {
-                    break
-                }
-            }
-            if fstr.first! == "0" {
-                fstr = ZStr.Body(fstr, pos:1)
-            }
-        }
-        if fstr == "0" {
-            fstr = ""
-        }
-        var str = ""
+        var sint = ""
         while true {
             if n / 1000 > 0 {                
-                str = ZStr.Format("%03ld", n % 1000) + str
+                sint = ZStr.Format("%03ld", n % 1000) + sint
             } else {
-                str = "\(n % 1000)" + str
+                sint = "\(n % 1000)" + sint
             }
             n /= 1000
             if n == Int64(0) {
                 break
             }
-            str = separator + str
+            sint = separator + sint
         }
-        return str + fstr
+        if !sfract.isEmpty {
+            sfract = "." + sfract
+        }
+        return sint + sfract
     }
     
     static func ToDouble(str:String, def:Double = -1.0) -> Double {

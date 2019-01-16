@@ -101,7 +101,7 @@ class ZTextView : UITextView, UITextViewDelegate, ZTextBase, ZView {
     }
     
     func SetMargins(_ margins:ZRect) {
-        self.contentInset = UIEdgeInsetsMake(CGFloat(margins.Min.y), CGFloat(margins.Min.x), -CGFloat(margins.Max.y), -CGFloat(margins.Max.x))
+        self.contentInset = UIEdgeInsets(top: CGFloat(margins.Min.y), left: CGFloat(margins.Min.x), bottom: -CGFloat(margins.Max.y), right: -CGFloat(margins.Max.x))
     }
     
     func View() -> UIView {
@@ -226,7 +226,7 @@ class ZTextView : UITextView, UITextViewDelegate, ZTextBase, ZView {
     
     func SetTarget(_ target: ZTextEditDelegate) {
         self.target = target
-        NotificationCenter.default.addObserver(self, selector:#selector(ZTextView.textViewDidChange(_:)), name:NSNotification.Name.UITextViewTextDidChange, object:nil)
+        NotificationCenter.default.addObserver(self, selector:#selector(ZTextView.textViewDidChange(_:)), name:UITextView.textDidChangeNotification, object:nil)
     }
     
     func textViewDidChangeSelection(_ textView: UITextView) {
@@ -289,7 +289,7 @@ class ZTextView : UITextView, UITextViewDelegate, ZTextBase, ZView {
         #if os(iOS)
         let menuController = UIMenuController.shared
         menuController.setTargetRect(self.frame, in:self.superview!)
-        menuController.arrowDirection = UIMenuControllerArrowDirection.left;
+        menuController.arrowDirection = UIMenuController.ArrowDirection.left;
         for (_, name) in items {
             let menuItem = UIMenuItem(title:name, action:#selector(ZTextView.handleCustomMenu))
             menuController.menuItems?.append(menuItem)

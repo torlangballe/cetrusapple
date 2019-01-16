@@ -30,11 +30,10 @@ class ZTitleBar : ZStackView {
         space = 0.0
         margin = ZRect(0.0, 8.0, 0.0, -4.0)
         accessibilityLabel = text
-        minSize = ZSize(100, 60)
-//        if ZScreen.HasNotch() {
-//            minSize.h += 88
-//        }
-//      closeButton?.AddTarget(self, forEventType:ZControlEventType.pressed)
+        minSize = ZSize(100, 44.0)
+        if ZScreen.HasNotch() {
+            minSize.h += 45.0
+        }
         closeButton?.accessibilityLabel = ZWords.GetClose()
         closeButton!.HandlePressedInPosFunc = { [weak self] (pos) in
             if self!.closeHandler != nil {
@@ -49,7 +48,6 @@ class ZTitleBar : ZStackView {
         }
         Add(title, align:ZAlignment.HorCenter | ZAlignment.Bottom, marg:ZSize(0, 5))
         SetBackgroundColor(ZTitleBar.Color)
-        minSize.h = 44.0
         if ZIsIOS() {
             minSize.h += ZScreen.StatusBarHeight
         }

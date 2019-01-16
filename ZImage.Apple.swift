@@ -146,7 +146,7 @@ extension ZImage {
     }
    
     func Normalized() -> ZImage {
-        var imageOrientation: UIImageOrientation = .up
+      var imageOrientation: UIImage.Orientation = .up
         
         switch self.imageOrientation {
         case .down:
@@ -329,7 +329,7 @@ extension ZImage {
     }
     
     func SaveToPng(_ file:ZFileUrl) -> ZError? {
-        let data:ZData? = UIImagePNGRepresentation(self) as ZData?
+      let data:ZData? = self.pngData() as ZData?
         if data != nil {
             if data!.SaveToFile(file) == nil {
                 return nil
@@ -339,7 +339,7 @@ extension ZImage {
     }
     
     func SaveToJpeg(_ file:ZFileUrl, quality:Float = 0.8) -> ZError? {
-        let data:ZData? = UIImageJPEGRepresentation(self, CGFloat(quality)) as ZData?
+        let data:ZData? = self.jpegData(compressionQuality:CGFloat(quality)) as ZData?
         if data != nil {
             if data!.SaveToFile(file) != nil {
                 return nil

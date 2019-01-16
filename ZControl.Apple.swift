@@ -8,7 +8,7 @@
 
 import UIKit
 
-typealias ZControlEvents = UIControlEvents
+typealias ZControlEvents = UIControl.Event
 
 public enum ZControlEventType: Int {
 //    case pressed = 1
@@ -40,7 +40,7 @@ extension ZControl {
             case ZControlEventType.valueChanged:
                 Control().addTarget(target,
                     action:#selector(ZCustomView.handleValueChanged(_:)),
-                    for:UIControlEvents.valueChanged)
+                    for:UIControl.Event.valueChanged)
         }
     }
 }

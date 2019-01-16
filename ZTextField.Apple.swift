@@ -15,7 +15,7 @@ typealias ZKeyboardType = UIKeyboardType
 typealias ZAutocapitalizationType = UITextAutocapitalizationType
 typealias ZReturnKeyType = UIReturnKeyType
 typealias ZTextPosition = UITextPosition
-typealias ZTextClearButtonMode = UITextFieldViewMode
+typealias ZTextClearButtonMode = UITextField.ViewMode
 
 protocol ZTextBase {
     var assumedLangCode: String { get }
@@ -231,7 +231,7 @@ class ZTextField : UITextField, UITextFieldDelegate, ZTextBase, ZView {
 
 func SetTarget(_ target: ZTextEditDelegate) {
         self.target = target
-        NotificationCenter.default.addObserver(self, selector:#selector(ZTextField.textFieldDidChange(_:)), name:NSNotification.Name.UITextFieldTextDidChange, object:nil)
+    NotificationCenter.default.addObserver(self, selector:#selector(ZTextField.textFieldDidChange(_:)), name:UITextField.textDidChangeNotification, object:nil)
     }
     
     @objc func textFieldDidChange(_ notification:Notification) {
@@ -308,7 +308,7 @@ func SetTarget(_ target: ZTextEditDelegate) {
             }
         }
         self.placeholder = placeholder
-        self.attributedPlaceholder = NSAttributedString(string:placeholder, attributes:[NSAttributedStringKey.foregroundColor:col.color])
+        self.attributedPlaceholder = NSAttributedString(string:placeholder, attributes:[NSAttributedString.Key.foregroundColor:col.color])
     }
  
     override func textRect(forBounds bounds: CGRect) -> CGRect {
@@ -331,7 +331,7 @@ func SetTarget(_ target: ZTextEditDelegate) {
                         let button = view as! UIButton
                         if let image = ZImage.Named("ztextclear.png") {
                             button.setImage(image, for:.highlighted)
-                            button.setImage(image, for:UIControlState())
+                            button.setImage(image, for:UIControl.State())
                         }
                     }
                 }

@@ -38,11 +38,11 @@ class ZAppController : UIResponder, UIApplicationDelegate, UNUserNotificationCen
     @objc func handleInterruption(_ notification:Notification) {
         if let ntype = (notification as NSNotification).userInfo?[AVAudioSessionInterruptionTypeKey] as? UInt {
             print(ntype)
-            if ntype == AVAudioSessionInterruptionType.began.rawValue {
+            if ntype == AVAudioSession.InterruptionType.began.rawValue {
                 mainZApp!.HandleAudioInterrupted()
             } else {
                 if let number = (notification as NSNotification).userInfo?[AVAudioSessionInterruptionOptionKey] as? UInt {
-                    if number == AVAudioSessionInterruptionOptions.shouldResume.rawValue {
+                    if number == AVAudioSession.InterruptionOptions.shouldResume.rawValue {
                         mainZApp!.HandleAudioResume()
                         //                        ZAudioSession.SetAppIsPlayingSound(true, mixWithOthers:true) // dangerous...
                     }
@@ -72,7 +72,7 @@ class ZAppController : UIResponder, UIApplicationDelegate, UNUserNotificationCen
     */
     
     @objc func keyboardWillShow(_ notification: Notification) {
-        let frame = ((notification as NSNotification).userInfo![UIKeyboardFrameEndUserInfoKey] as! NSValue).cgRectValue
+        let frame = ((notification as NSNotification).userInfo![UIResponder.keyboardFrameEndUserInfoKey] as! NSValue).cgRectValue
         ZScreen.KeyboardRect = ZRect(frame)
     }
 
@@ -125,7 +125,7 @@ class ZAppController : UIResponder, UIApplicationDelegate, UNUserNotificationCen
     
 
     func applicationDidFinishLaunching(_ application: UIApplication) {
-        let launchOptions: [UIApplicationLaunchOptionsKey: Any]? = nil
+        let launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil
 //!        mainAnalytics.InitCrashReporter()
 
         /*
@@ -157,23 +157,23 @@ class ZAppController : UIResponder, UIApplicationDelegate, UNUserNotificationCen
 
         let nc = NotificationCenter.default
         
-        nc.addObserver(self, selector:#selector(ZAppController.handleInterruption(_:)), name:NSNotification.Name.AVAudioSessionInterruption, object:AVAudioSession.sharedInstance())
+        nc.addObserver(self, selector:#selector(ZAppController.handleInterruption(_:)), name:AVAudioSession.interruptionNotification, object:AVAudioSession.sharedInstance())
         
-        nc.addObserver(self, selector:#selector(ZAppController.keyboardWillShow(_:)), name: NSNotification.Name.UIKeyboardWillShow, object:nil)
+        nc.addObserver(self, selector:#selector(ZAppController.keyboardWillShow(_:)), name: UIResponder.keyboardWillShowNotification, object:nil)
         
 
         // later in your class:
         
         func keyboardWillShow(_ notification: Notification) {
-            if let frame = ((notification as NSNotification).userInfo?[UIKeyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue {
+            if let frame = ((notification as NSNotification).userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue {
                 ZScreen.KeyboardRect = ZRect(frame)
             }
         }
 
         // http://stackoverflow.com/questions/31429800/how-to-check-if-the-ios-device-is-locked-unlocked-using-swift
-        nc.addObserver(self, selector:#selector(ZAppController.handleAudioRouteChanged(_:)), name:NSNotification.Name.AVAudioSessionRouteChange, object:nil)
+        nc.addObserver(self, selector:#selector(ZAppController.handleAudioRouteChanged(_:)), name:AVAudioSession.routeChangeNotification, object:nil)
         if #available(iOS 11.0, *) {
-            nc.addObserver(self, selector:#selector(ZAppController.voiceOverStatusChanged(_:)), name:NSNotification.Name.UIAccessibilityVoiceOverStatusDidChange, object:nil)
+            nc.addObserver(self, selector:#selector(ZAppController.voiceOverStatusChanged(_:)), name:UIAccessibility.voiceOverStatusDidChangeNotification, object:nil)
         } else {
             // Fallback on earlier versions
         }
@@ -193,7 +193,7 @@ class ZAppController : UIResponder, UIApplicationDelegate, UNUserNotificationCen
 //            mainZApp!.HandleAppNotification(notification, action:"")
 //            application.statusBarStyle = UIStatusBarStyle.lightContent
 //        }
-        if let notification = launchOptions?[UIApplicationLaunchOptionsKey.remoteNotification] as? [String: AnyObject] {
+        if let notification = launchOptions?[UIApplication.LaunchOptionsKey.remoteNotification] as? [String: AnyObject] {
             let aps = notification["aps"] as! [String: AnyObject]
             ZPerformAfterDelay(0.5) { () in
                 mainZApp?.HandlePushNotificationWithDictionary(aps, fromStartup:true, whileActive:false)
@@ -280,7 +280,7 @@ class ZAppController : UIResponder, UIApplicationDelegate, UNUserNotificationCen
   
     func willChangeStatusBarFrame(_ notification: Notification) {
         if let userInfo = (notification as NSNotification).userInfo {
-            if let value = userInfo[UIApplicationStatusBarFrameUserInfoKey] as? NSValue {
+            if let value = userInfo[UIApplication.statusBarFrameUserInfoKey] as? NSValue {
                 let statusBarFrame = value.cgRectValue
                 let transitionView = UIApplication.shared.delegate!.window!!.subviews.last! as UIView
                 var frame = transitionView.frame

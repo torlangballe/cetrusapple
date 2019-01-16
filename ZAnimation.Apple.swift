@@ -14,7 +14,7 @@ class ZAnimation {
             animations()
             completion?(true)
         } else {
-            let o = UIViewAnimationOptions.allowUserInteraction
+          let o = UIView.AnimationOptions.allowUserInteraction
             UIView.animate(withDuration: TimeInterval(duration), delay:0, options:[o], animations:animations, completion:completion)
         }
     }
@@ -46,16 +46,16 @@ class ZAnimation {
     static func RippleWidget(_ view:UIView, duration:Double) {
         let animation = CATransition()
         animation.duration = CFTimeInterval(duration)
-        animation.timingFunction = CAMediaTimingFunction(name:kCAMediaTimingFunctionEaseInEaseOut)
-        animation.type = "rippleEffect"
+      animation.timingFunction = CAMediaTimingFunction(name:CAMediaTimingFunctionName.easeInEaseOut)
+      animation.type = CATransitionType(rawValue: "rippleEffect")
         view.layer.add(animation, forKey:nil)
     }
 
     static func MoveViewOnPath(_ view:ZView, path:ZPath, duration:Double, repeatCount:Double = .infinity, begin:Double = 0) {
         let key = "position"
         let animation = CAKeyframeAnimation(keyPath:key)
-        animation.calculationMode = kCAAnimationLinear
-        animation.fillMode = kCAFillModeForwards
+      animation.calculationMode = CAAnimationCalculationMode.linear
+      animation.fillMode = CAMediaTimingFillMode.forwards
         var vduration = duration
         if vduration < 0 {
             vduration *= -1
@@ -63,12 +63,12 @@ class ZAnimation {
         }
         animation.duration = CFTimeInterval(vduration)
         animation.isRemovedOnCompletion = false
-        animation.rotationMode = kCAAnimationRotateAuto
+      animation.rotationMode = CAAnimationRotationMode.rotateAuto
         animation.repeatCount = Float(repeatCount)
         animation.beginTime = CFTimeInterval(begin)
         animation.path = path.path
-        animation.calculationMode = kCAAnimationPaced;
-        animation.timingFunction = CAMediaTimingFunction(name:kCAMediaTimingFunctionLinear)
+      animation.calculationMode = CAAnimationCalculationMode.paced;
+      animation.timingFunction = CAMediaTimingFunction(name:CAMediaTimingFunctionName.linear)
         view.View().layer.add(animation, forKey:"position")
         if view.View().window == nil {
             ZPerformAfterDelay(2.5) { () in
@@ -114,8 +114,8 @@ class ZAnimation {
             animation.repeatCount = 0;
             animation.autoreverses = false
             animation.isRemovedOnCompletion = false
-            animation.fillMode = kCAFillModeForwards;
-            animation.timingFunction = CAMediaTimingFunction(name:kCAMediaTimingFunctionLinear)
+          animation.fillMode = CAMediaTimingFillMode.forwards;
+          animation.timingFunction = CAMediaTimingFunction(name:CAMediaTimingFunctionName.linear)
             animation.beginTime = CFTimeInterval(duration) * CFTimeInterval(i)
             animations.append(animation)
         }
@@ -124,9 +124,9 @@ class ZAnimation {
         group.duration = CFTimeInterval(locations.count) * CFTimeInterval(duration)
         group.isRemovedOnCompletion = true
         group.repeatCount = .infinity
-        group.fillMode = kCAFillModeForwards;
+      group.fillMode = CAMediaTimingFillMode.forwards;
         group.autoreverses = autoReverse;
-        group.timingFunction = CAMediaTimingFunction(name:kCAMediaTimingFunctionLinear)
+      group.timingFunction = CAMediaTimingFunction(name:CAMediaTimingFunctionName.linear)
         group.animations = animations
         group.speed = Float(speed)
         layer.add(group, forKey:"animateGradient")
@@ -159,7 +159,7 @@ class ZAnimation {
     }
 
     static func FlipViewHorizontal(_ view:UIView, duration:Double = 0.8, left:Bool, animate:(()->Void)? = nil) {
-        let trans = left ? UIViewAnimationOptions.transitionFlipFromLeft : UIViewAnimationOptions.transitionFlipFromRight
+      let trans = left ? UIView.AnimationOptions.transitionFlipFromLeft : UIView.AnimationOptions.transitionFlipFromRight
         UIView.transition(with: view, duration:TimeInterval(duration), options:trans, animations: {
             animate?()
         }, completion:  { finished in
@@ -179,8 +179,8 @@ private func animateView(_ view:UIView, from:Double, to:Double, duration:Double,
     animation.autoreverses = autoreverses
     animation.isRemovedOnCompletion = false
     animation.timeOffset = 0;
-    animation.fillMode = kCAFillModeForwards;
-    animation.timingFunction = CAMediaTimingFunction(name:kCAMediaTimingFunctionEaseInEaseOut)
+  animation.fillMode = CAMediaTimingFillMode.forwards;
+  animation.timingFunction = CAMediaTimingFunction(name:CAMediaTimingFunctionName.easeInEaseOut)
     let key = "ani." + type
     view.layer.add(animation, forKey:key)
 }

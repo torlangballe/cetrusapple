@@ -11,7 +11,7 @@ typealias ZMediaPlayer = AVPlayer
 extension ZMediaPlayer {
 @discardableResult func AddIntervalObserver(secs:Double, onMain:Bool = true, got:@escaping (_ t:Double)->Void) -> Any {
         let que:DispatchQueue? = onMain ? ZMainQue : nil
-        return addPeriodicTimeObserver(forInterval:CMTimeMakeWithSeconds(secs, 1000), queue:que) { (cmtime) in
+    return addPeriodicTimeObserver(forInterval:CMTimeMakeWithSeconds(secs, preferredTimescale: 1000), queue:que) { (cmtime) in
             got(CMTimeGetSeconds(cmtime))
         }
     }

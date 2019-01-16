@@ -29,7 +29,7 @@ open class ZCustomView: UIControl, ZView, ZControl, UIGestureRecognizerDelegate 
             canFocus = true
             isUserInteractionEnabled = true
             isAccessibilityElement = true
-            accessibilityTraits |= UIAccessibilityTraitButton
+            accessibilityTraits = UIAccessibilityTraits(rawValue: accessibilityTraits.rawValue | UIAccessibilityTraits.button.rawValue)
             if ZIsTVBox() {
                 AddGestureTo(self, type:ZGestureType.tap)
             }
@@ -60,7 +60,7 @@ open class ZCustomView: UIControl, ZView, ZControl, UIGestureRecognizerDelegate 
         get { return isEnabled }
         set {
             isEnabled = newValue
-            accessibilityTraits =  isEnabled ? UIAccessibilityTraitNone : UIAccessibilityTraitNotEnabled
+          accessibilityTraits =  isEnabled ? UIAccessibilityTraits.none : UIAccessibilityTraits.notEnabled
             Expose()
         }
     }
@@ -116,7 +116,7 @@ open class ZCustomView: UIControl, ZView, ZControl, UIGestureRecognizerDelegate 
         }
         let (handled, message) = HandleAcessibilityScroll(a)
         if handled && !message.isEmpty {
-            UIAccessibilityPostNotification(UIAccessibilityPageScrolledNotification, message)
+          UIAccessibility.post(notification: UIAccessibility.Notification.pageScrolled, argument: message)
         }
         return handled
     }
@@ -298,10 +298,10 @@ open class ZCustomView: UIControl, ZView, ZControl, UIGestureRecognizerDelegate 
         return canFocus
     }
     
-    override open func motionEnded(_ motion: UIEventSubtype, with event: UIEvent?) {
-        if motion == .motionShake {
-            mainZApp?.HandleShake()
-        }
+  override open func motionEnded(_ motion: UIEvent.EventSubtype, with event: UIEvent?) {
+//        if motion == .motionShake {
+//            mainZApp?.HandleShake()
+//        }
     }
     
     func AddGestureTo(_ view:ZView, type:ZGestureType, taps:Int = 1, touches:Int = 1, duration:Double = 0.8, movement:Double = 10, dir:ZAlignment = .None) {
@@ -365,10 +365,10 @@ open class ZCustomView: UIControl, ZView, ZControl, UIGestureRecognizerDelegate 
             gswipe.numberOfTouchesRequired = touches
             #endif
             switch dir {
-            case ZAlignment.Left  : gswipe.direction = UISwipeGestureRecognizerDirection.left
-            case ZAlignment.Right : gswipe.direction = UISwipeGestureRecognizerDirection.right
-            case ZAlignment.Top   : gswipe.direction = UISwipeGestureRecognizerDirection.up
-            case ZAlignment.Bottom: gswipe.direction = UISwipeGestureRecognizerDirection.down
+            case ZAlignment.Left  : gswipe.direction = UISwipeGestureRecognizer.Direction.left
+            case ZAlignment.Right : gswipe.direction = UISwipeGestureRecognizer.Direction.right
+            case ZAlignment.Top   : gswipe.direction = UISwipeGestureRecognizer.Direction.up
+            case ZAlignment.Bottom: gswipe.direction = UISwipeGestureRecognizer.Direction.down
             default:
                 return
             }
@@ -398,12 +398,12 @@ open class ZCustomView: UIControl, ZView, ZControl, UIGestureRecognizerDelegate 
         var align = ZAlignment.None
         
         switch g.state {
-        case UIGestureRecognizerState.possible: state = .possible
-        case UIGestureRecognizerState.began: state = .began
-        case UIGestureRecognizerState.changed: state = .changed
-        case UIGestureRecognizerState.ended: state = .ended
-        case UIGestureRecognizerState.cancelled: state = .canceled
-        case UIGestureRecognizerState.failed: state = .failed
+        case UIGestureRecognizer.State.possible: state = .possible
+        case UIGestureRecognizer.State.began: state = .began
+        case UIGestureRecognizer.State.changed: state = .changed
+        case UIGestureRecognizer.State.ended: state = .ended
+        case UIGestureRecognizer.State.cancelled: state = .canceled
+        case UIGestureRecognizer.State.failed: state = .failed
         }
         #if os(iOS)
         if state == .began && UIMenuController.shared.isMenuVisible {
@@ -456,19 +456,19 @@ open class ZCustomView: UIControl, ZView, ZControl, UIGestureRecognizerDelegate 
             touches = gswipe.numberOfTouchesRequired
             #endif
             switch gswipe.direction {
-            case UISwipeGestureRecognizerDirection.right:
+            case UISwipeGestureRecognizer.Direction.right:
                 delta = ZPos(1, 0)
                 name = "swiperight"
                 align = ZAlignment.Right
-            case UISwipeGestureRecognizerDirection.left:
+            case UISwipeGestureRecognizer.Direction.left:
                 delta = ZPos(-1, 0)
                 name = "swipeleft"
                 align = ZAlignment.Left
-            case UISwipeGestureRecognizerDirection.up:
+            case UISwipeGestureRecognizer.Direction.up:
                 delta = ZPos(0, -1)
                 name = "swipeup"
                 align = ZAlignment.Top
-            case UISwipeGestureRecognizerDirection.down:
+            case UISwipeGestureRecognizer.Direction.down:
                 delta = ZPos(0, 1)
                 name = "swipedown"
                 align = ZAlignment.Bottom

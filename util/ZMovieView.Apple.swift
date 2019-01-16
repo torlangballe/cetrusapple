@@ -60,7 +60,7 @@ class ZMovieView : ZCustomView {
         }
         set {
             seeking = true
-            player?.seek(to: CMTimeMakeWithSeconds(newValue, 1000)) { [weak self] (finished) in
+            player?.seek(to: CMTimeMakeWithSeconds(newValue, preferredTimescale: 1000)) { [weak self] (finished) in
                 self?.seeking = !finished
             }
         }

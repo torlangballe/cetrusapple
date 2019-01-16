@@ -12,7 +12,7 @@ import UIKit
 enum ZGestureType:Int { case tap = 1, longpress = 2, pan = 4, pinch = 8, swipe = 16, rotation = 32 }
 enum ZGestureState:Int { case began = 1, ended = 2, changed = 4, possible = 8, canceled = 16, failed = 32 }
 
-typealias ZViewContentMode = UIViewContentMode
+typealias ZViewContentMode = UIView.ContentMode
 public typealias ZNativeView = UIView
 
 var collapsedViews = [UIView:ZContainerView]()
