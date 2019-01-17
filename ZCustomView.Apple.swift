@@ -315,7 +315,7 @@ open class ZCustomView: UIControl, ZView, ZControl, UIGestureRecognizerDelegate 
             gtap.numberOfTouchesRequired = touches
             #endif
             #if os(tvOS)
-            gtap.allowedPressTypes = [NSNumber(value:UIPressType.select.rawValue)] // only this for now
+            gtap.allowedPressTypes = [NSNumber(value:UIPress.PressType.select.rawValue)] // only this for now
             #endif
             gtap.cancelsTouchesInView = true
             addGesture(gtap, view:view, handler:self)

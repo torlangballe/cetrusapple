@@ -7,7 +7,7 @@
 // #package com.github.torlangballe.cetrusandroid
 
 import Foundation
-import UIKit
+//import UIKit
 import AVFoundation
 
 struct ZLocale {

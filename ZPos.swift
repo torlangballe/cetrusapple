@@ -9,8 +9,7 @@
 // https://github.com/seivan/VectorArithmetic/blob/master/VectorArithmetic/VectorArithmetic.swift
 // http://practicalswift.com/2014/06/14/the-swift-standard-library-list-of-built-in-functions/
 
-import Darwin
-import UIKit
+import Foundation
 
 /* #kotlin-raw:
 import kotlin.math.*

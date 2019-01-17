@@ -10,7 +10,7 @@
  import kotlin.math.*
  */
 
-import UIKit
+import Foundation
 
 public struct ZRect : ZCopy {
     var pos: ZPos = ZPos()

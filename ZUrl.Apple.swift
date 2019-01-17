@@ -4,11 +4,11 @@
 //  Created by Tor Langballe on /30/10/15.
 //
 
-import UIKit
-import MobileCoreServices
+import Foundation
 
 #if os(iOS)
 import SafariServices
+import MobileCoreServices
 #endif
 
 class ZUrl : Hashable  {
@@ -70,8 +70,8 @@ class ZUrl : Hashable  {
             ZGetTopViewController()!.present(c, animated:true, completion:nil)
             return
         }
-        #endif
         UIApplication.shared.open(url!, options:[:]) // can have completion handler too
+        #endif
     }
 
     func GetName() -> String {

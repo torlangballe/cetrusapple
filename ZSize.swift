@@ -7,7 +7,7 @@
 
 // #package com.github.torlangballe.cetrusandroid
 
-import UIKit
+import Foundation
 
 public struct ZSize : ZCopy {
     var w:Double = 0.0
