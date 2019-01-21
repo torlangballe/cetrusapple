@@ -12,7 +12,15 @@ typealias ZObject = NSObject
 typealias ZAnyObject = AnyObject
 
 func ZIsIOS() -> Bool {
-    return true // for now
+    #if os(tvOS)
+    return true
+    #else
+    return false
+    #endif
+}
+
+func ZIsApple() -> Bool {
+    return true
 }
 
 func ZIsTVBox() -> Bool {

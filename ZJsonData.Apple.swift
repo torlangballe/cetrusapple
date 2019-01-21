@@ -38,13 +38,13 @@ extension ZJSONData {
 typealias ZJSONSerializer = JSONEncoder
 
 extension Encodable  {
-    static func serialiser() -> JSONEncoder {
+    static func serializer() -> JSONEncoder {
         return JSONEncoder()
     }
 }
 
 extension Decodable  {
-    static func serialiser() -> JSONDecoder {
+    static func serializer() -> JSONDecoder {
         return JSONDecoder()
     }
 }

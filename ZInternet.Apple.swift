@@ -7,11 +7,15 @@
 import Foundation
 
 class ZIPAddress {
+    func GetString() -> String {
+        return "127.0.0.1"
+    }
 }
 
 struct ZInternet {
     static func ResolveAddress(_ address:String, got:(_ a:ZIPAddress )->Void) {
         let ip = ZIPAddress()
+        ZTimer.Sleep(secs:0.2 + ZMath.Random1() * 0.4)
         // TODO: do this
         got(ip)
     }

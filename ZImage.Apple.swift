@@ -22,8 +22,6 @@ struct ZFaceInfo {
 }
 
 extension ZImage {
-    
-    
     static func Named(_ name:String) -> ZImage? {
         if let i = ZImage(named:name) {
             if i.scale == 2 && ZIsTVBox(), let c = i.cgImage {

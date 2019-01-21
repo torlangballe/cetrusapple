@@ -58,6 +58,19 @@ extension ZColor {
         }
         return ZColor.Black()
     }
+    
+    class public func White() -> ZColor   { return ZColor(white:1.0)            }
+    class public func Black() -> ZColor   { return ZColor(white:0.0)            }
+    class public func Gray() -> ZColor    { return ZColor(white:0.5)            }
+    class public func Clear() -> ZColor   { return ZColor(white:0.0, a:0)       }
+    class public func Blue() -> ZColor    { return ZColor(r:0.0, g:0.0, b:1.0)  }
+    class public func Red() -> ZColor     { return ZColor(r:1.0, g:0.0, b:0.0)  }
+    class public func Yellow() -> ZColor  { return ZColor(r:1.0, g:1.0, b:0.0)  }
+    class public func Green() -> ZColor   { return ZColor(r:0.0, g:1.0, b:0.0)  }
+    class public func Orange() -> ZColor  { return ZColor(r:1.0, g:0.5, b:0.0)  }
+    class public func Cyan() -> ZColor    { return ZColor(r:0.0, g:1.0, b:1.0)  }
+    class public func Magenta() -> ZColor { return ZColor(r:1.0, g:0.0, b:1.0)  }
+
 }
 
 

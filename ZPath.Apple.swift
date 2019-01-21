@@ -5,8 +5,7 @@
 //  Created by Tor Langballe on /21/10/15.
 //  Copyright © 2015 Capsule.fm. All rights reserved.
 //
-
-import UIKit
+import Foundation
 
 class ZPath {
     enum LineType { case square, round, butt }

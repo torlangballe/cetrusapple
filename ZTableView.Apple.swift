@@ -45,6 +45,7 @@ class ZTableView : UITableView, ZView, UITableViewDelegate, UITableViewDataSourc
     var drawHandler:((_ rect: ZRect, _ canvas: ZCanvas)->Void)!
     var margins = ZSize(0, 0)
     var spacing = 0.0
+    var focusedRow:Int? = nil
     
     func View() -> UIView { return self }
     
@@ -57,9 +58,9 @@ class ZTableView : UITableView, ZView, UITableViewDelegate, UITableViewDataSourc
     init() {
         super.init(frame:CGRect(x:0, y:0, width:10, height:10), style:.plain)
         delegate = self
-        selectionIndex.row = -1;
+        selectionIndex.row = -1
         dataSource = self
-        sectionFooterHeight = 3;
+//        sectionFooterHeight = 3
         backgroundView = nil
         #if os(iOS)
       separatorStyle = UITableViewCell.SeparatorStyle.none
@@ -71,12 +72,13 @@ class ZTableView : UITableView, ZView, UITableViewDelegate, UITableViewDataSourc
     required init?(coder aDecoder: NSCoder) { fatalError("init(coder:) has not been implemented") }
     
     override func layoutSubviews() {
+        let tvOsInset:CGFloat = ZIsTVBox() ? 174 : 0
         if first {
             allowsSelection = true // selectable
             if selectionIndex.row != -1 {
                 Select(selectionIndex.row);
             }
-          contentInset = UIEdgeInsets(top: CGFloat(margins.h), left: 0, bottom: CGFloat(margins.h), right: 0)
+          contentInset = UIEdgeInsets(top: CGFloat(margins.h), left: -tvOsInset, bottom: CGFloat(margins.h), right: tvOsInset)
             first = false
         }
         super.layoutSubviews()
@@ -85,7 +87,8 @@ class ZTableView : UITableView, ZView, UITableViewDelegate, UITableViewDataSourc
     override func draw(_ rect: CGRect) {
         drawHandler?(ZRect(rect), ZCanvas(context: UIGraphicsGetCurrentContext()!))
     }
-    
+
+
     func ExposeRows() {
         for i in indexPathsForVisibleRows ?? [] {
             if let c = self.cellForRow(at: i) {
@@ -210,6 +213,29 @@ class ZTableView : UITableView, ZView, UITableViewDelegate, UITableViewDataSourc
     func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
         scrolling = false
     }
+
+    func IsFocused(rowView:ZCustomView) -> Bool {
+        if focusedRow != nil, let row = GetIndexFromRowView(rowView) {
+            return row == focusedRow!
+        }
+        return false
+    }
+    
+    func tableView(_ tableView: UITableView, didUpdateFocusIn context: UITableViewFocusUpdateContext, with coordinator: UIFocusAnimationCoordinator) {
+        if let next = context.nextFocusedIndexPath {
+            focusedRow = next.row
+            if let view = GetRowViewFromIndex(next.row) {
+                view.Expose()
+            }
+        } else {
+            focusedRow = nil
+        }
+        if let prev = context.previouslyFocusedIndexPath {
+            if let view = GetRowViewFromIndex(prev.row) {
+                view.Expose()
+            }
+        }
+    }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let index = ZTableIndex(path:indexPath)
@@ -238,6 +264,10 @@ class ZTableView : UITableView, ZView, UITableViewDelegate, UITableViewDataSourc
         let index = ZTableIndex(path:indexPath)
         var r = ZRect(size:ZSize(Rect.size.w, owner!.TableViewGetHeightOfItem(index)))
         r = r.Expanded(ZSize(-margins.w, 0))
+        if ZIsTVBox() {
+            r.size.w -= 5
+            cell.focusStyle = UITableViewCell.FocusStyle.custom
+        }
         cell.frame = r.GetCGRect()
         cell.backgroundColor = UIColor.clear
         

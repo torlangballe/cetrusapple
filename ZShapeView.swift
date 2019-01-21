@@ -155,7 +155,7 @@ import UIKit
             }
         }
         if isFocused {
-            ZFocus.Draw(canvas, rect:rect, corner:5.0)
+            ZFocus.Draw(canvas, rect:rect, corner:15.0)
         }
     }
 

@@ -91,7 +91,7 @@ class ZImageView: ZCustomView, ZImageLoader {
             let r = LocalRect.Align(drawImage.Size, align:ZAlignment.Center | ZAlignment.Shrink)
             canvas.DrawImage(drawImage, destRect:r)
             if isFocused {
-                ZFocus.Draw(canvas, rect:r, corner:5.0)
+                ZFocus.Draw(canvas, rect:r, corner:10.0)
             }
         }
     }

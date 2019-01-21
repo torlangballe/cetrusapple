@@ -209,7 +209,7 @@ class ZUrlSession {
     }
     
     static func CheckError(data:ZData) -> (ZError?, Int?) {
-        let (m, _) =  data.Decode(ZUrlRequestReturnMessage.serialiser(), ZUrlRequestReturnMessage())
+        let (m, _) =  data.Decode(ZUrlRequestReturnMessage.serializer(), ZUrlRequestReturnMessage())
         if let m = m {
             if m.messages != nil && m.messages!.count != 0 {
                 return (ZNewError(m.messages!.first!), nil)

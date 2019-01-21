@@ -5,7 +5,10 @@
 //  Copyright © 2015 Capsule.fm. All rights reserved.
 //
 
-import UIKit
+import Foundation
+#if os(macOS)
+import AppKit
+#endif
 
 typealias ZMatrix = CGAffineTransform
 typealias ZCanvasBlendMode = CGBlendMode
@@ -35,7 +38,11 @@ class ZCanvas {
     }
     
     init() {
+        #if !os(macOS)
         context = UIGraphicsGetCurrentContext()!
+        #else
+        context = NSGraphicsContext.current!.cgContext
+        #endif
     }
     
     func SetColor(_ color: ZColor, opacity:Double = -1.0) {
@@ -126,6 +133,7 @@ class ZCanvas {
         context.drawPath(using: eofill ? CGPathDrawingMode.eoFillStroke : CGPathDrawingMode.fillStroke);
     }
     
+    #if !os(macOS)
     @discardableResult func DrawImage(_ image: ZImage, destRect: ZRect, align:ZAlignment = ZAlignment.None, opacity:Float32 = 1.0, blendMode:ZCanvasBlendMode = .normal, corner:Double? = nil, margin:ZSize = ZSize()) -> ZRect {
         var vdestRect = destRect
         if align != ZAlignment.None {
@@ -144,6 +152,7 @@ class ZCanvas {
         }
         return vdestRect
     }
+    #endif
     
     func PushState() {
         context.saveGState();
@@ -217,8 +226,7 @@ class ZCanvas {
             self.ClipPath(path!)
         }
         if let gradient = createGradient(colors:colors, locations:locations) {
-            let c = UIGraphicsGetCurrentContext()
-            c?.drawLinearGradient(gradient, start: pos1.GetCGPoint(), end: pos2.GetCGPoint(), options: CGGradientDrawingOptions(rawValue:CGGradientDrawingOptions.drawsBeforeStartLocation.rawValue | CGGradientDrawingOptions.drawsBeforeStartLocation.rawValue))
+            context.drawLinearGradient(gradient, start: pos1.GetCGPoint(), end: pos2.GetCGPoint(), options: CGGradientDrawingOptions(rawValue:CGGradientDrawingOptions.drawsBeforeStartLocation.rawValue | CGGradientDrawingOptions.drawsBeforeStartLocation.rawValue))
             PopState()
         }
     }
@@ -229,66 +237,68 @@ class ZCanvas {
             //            self.ClipPath(path!)
         }
         if let gradient = createGradient(colors:colors, locations:locations) {
-            let c = UIGraphicsGetCurrentContext()
-            c?.drawRadialGradient(gradient, startCenter:center.GetCGPoint(), startRadius:CGFloat(startRadius), endCenter:(endCenter == nil ? center : endCenter!).GetCGPoint(), endRadius:CGFloat(radius), options: CGGradientDrawingOptions())
+//            let c = UIGraphicsGetCurrentContext()
+            context.drawRadialGradient(gradient, startCenter:center.GetCGPoint(), startRadius:CGFloat(startRadius), endCenter:(endCenter == nil ? center : endCenter!).GetCGPoint(), endRadius:CGFloat(radius), options: CGGradientDrawingOptions())
         }
         PopState()
     }
 }
 
 /*
-func gradientFunction(inInfo:UnsafeMutablePointer<Void>, input:UnsafeMutablePointer<CGFloat>, output:UnsafeMutablePointer<CGFloat>) -> Void {
-    var col = [ZColor](inInfo)
-    var d = input[0]
-    
-    c1 = (ZFRGBAColor *)inInfo;
-    c2 = c1 + 1;
-    d = in[0];
-    
-    out[0] = c1->r * d + c2->r * (1 - d);
-    out[1] = c1->g * d + c2->g * (1 - d);
-    out[2] = c1->b * d + c2->b * (1 - d);
-    out[3] = c1->a * d + c2->a * (1 - d);
-}
-func DrawGradient(path:ZPath, cola:ZColor, colb:ZColor, posa:ZPos, posb:ZPos, before:Bool, after:Bool, strokeWidth:Float32) {
-    let callbacks = CGFunctionCallbacks(version:0, evaluate:func, releaseInfo:nil)
-    CGShadingRef        cgshading;
-    var            cols: [ZColor]
-    
-    cols[0] = ZFRGBAColor(cola);
-    cols[1] = ZFRGBAColor(colb);
-    var cgfunction = CGFunctionCreate(&cols, 1, NULL, 4, NULL, &callbacks);
-    if(cgfunction)
-    {
-        CGColorSpaceRef cgspace;
-        
-        cgspace = CGColorSpaceCreateDeviceRGB();
-        cgshading = ::CGShadingCreateAxial(cgspace,
-        MacZPosToCGPoint(posb),
-        MacZPosToCGPoint(posa),
-        cgfunction,
-        before,
-        after);
-        CGColorSpaceRelease(cgspace);
-        
-        if(cgshading)
-        {
-            canvas->PushState();
-            if(strokewidth > 0)
-            {
-                setPath((CGContextRef)canvas->GetPF()->context, path);
-                ::CGContextSetLineWidth((CGContextRef)canvas->GetPF()->context, strokewidth);
-                ::CGContextReplacePathWithStrokedPath((CGContextRef)canvas->GetPF()->context);
-                ::CGContextEOClip((CGContextRef)canvas->GetPF()->context);
-            }
-            else
-            canvas->Clip(path);
-            ::CGContextDrawShading((CGContextRef)canvas->GetPF()->context, cgshading);
-            ::CGShadingRelease(cgshading);
-            canvas->PopState();
-        }
-        ::CGFunctionRelease(cgfunction);
-    }
-}
-*/
+ func gradientFunction(inInfo:UnsafeMutablePointer<Void>, input:UnsafeMutablePointer<CGFloat>, output:UnsafeMutablePointer<CGFloat>) -> Void {
+ var col = [ZColor](inInfo)
+ var d = input[0]
+ 
+ c1 = (ZFRGBAColor *)inInfo;
+ c2 = c1 + 1;
+ d = in[0];
+ 
+ out[0] = c1->r * d + c2->r * (1 - d);
+ out[1] = c1->g * d + c2->g * (1 - d);
+ out[2] = c1->b * d + c2->b * (1 - d);
+ out[3] = c1->a * d + c2->a * (1 - d);
+ }
+ func DrawGradient(path:ZPath, cola:ZColor, colb:ZColor, posa:ZPos, posb:ZPos, before:Bool, after:Bool, strokeWidth:Float32) {
+ let callbacks = CGFunctionCallbacks(version:0, evaluate:func, releaseInfo:nil)
+ CGShadingRef        cgshading;
+ var            cols: [ZColor]
+ 
+ cols[0] = ZFRGBAColor(cola);
+ cols[1] = ZFRGBAColor(colb);
+ var cgfunction = CGFunctionCreate(&cols, 1, NULL, 4, NULL, &callbacks);
+ if(cgfunction)
+ {
+ CGColorSpaceRef cgspace;
+ 
+ cgspace = CGColorSpaceCreateDeviceRGB();
+ cgshading = ::CGShadingCreateAxial(cgspace,
+ MacZPosToCGPoint(posb),
+ MacZPosToCGPoint(posa),
+ cgfunction,
+ before,
+ after);
+ CGColorSpaceRelease(cgspace);
+ 
+ if(cgshading)
+ {
+ canvas->PushState();
+ if(strokewidth > 0)
+ {
+ setPath((CGContextRef)canvas->GetPF()->context, path);
+ ::CGContextSetLineWidth((CGContextRef)canvas->GetPF()->context, strokewidth);
+ ::CGContextReplacePathWithStrokedPath((CGContextRef)canvas->GetPF()->context);
+ ::CGContextEOClip((CGContextRef)canvas->GetPF()->context);
+ }
+ else
+ canvas->Clip(path);
+ ::CGContextDrawShading((CGContextRef)canvas->GetPF()->context, cgshading);
+ ::CGShadingRelease(cgshading);
+ canvas->PopState();
+ }
+ ::CGFunctionRelease(cgfunction);
+ }
+ }
+ */
+
+
 

@@ -6,9 +6,15 @@
 //  Copyright © 2015 Capsule.fm. All rights reserved.
 //
 
+#if os(macOS)
+import AppKit
+typealias ZFont = NSFont
+#else
 import UIKit
-
 typealias ZFont = UIFont
+#endif
+
+//typealias ZFont = UIFont
 
 extension ZFont {
     public enum Style:String { case normal = "", bold = "bold", italic = "italic" }
@@ -21,8 +27,13 @@ extension ZFont {
         self.init(name:vfontName, size:CGFloat(pointsize))
     }
     
-static func Nice(_ size:Double, style:Style = .normal) -> ZFont {
-        return ZFont(name:"Helvetica", size * ZScreen.SoftScale, style:style)!
+    static func Nice(_ size:Double, style:Style = .normal) -> ZFont {
+        #if os(macOS)
+        let scale = 1.0
+        #else
+        let scale = ZScreen.SoftScale
+        #endif
+        return ZFont(name:"Helvetica", size * scale, style:style)!
     }
     
     func NewWithSize(_ size:Double) -> ZFont? {

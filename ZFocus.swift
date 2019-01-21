@@ -13,7 +13,7 @@ struct ZFocus {
     static func Draw(_ canvas:ZCanvas, rect:ZRect, corner:Double = 7.0) {
         let w = 4.0 * ZScreen.SoftScale
         let r = rect.Expanded(-2.0 * ZScreen.SoftScale)
-        let path = ZPath(rect:r, corner:ZSize(corner, corner) * ZScreen.SoftScale)
+        let path = ZPath(rect:r, corner:ZSize(corner, corner))
         canvas.SetColor(color)
         canvas.StrokePath(path, width:w)
     }

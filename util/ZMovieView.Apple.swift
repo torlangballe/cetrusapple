@@ -9,10 +9,13 @@
 
 import AVKit
 
+private var kAVPlayerItemKVOContext = 0
+
 class ZMovieView : ZCustomView {
     var player:ZMediaPlayer? = nil
     var seeking = false
     var handlePlayPause: ((_ play:Bool)->Void)? = nil
+    var handleError: ((_ error:ZError)->Void)? = nil
     var playerLayer:AVPlayerLayer? = nil
 
     init() {
@@ -36,6 +39,29 @@ class ZMovieView : ZCustomView {
             playerLayer!.frame = self.bounds
             player?.play()
             player?.addObserver(self, forKeyPath:"rate", options:NSKeyValueObservingOptions(), context:nil)
+            player?.addObserver(self, forKeyPath:"status", options:NSKeyValueObservingOptions(), context:nil)
+            player?.addObserver(self, forKeyPath:"currentItem.status", options:NSKeyValueObservingOptions(rawValue: 0), context:&kAVPlayerItemKVOContext)
+        }
+    }
+    
+    override open func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
+        if keyPath == "status" {
+            if object is AVPlayer {
+                if player!.status == AVPlayer.Status.failed && player!.error != nil {
+                    handleError?(player!.error!)
+                }
+            }
+            return
+        }
+        if keyPath == "rate" {
+            handlePlayPause?(player!.rate != 0)
+            return
+        }
+        if context == &kAVPlayerItemKVOContext && object is AVPlayer && keyPath == "currentItem.status" {
+            if player!.currentItem!.status == AVPlayerItem.Status.failed && player!.currentItem!.error != nil {
+                handleError?(player!.currentItem!.error!)
+            }
+            return
         }
     }
 
@@ -71,12 +97,6 @@ class ZMovieView : ZCustomView {
                 return ZMath.NanCheck(CMTimeGetSeconds(player!.currentItem!.duration), set:0)
             }
             return 0.0
-        }
-    }
-
-    override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
-        if keyPath == "rate" {
-            handlePlayPause?(player!.rate != 0)
         }
     }
 }

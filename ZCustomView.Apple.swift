@@ -20,6 +20,7 @@ open class ZCustomView: UIControl, ZView, ZControl, UIGestureRecognizerDelegate 
     var IsFocused: Bool {
         return isFocused
     }
+    
     var HandlePressedInPosFunc: ((_ pos: ZPos)->Void)? {
         get {
             return touchInfo.handlePressedInPosFunc

@@ -25,13 +25,13 @@ class ZProgressBar: ZCustomView {
     
     init(height:Double = 2.0, width:Double = 100.0, color:ZColor = ZColor.Blue(), value:Double = 0.0) {
         self.height = height
-        self.width = width
+        self.width = width * ZScreen.SoftScale
         self.color = color
         self.value = value
         super.init(name:"progress")
-        minSize = ZSize(width, height)
+        minSize = ZSize(self.width, self.height)
         SetBackgroundColor(ZColor.Clear())
-        SetCornerRadius(height/2)
+        SetCornerRadius(height / 2.0)
     }
     
     override func HandleClosing() {
