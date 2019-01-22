@@ -44,6 +44,15 @@ class ZMovieView : ZCustomView {
         }
     }
     
+    func GetObservedBitrateInBps() -> Double? {
+        if let events = player?.currentItem?.accessLog()?.events {
+            if let e = events.last {
+                return e.observedBitrate
+            }
+        }
+        return nil
+    }
+    
     override open func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
         if keyPath == "status" {
             if object is AVPlayer {
