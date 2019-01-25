@@ -8,7 +8,7 @@
 
 import Foundation
 
-typealias ZJSONData = ZData;
+//typealias ZJSONData = ZData;
 /*
 extension ZJSONData {
     init<T : Encodable>(object:T) {

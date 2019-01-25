@@ -129,16 +129,19 @@ class ZDeltaTimeGetter {
     var lastGetTime:ZTime = ZTimeNull
     var lastGetValue:Double? = nil
     
-    func Get(get:() -> Double) -> (Double, Double) {
+    func Get(get:() -> Double?) -> (Double, Double) {
         let v = get()
+        if v == nil {
+            return (0, 0)
+        }
         var delta = 0.0
         var interval = 0.0
         let t = ZTime.Now()
         if lastGetValue != nil {
-            delta = v - lastGetValue!
+            delta = v! - lastGetValue!
             interval = t - lastGetTime
         }
-        lastGetValue = v
+        lastGetValue = v!
         lastGetTime = ZTime.Now()
     
         return (delta, interval)

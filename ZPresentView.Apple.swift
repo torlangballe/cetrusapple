@@ -319,9 +319,6 @@ func ZPopTopView(namedView:String = "", animated:Bool = true, overrideDuration:D
                 ZDebug.Print("View not deinited:", lastView)
             }
         }
-//        if let pv = popView as? ZContainerView { // we need to unset it here first for some reason
-//            setFocusInView(pv)
-//        }
         if let ov = oldView as? ZContainerView {
             setFocusInView(ov)
         }

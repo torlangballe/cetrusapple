@@ -17,6 +17,7 @@ class ZMovieView : ZCustomView {
     var handlePlayPause: ((_ play:Bool)->Void)? = nil
     var handleError: ((_ error:ZError)->Void)? = nil
     var playerLayer:AVPlayerLayer? = nil
+    let trafficGetter = ZDeltaTimeGetter()
 
     init() {
         super.init(name:"zmovieview")
@@ -44,13 +45,23 @@ class ZMovieView : ZCustomView {
         }
     }
     
-    func GetObservedBitrateInBps() -> Double? {
-        if let events = player?.currentItem?.accessLog()?.events {
-            if let e = events.last {
-                return e.observedBitrate
+    func GetCurrentTransferBitrateInBps() -> Double? {
+        let (traffic, interval) = trafficGetter.Get {
+            if let events = player?.currentItem?.accessLog()?.events {
+                var n = 0.0
+                for e in events {
+                    n += Double(e.numberOfBytesTransferred)
+                }
+                ZDebug.Print("bytes transferred:", n, events.count)
+                return n
             }
+            return 0.0
         }
-        return nil
+        if (interval == 0.0) {
+            return 0.0
+        }
+        let bitrate = traffic * 8.0 / interval
+        return bitrate
     }
     
     override open func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
