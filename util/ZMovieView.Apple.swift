@@ -52,7 +52,7 @@ class ZMovieView : ZCustomView {
                 for e in events {
                     n += Double(e.numberOfBytesTransferred)
                 }
-                ZDebug.Print("bytes transferred:", n, events.count)
+//                ZDebug.Print("bytes transferred:", n, events.count)
                 return n
             }
             return 0.0

@@ -11,6 +11,14 @@ import Foundation
 typealias ZObject = NSObject
 typealias ZAnyObject = AnyObject
 
+func ZIsRunningInSimulator() -> Bool {
+#if targetEnvironment(simulator)
+    return true
+#else
+    return false
+#endif
+}
+
 func ZIsIOS() -> Bool {
     #if os(tvOS)
     return true

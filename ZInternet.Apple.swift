@@ -7,21 +7,22 @@
 import Foundation
 
 class ZIPAddress {
-    func GetString() -> String {
-        return "127.0.0.1"
+    var ip4String = "127.0.0.1"
+    func GetIp4String() -> String {
+        return ip4String
+    }
+        
+    init(ip4String:String = "") {
+        self.ip4String = ip4String
     }
 }
 
 struct ZInternet {
     static func ResolveAddress(_ address:String, got:(_ a:ZIPAddress )->Void) {
-        let ip = ZIPAddress()
+        let ip = ZIPAddress(ip4String: "127.0.0.1")
         ZTimer.Sleep(secs:0.2 + ZMath.Random1() * 0.4)
         // TODO: do this
         got(ip)
-    }
-
-    static func SendWithUDP(address:ZIPAddress, port:Int, data:ZData, done:(_ e:ZError?)->Unit) {
-        // TODO: do this
     }
     
     static func GetNetworkTrafficBytes(processUid:Int? = nil) -> Int64 {
@@ -123,4 +124,3 @@ class DataUsage {
         return dataUsageInfo
     }
 }
-

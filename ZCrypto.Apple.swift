@@ -77,15 +77,5 @@ struct ZCrypto {
         }
         return digest
     }
-
-    static func MD5ToHex(data:ZData) -> String {
-        var str = ""
-        for b in MD5(data:data) {
-            str += ZStr.Format("%x", b)
-        }
-        return str
-    }
 }
-
-
 

@@ -64,7 +64,7 @@ struct ZDevice {
         #endif
     }
     
-    static var FreeAndUsedDiskSpace: (Int64, Int64) {
+    static func FreeAndUsedDiskSpace() -> (Int64, Int64) {
         return (1024 * 1024 * 300, 1024 * 1024 * 32)
     }
     
@@ -81,12 +81,12 @@ struct ZDevice {
     }
 
     static var Manufacturer: String {
-        return ""
+        return "Apple"
     }
 
     static var DeviceType: String {
         let n = DeviceCodeNumbered
-        return n.0
+        return "\(n.0)\(n.1)\(n.2)"
     }
 
     static var HardwareModel: String {
@@ -95,7 +95,13 @@ struct ZDevice {
     
     static var HardwareType: String {
         let n = DeviceCodeNumbered
-        return "\(n.0)\(n.1)\(n.2)"
+        if ZIsTVBox() {
+            if ZIsRunningInSimulator() {
+                return "TV Emulator"
+            }
+            return "TV"
+        }
+        return n.0
     }
     
     static var HardwareBrand: String {
@@ -114,12 +120,12 @@ struct ZDevice {
         return ""
     }
     
-    static func GetWifiMAC() -> String {
-        return ""
+    static func GetWifiMAC() -> UInt64 {
+        return 0x112233445567
     }
     
-    static func GetLanMAC() -> String {
-        return ""
+    static func GetLanMAC() -> UInt64 {
+        return 0x112233445566
     }
     
     static func GetNetworkType() -> String {

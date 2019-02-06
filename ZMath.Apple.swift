@@ -19,8 +19,8 @@ extension ZMath {
         return d
     }
     
-    static func Random1() -> Double     { return Double(arc4random_uniform(10000)) / Double(10000) }
-    static func RandomN(_ n:Int) -> Int { return Int(arc4random_uniform(UInt32(n))) }
+    static func Random1() -> Double               { return Double(arc4random_uniform(10000)) / Double(10000) }
+    static func RandomN(_ n:Int = Int(INT_MAX)) -> Int { return Int(arc4random_uniform(UInt32(n))) }
 }
 
 func sign<T: FloatingPoint>(_ a:T) -> Int {

@@ -28,6 +28,10 @@ class ZTime {
         get { return date.timeIntervalSinceReferenceDate }
     }
     
+    var SecsSinceUnixEpoc: Double {
+        get { return date.timeIntervalSince1970 }
+    }
+    
     init() {
         date = Date.distantPast
     }
