@@ -37,25 +37,18 @@ open class ZCustomView: UIControl, ZView, ZControl, UIGestureRecognizerDelegate 
         }
     }
     
+    var HandleValueChangedFunc: (()->Void)? {
+        get {
+            return handleValueChangedFunc
+        }
+        set {
+            handleValueChangedFunc = newValue
+            isUserInteractionEnabled = true
+        }
+    }
     private var handleValueChangedFunc: (()->Void)? = nil
     
-    weak var valueTarget: ZCustomView? = nil
     var timers = [ZTimerBase]()
-    
-    func SetHandleValueChangedFunc(_ handler:@escaping ()->Void) {
-        handleValueChangedFunc = handler
-        self.AddTarget(self, forEventType:.valueChanged)
-    }
-    
-    public func AddTarget(_ t: ZCustomView?, forEventType:ZControlEventType) {
-        switch forEventType {
-//        case .pressed:
-//            touchInfo.tapTarget = t
-        case .valueChanged:
-            valueTarget = t
-        }
-        isUserInteractionEnabled = true
-    }
     
     public var Usable: Bool {
         get { return isEnabled }
@@ -181,13 +174,13 @@ open class ZCustomView: UIControl, ZView, ZControl, UIGestureRecognizerDelegate 
         Expose()
     }
     
-    func GetPosFromMe(_ pos:ZPos, inView:UIView) -> ZPos {
-        let cgpos = self.convert(pos.GetCGPoint(), to:inView)
+    func GetPosFromMe(_ pos:ZPos, inView:ZView) -> ZPos {
+        let cgpos = self.convert(pos.GetCGPoint(), to:inView.View())
         return ZPos(cgpos)
     }
 
-    func GetPosToMe(_ pos:ZPos, inView:UIView) -> ZPos {
-        let cgpos = inView.convert(pos.GetCGPoint(), to:self)
+    func GetPosToMe(_ pos:ZPos, inView:ZView) -> ZPos {
+        let cgpos = inView.View().convert(pos.GetCGPoint(), to:self)
         return ZPos(cgpos)
     }
 

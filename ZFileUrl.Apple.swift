@@ -19,6 +19,7 @@ struct ZFileInfo : ZCopy
 
 class ZFileUrl : ZUrl {
     init(filePath:String, isDir:Bool = false, dirUnknow:Bool = false) {
+//        let vfilePath = filePath.replacingOccurrences(of: "~", with: FileManager.default.homeDirectoryForCurrentUser.path)
         let vfilePath = NSString(string:filePath).expandingTildeInPath
         super.init()
         if dirUnknow {
@@ -57,6 +58,11 @@ class ZFileUrl : ZUrl {
             return str
         }
     }
+    
+    var ParentPath : String {
+        let str = FilePath as NSString
+        return str.deletingLastPathComponent
+    }
 
     func OpenOutput(append:Bool = false) -> (ZOutputStream?, ZError?) {
         if let stream = OutputStream(url:url!, append:append) {
@@ -78,13 +84,13 @@ class ZFileUrl : ZUrl {
         return false
     }
     
-    @discardableResult func CreateFolder() -> Bool {
+    @discardableResult func CreateFolder(withIntermediateDirectories:Bool = false) -> Bool {
         if url != nil {
             if Exists() && IsFolder() {
                 return true
             }
             do {
-                try dm().createDirectory(atPath: url!.path, withIntermediateDirectories:false, attributes:nil)
+                try dm().createDirectory(atPath: url!.path, withIntermediateDirectories:withIntermediateDirectories, attributes:nil)
                 return true
             } catch {}
         }
@@ -106,18 +112,18 @@ class ZFileUrl : ZUrl {
         return str
     }
     
-    static func GetPathParts(_ path:String) -> (String, String, String, String) { // place/a.txt = "place" "a.txt" "a" ".txt"
+    static func GetPathParts(_ path:String) -> (String, String, String) { // place/a.txt = "place" "a.txt" "a" ".txt"
         if let url = URL(string:path) {
             let fullname = url.lastPathComponent
             var base = ""
             if fullname != path {
                 base = url.deletingLastPathComponent().absoluteString
             }
-            let ext = "." + url.pathExtension
+            let ext = url.pathExtension
             let stub = NSString(string:fullname).deletingPathExtension
-            return (base, fullname, stub, ext)
+            return (base, stub, ext)
         }
-        return ("", "", "", "")
+        return ("", "", "")
     }
 
     func GetInfo( ) -> (ZFileInfo, ZError?) {
@@ -128,8 +134,8 @@ class ZFileUrl : ZUrl {
         do {
             let dict = try dm().attributesOfItem(atPath: url!.path)
             info.dataSize = 0;
-            info.created = dict[FileAttributeKey.creationDate] as? ZTime ?? ZTimeNull
-            info.modified = dict[FileAttributeKey.modificationDate] as? ZTime ?? ZTimeNull
+            info.created = ZTime(date: dict[FileAttributeKey.creationDate] as? Date ?? Date.distantPast)
+            info.modified = ZTime(date: dict[FileAttributeKey.modificationDate] as? Date ?? Date.distantPast)
             info.isLocked = dict[FileAttributeKey.immutable] as? Bool ?? false
             //            info.isHidden = dict[FileAttributeKey URLResourceKey.isHiddenKey] as? Bool ?? false // extensionHidden ??
             
@@ -181,9 +187,21 @@ class ZFileUrl : ZUrl {
         return -1
     }
 
-    enum WalkOptions:Int { case None = 0, SubFolders = 1, GetInfo = 2, GetInvisible = 4 }
+    enum WalkOptions:Int {
+        case None = 0, SubFolders = 1, GetInfo = 2, GetInvisible = 4,
+        Three = 3, Five = 5, Six = 6, Seven = 7
+    }
     
-    @discardableResult func Walk(options:WalkOptions = WalkOptions.None, wildcard:String? = nil, foreach:(ZFileUrl, ZFileInfo)->Bool) -> ZError? {
+    func GetFiles(options:WalkOptions = .None, wildcard:String? = nil) -> [ZFileUrl : ZFileInfo] {
+        var files = [ZFileUrl : ZFileInfo]()
+        Walk(options: options, wildcard: wildcard) { (file, info) in
+            files[file] = info
+            return true
+        }
+        return files
+    }
+    
+    @discardableResult func Walk(options:WalkOptions = .None, wildcard:String? = nil, foreach:(ZFileUrl, ZFileInfo)->Bool) -> ZError? {
         if url == nil {
             return nil
         }
@@ -192,7 +210,7 @@ class ZFileUrl : ZUrl {
         if !(options & .SubFolders) {
             nsOptions.insert(FileManager.DirectoryEnumerationOptions.skipsSubdirectoryDescendants)
         }
-        if options & .GetInvisible {
+        if !(options & .GetInvisible) {
             nsOptions.insert(FileManager.DirectoryEnumerationOptions.skipsHiddenFiles)
         }
         if let nsEnum = dm().enumerator(at: url! as URL, includingPropertiesForKeys:[URLResourceKey.typeIdentifierKey], options:nsOptions, errorHandler:nil) {

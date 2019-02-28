@@ -4,7 +4,9 @@
 //  Created by Tor Langballe on /22/10/15.
 //
 
-import UIKit
+#if os(macOS)
+import AppKit
+#endif
 
 enum ZTextDrawType { case fill, stroke, clip }
 enum ZTextWrapType { case `default`, word, char, clip, headTruncate, tailTruncate, middleTruncate }
@@ -28,7 +30,11 @@ struct ZTextDraw : ZCopy {
     
     func GetBounds(noWidth:Bool = false) -> ZRect {
         let aStr = NSAttributedString(string:text, attributes:MakeAttributes())
+        #if os(macOS)
+        let opt = NSString.DrawingOptions(rawValue:NSString.DrawingOptions.usesLineFragmentOrigin.rawValue | NSString.DrawingOptions.usesFontLeading.rawValue)
+        #else
         let opt = NSStringDrawingOptions(rawValue:NSStringDrawingOptions.usesLineFragmentOrigin.rawValue | NSStringDrawingOptions.usesFontLeading.rawValue)
+        #endif
         var cgSize = rect.size.GetCGSize()
         if noWidth {
             cgSize.width = 0
@@ -144,6 +150,7 @@ struct ZTextDraw : ZCopy {
         }
     }
     
+    #if os(iOS)
     func CreateLayer(margin:ZRect = ZRect()) -> ZTextLayer {
         let textLayer = ZTextLayer()
         textLayer.font = font
@@ -166,5 +173,6 @@ struct ZTextDraw : ZCopy {
         
         return textLayer
     }
+    #endif
 }
 

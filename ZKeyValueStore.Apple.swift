@@ -79,7 +79,9 @@ struct ZKeyValueStore {
             for a in (array as NSArray) {
                 if var str = a as? String {
                     if !keyPrefix.isEmpty {
-                        ZStr.HasPrefix(str, prefix:keyPrefix, rest:&str)
+                        if let rest = ZStr.HasPrefixWithRest(str, prefix:keyPrefix) {
+                            str = rest
+                        }
                     }
                     got(str)
                 }

@@ -197,10 +197,14 @@ class ZUrlSession {
     
     static func DeleteAllCookiesForDomain(_ domain: String) {
         var vdomain = domain
-        let hasSuffix = ZStr.HasPrefix(vdomain, prefix:"*", rest:&vdomain);
+        var hasPrefix = false
+        if let v = ZStr.HasPrefixWithRest(vdomain, prefix:"*") {
+            vdomain = v
+            hasPrefix = true
+        }
         if let store = HTTPCookieStorage.shared.cookies {
             for c in store {
-                if (hasSuffix && String(c.domain).hasSuffix(vdomain)) || (!hasSuffix && String(c.domain) == vdomain) {
+                if (hasPrefix && String(c.domain).hasSuffix(vdomain)) || (!hasPrefix && String(c.domain) == vdomain) {
                     HTTPCookieStorage.shared.deleteCookie(c)
                 }
             }

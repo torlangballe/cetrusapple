@@ -6,7 +6,7 @@
 //  Copyright © 2015 Capsule.fm. All rights reserved.
 //
 
-import UIKit
+import QuartzCore
 
 typealias ZGradientLayer = CAGradientLayer
 typealias ZTextLayer = CATextLayer

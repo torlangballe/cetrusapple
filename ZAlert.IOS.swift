@@ -1,26 +1,31 @@
 //
-//  ZAlert.swift
+//  ZAlert.IOS.swift
 //
 //  Created by Tor Langballe on /7/11/15.
 //
-
-// #package com.github.torlangballe.cetrusandroid
 
 import UIKit
 
 class ZAlert {
     enum Result: Int { case ok = 1, cancel = 2, destructive = 3, other = 4 }
-    static func Say(_ text:String, ok:String = "🆗", cancel:String = "", other:String = "", destructive:String = "", subText:String = "", pressed:((_ result:Result)->Void)? = nil)  {
+    static let DefOk = "🆗"
+    static let DefCancel = "❌"
+    static func Say(_ text:String, ok:String = DefOk, cancel:String = "", other:String = "", destructive:String = "", subText:String = "", pressed:((_ result:Result)->Void)? = nil)  {
         let view = UIAlertController(title:text, message:subText, preferredStyle:UIAlertController.Style.alert)
-
+        
         var vok = ok
         var vcancel = cancel
-        if vok ==  "🆗" {
+        if vok == DefOk  {
             vok = ZWords.GetOk()
         }
-        if vcancel == "❌" {
+        if vcancel == DefCancel {
             vcancel = ZWords.GetCancel()
         }
+        view.addAction(UIAlertAction(title:vok, style:.default) { (UIAlertAction) in
+            if pressed != nil {
+                pressed!(Result.ok)
+            }
+        })
         view.addAction(UIAlertAction(title:vok, style:.default) { (UIAlertAction) in
             if pressed != nil {
                 pressed!(Result.ok)

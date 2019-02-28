@@ -8,7 +8,7 @@
 
 import Foundation
 
-typealias ZObject = NSObject
+public typealias ZObject = NSObject
 typealias ZAnyObject = AnyObject
 
 func ZIsRunningInSimulator() -> Bool {
@@ -224,11 +224,14 @@ extension Array where Element : Equatable {
 }
 
 extension Array {
-    mutating func sortWithCondition(_ sortFunc:@escaping (_ a:Element, _ b:Element) -> Int) {
-        sort(by:{ a, b in sortFunc(a, b) < 0 })
+    mutating func sortWithCondition(_ sortFunc:@escaping (_ a:Element, _ b:Element) -> Bool) {
+        sort(by:{ a, b in sortFunc(a, b) })
     }
 
-    func Max<T:Comparable>(get:(_ e:Element)->T) -> Element {
+    func Max<T:Comparable>(_ get:(_ e:Element)->T) -> Element? {
+        if isEmpty {
+            return nil
+        }
         return reduce(first!) { (r, e) in
             if get(r) < get(e) {
                 return e
@@ -236,7 +239,10 @@ extension Array {
             return r
         }
     }
-    func Min<T:Comparable>(get:(_ e:Element)->T) -> Element {
+    func Min<T:Comparable>(_ get:(_ e:Element)->T) -> Element? {
+        if isEmpty {
+            return nil
+        }
         return reduce(first!) { (r, e) in
             if get(r) > get(e) {
                 return e

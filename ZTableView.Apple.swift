@@ -15,41 +15,28 @@ class zUITableViewCell : UITableViewCell {
 
 protocol ZTableViewDelegate : class {
     func TableViewGetRowCount() -> Int
-    func TableViewGetHeightOfItem(_ index: ZTableIndex)  -> Double
-    func TableViewSetupCell(_ cellSize:ZSize, index:ZTableIndex) -> ZCustomView?
-    func HandleRowSelected(_ index:ZTableIndex)
-    func UpdateRow(index: Int)
-    func GetAccessibilityForCell(_ index:ZTableIndex, prefix:String) -> [ZAccessibilty]
+    func TableViewGetHeightOfItem(_ index: Int)  -> Double
+    func TableViewSetupCell(_ cellSize:ZSize, index: Int) -> ZCustomView?
+    func HandleRowSelected(_ index: Int)
+//    func UpdateRow(index: Int)
+    func GetAccessibilityForCell(_ index: Int, prefix:String) -> [ZAccessibilty]
 }
 
 typealias ZTableViewRowAnimation = UITableView.RowAnimation
-
-struct ZTableIndex : ZCopy {
-    var row = 0
-    var section = 0
-    init(row:Int = 0, section:Int = 0) {
-        self.row = row
-        self.section = section
-    }
-    init(path:IndexPath) {
-        row = (path as NSIndexPath).row
-        section = (path as NSIndexPath).section
-    }
-};
 
 class ZTableView : UITableView, ZView, UITableViewDelegate, UITableViewDataSource {
     var first = true
     var objectName = "ZTableView"
     var tableRowBackgroundColor = ZColor.Black()
     var scrolling = false
-    var drawHandler:((_ rect: ZRect, _ canvas: ZCanvas)->Void)!
+    var drawHandler:((_ rect: ZRect, _ canvas: ZCanvas)->Void)? = nil
     var margins = ZSize(0, 0)
     var spacing = 0.0
     var focusedRow:Int? = nil
     
     func View() -> UIView { return self }
     
-    var selectionIndex = ZTableIndex()
+    var selectionIndex = 0
     weak var owner: ZTableViewDelegate? = nil
     var selectable = true
     var deleteHandler: (()->Void)? = nil
@@ -58,7 +45,7 @@ class ZTableView : UITableView, ZView, UITableViewDelegate, UITableViewDataSourc
     init() {
         super.init(frame:CGRect(x:0, y:0, width:10, height:10), style:.plain)
         delegate = self
-        selectionIndex.row = -1
+        selectionIndex = -1
         dataSource = self
 //        sectionFooterHeight = 3
         backgroundView = nil
@@ -72,13 +59,14 @@ class ZTableView : UITableView, ZView, UITableViewDelegate, UITableViewDataSourc
     required init?(coder aDecoder: NSCoder) { fatalError("init(coder:) has not been implemented") }
     
     override func layoutSubviews() {
-        let tvOsInset:CGFloat = ZIsTVBox() ? 174 : 0
+//        let tvOsInset:CGFloat = ZIsTVBox() ? 174 : 0
+//        let tvOsInset:CGFloat = ZIsTVBox() ? 87 : 0
         if first {
             allowsSelection = true // selectable
-            if selectionIndex.row != -1 {
-                Select(selectionIndex.row);
+            if selectionIndex != -1 {
+                Select(selectionIndex);
             }
-          contentInset = UIEdgeInsets(top: CGFloat(margins.h), left: -tvOsInset, bottom: CGFloat(margins.h), right: tvOsInset)
+  //        contentInset = UIEdgeInsets(top: CGFloat(margins.h), left: -tvOsInset, bottom: CGFloat(margins.h), right: tvOsInset)
             first = false
         }
         super.layoutSubviews()
@@ -102,33 +90,25 @@ class ZTableView : UITableView, ZView, UITableViewDelegate, UITableViewDataSourc
     }
     
     func ScrollToMakeRowVisible(_ row:Int, animated:Bool = true) {
-        let path = makeIndexPathFromIndex(ZTableIndex(row:row, section:0))
+        let path = makeIndexPathFromIndex(row)
         scrollToRow(at: path, at:.none, animated:animated)
-        print("-------------------------- scrollToRow:", row)
     }
     
-    func ReloadData(row:Int? = nil, animate:Bool = false) {
-        if row != nil {
-            owner?.UpdateRow(index:row!)
-            return
-        }
+    func UpdateRow(row: Int) {
+        reloadRows(at:[makeIndexPathFromIndex(row)], with:UITableView.RowAnimation.none)
+    }
+    
+    func ReloadData(animate:Bool = false) {
         if animate {
           self.reloadSections([0], with:UITableView.RowAnimation.fade)
         } else {
-            if row != nil {
-              reloadRows(at:[makeIndexPathFromIndex(ZTableIndex(row:row!, section:0))], with:UITableView.RowAnimation.none)
-            } else {
-                reloadData()
-            }
+            reloadData()
         }
-        //        let range = NSMakeRange(0, numberOfSections)
-        //        let indexSet = NSIndexSet(indexesInRange:range)
-        //        reloadSections(indexSet, withRowAnimation:UITableViewRowAnimation.Automatic)
     }
     
     func MoveRow(fromIndex:Int, toIndex:Int) {
-        let from = makeIndexPathFromIndex(ZTableIndex(row:fromIndex, section:0))
-        let to = makeIndexPathFromIndex(ZTableIndex(row:toIndex, section:0))
+        let from = makeIndexPathFromIndex(fromIndex)
+        let to = makeIndexPathFromIndex(toIndex)
         self.moveRow(at:from, to:to)
     }
     
@@ -147,7 +127,7 @@ class ZTableView : UITableView, ZView, UITableViewDelegate, UITableViewDataSourc
     }
     
     func GetRowViewFromIndex(_ index:Int) -> ZView? {
-        let indexpath = makeIndexPathFromIndex(ZTableIndex(row:index, section:0))
+        let indexpath = makeIndexPathFromIndex(index)
         if let c = self.cellForRow(at: indexpath) {
             return getZViewChild(c)
         }
@@ -183,10 +163,10 @@ class ZTableView : UITableView, ZView, UITableViewDelegate, UITableViewDataSourc
     
     func Select(_ row:Int) {
         let oldSelection = selectionIndex
-        selectionIndex = ZTableIndex(row:row, section:0)
+        selectionIndex = row
         if selectable {
             if row == -1 {
-                if oldSelection.row != -1 {
+                if oldSelection != -1 {
                     deselectRow(at: makeIndexPathFromIndex(oldSelection), animated:true)
                 }
             } else {
@@ -196,7 +176,7 @@ class ZTableView : UITableView, ZView, UITableViewDelegate, UITableViewDataSourc
     }
     
     func DeleteChildRow(index:Int, animation:ZTableViewRowAnimation = .fade) { // call this after removing data
-        let ipath = makeIndexPathFromIndex(ZTableIndex(row:index, section:0))
+        let ipath = makeIndexPathFromIndex(index)
         self.deleteRows(at:[ipath], with: .left)
     }
     
@@ -238,13 +218,13 @@ class ZTableView : UITableView, ZView, UITableViewDelegate, UITableViewDataSourc
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let index = ZTableIndex(path:indexPath)
+        let index = pathToRow(indexPath)
         owner!.HandleRowSelected(index)
         selectionIndex = index
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        let index = ZTableIndex(path:indexPath)
+        let index = pathToRow(indexPath)
         return CGFloat(owner!.TableViewGetHeightOfItem(index))
     }
     
@@ -261,19 +241,24 @@ class ZTableView : UITableView, ZView, UITableViewDelegate, UITableViewDataSourc
         //        let cell : UITableViewCell = self.dequeueReusableCellWithIdentifier("ZTableView", forIndexPath:indexPath) as UITableViewCell
         let cell = zUITableViewCell()
         cell.isEditing = true
-        let index = ZTableIndex(path:indexPath)
+        let index = pathToRow(indexPath)
         var r = ZRect(size:ZSize(Rect.size.w, owner!.TableViewGetHeightOfItem(index)))
-        r = r.Expanded(ZSize(-margins.w, 0))
+        var m = margins.w
         if ZIsTVBox() {
-            r.size.w -= 5
+            m = 87
+        }
+        r = r.Expanded(ZSize(-m, 0))
+        if ZIsTVBox() {
             cell.focusStyle = UITableViewCell.FocusStyle.custom
         }
         cell.frame = r.GetCGRect()
         cell.backgroundColor = UIColor.clear
-        
-        let customView = owner!.TableViewSetupCell(ZSize(cell.frame.size), index:index)
-        customView?.frame = cell.frame
-        customView!.minSize.h -= spacing
+        let s = ZSize(cell.frame.size)
+        let customView = owner!.TableViewSetupCell(s, index:index)
+        customView?.frame = ZRect(size:s).GetCGRect()
+        if !ZIsTVBox() {
+            customView!.minSize.h -= spacing
+        }
         customView?.frame.size.height = CGFloat(customView!.minSize.h)
         if let cv = customView as? ZContainerView {
             cv.ArrangeChildren()
@@ -321,19 +306,17 @@ class ZTableView : UITableView, ZView, UITableViewDelegate, UITableViewDataSourc
         return false
     }
     
-    fileprivate func makeIndexPathFromIndex(_ index:ZTableIndex) -> IndexPath {
-        
-        let indexes:[Int] = [ index.section, index.row]
-        
+    fileprivate func makeIndexPathFromIndex(_ index:Int) -> IndexPath {
+        let indexes:[Int] = [ 0, index]
         return (NSIndexPath(indexes:indexes, length:2) as IndexPath)
     }
 }
 
 extension ZTableViewDelegate {
-    //    func TableViewGetHeightOfItem(index: ZTableIndex) -> Double { return 52 }
-    func HandleRowSelected(_ index:ZTableIndex) { }
-    func GetAccessibilityForCell(_ index:ZTableIndex, prefix:String) -> [ZAccessibilty] { return [] }
-    func UpdateRow(index: Int) { }
+    //    func TableViewGetHeightOfItem(index: Int) -> Double { return 52 }
+    func HandleRowSelected(_ index:Int) { }
+    func GetAccessibilityForCell(_ index:Int, prefix:String) -> [ZAccessibilty] { return [] }
+//    func UpdateRow(index: Int) { }
 }
 
 private func exposeAll(_ view:UIView) {
@@ -341,6 +324,10 @@ private func exposeAll(_ view:UIView) {
     for s in view.subviews {
         exposeAll(s)
     }
+}
+
+func pathToRow(_ path:IndexPath) -> Int {
+    return (path as NSIndexPath).row
 }
 
 

@@ -86,6 +86,7 @@ class ZSoundPlayer: NSObject, AVAudioPlayerDelegate {
         }
     }
 
+    #if os(iOS)
     static func SetCurrentTrackPlayingMetadata(_ image:ZImage?, title:String, album:String = "", pos:Double? = nil) {
         ZMainQue.async {
             var songInfo = [String:AnyObject]()
@@ -106,4 +107,5 @@ class ZSoundPlayer: NSObject, AVAudioPlayerDelegate {
     static func Vibrate() {
         AudioServicesPlayAlertSound(kSystemSoundID_Vibrate)
     }
+    #endif
 }

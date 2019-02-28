@@ -118,7 +118,7 @@ let ZTimeIsoFormatWithMSecsWithZone = "yyyy-MM-dd'T'HH:mm:ss.SSSZZZZZ"
 let ZTimeIsoFormatCompactWithZone = "yyyyMMdd'T'HHmmssZZZZZ"
 
 let ZTimeCompactFormat = "yyyy-MM-dd' 'HH:mm:ss"
-let ZTimeNiceFormat = "yy-MMM-dd' 'HH:mm"
+let ZTimeNiceFormat = "dd-MMM-yyyy' 'HH:mm"
 let ZTimeHTTPHeaderDateFormat = "EEEE, dd LLL yyyy HH:mm:ss zzz"
 
 let ZTimeMinute = 60.0

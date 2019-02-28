@@ -7,10 +7,11 @@
 
 import Foundation
 
-open class ZService {
+// On iOS ZService is a dummy at the moment, just runs code.
+open class ZService : ZObject {
     var keepAlive = false
     
-    public required init() {
+    override public required init() {
         
     }
     

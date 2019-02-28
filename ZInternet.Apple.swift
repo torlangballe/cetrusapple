@@ -18,11 +18,9 @@ class ZIPAddress {
 }
 
 struct ZInternet {
-    static func ResolveAddress(_ address:String, got:(_ a:ZIPAddress )->Void) {
+    static func ResolveAddress(_ address:String) -> ZIPAddress {
         let ip = ZIPAddress(ip4String: "127.0.0.1")
-        ZTimer.Sleep(secs:0.2 + ZMath.Random1() * 0.4)
-        // TODO: do this
-        got(ip)
+        return ip
     }
     
     static func GetNetworkTrafficBytes(processUid:Int? = nil) -> Int64 {
@@ -31,7 +29,7 @@ struct ZInternet {
     }
     
     static func PingAddressForLatency(_ ipAddress:ZIPAddress) -> Double? {
-        return ZMath.Random1() * 5.0
+        return ZMath.Random1() + 0.1
     }
 }
 

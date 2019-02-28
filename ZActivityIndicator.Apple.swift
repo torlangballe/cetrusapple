@@ -32,7 +32,7 @@ class ZActivityIndicator: UIActivityIndicatorView, ZView {
 
 func ZAddActivityToContainer(on:Bool, container:ZContainerView, align:ZAlignment, marg:ZSize = ZSize(0.0, 0.0), big:Bool = true) {
     if on {
-        let v = ZActivityIndicator(big:ZIsTVBox() ? true : big)
+        let v = ZActivityIndicator(big:big)
         container.Add(v, align:align, marg:marg)
         v.Start()
     } else {

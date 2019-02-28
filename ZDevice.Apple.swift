@@ -97,7 +97,7 @@ struct ZDevice {
         let n = DeviceCodeNumbered
         if ZIsTVBox() {
             if ZIsRunningInSimulator() {
-                return "TV Emulator"
+                return "TV Simulator"
             }
             return "TV"
         }

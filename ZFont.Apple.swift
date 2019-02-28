@@ -22,10 +22,17 @@ extension ZFont {
     public convenience init?(name fontName: String, _ pointsize:Double, style:Style = .normal) {
         var vfontName = fontName
         if style != .normal {
-            vfontName += "-" + style.rawValue
+            vfontName += "-" + ZStr.TitleCase(style.rawValue)
         }
         self.init(name:vfontName, size:CGFloat(pointsize))
     }
+    
+    #if os(macOS)
+    open var lineHeight: CGFloat { get {
+            return 20
+        }
+    }
+    #endif
     
     static func Nice(_ size:Double, style:Style = .normal) -> ZFont {
         #if os(macOS)

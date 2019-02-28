@@ -91,9 +91,8 @@ class Translations {
             var fileName = ""
             let (sfile, _) = ZStr.LoadFromFile(file)
             ZStr.ForEachLine(sfile) { (str) in
-                var line = ""
                 var extra = ""
-                let label = ZStr.HeadUntil(str, sep:" ", rest:&line)
+                let (label, line) = ZStr.HeadUntilWithRest(str, sep:" ")
                 switch label {
                 case "#:":
                     fileName = ZStr.TailUntil(ZStr.Trim(line), sep:"/")

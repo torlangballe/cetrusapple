@@ -59,9 +59,13 @@ class ZProgressBar: ZCustomView {
     // #end
     
     override func DrawInRect(_ rect: ZRect, canvas: ZCanvas) {
+        var path = ZPath(rect:rect, corner:ZSize(height / 2, height / 2))
+        canvas.SetColor(color.OpacityChanged(0.2))
+        canvas.FillPath(path)
+
         var r = rect
         r.SetMaxX(rect.size.w * Double(value))
-        let path = ZPath(rect:r, corner:ZSize(height / 2, height / 2))
+        path = ZPath(rect:r, corner:ZSize(height / 2, height / 2))
         canvas.SetColor(color)
         canvas.FillPath(path)
     }

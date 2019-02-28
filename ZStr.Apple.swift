@@ -147,10 +147,10 @@ struct ZStr {
         return String(body)
     }
 
-    @discardableResult static func HeadUntil(_ str: String, sep:String, rest:inout String, options: ZStringCompareOptions = .literal) -> String {
+    @discardableResult static func HeadUntilWithRest(_ str: String, sep:String, options: ZStringCompareOptions = .literal) -> (String, String) { // head, rest
         let s = ZStr.HeadUntil(str, sep:sep, options:options)
-        rest = ZStr.Body(str, pos:(s + sep).count)
-        return s
+        let rest = ZStr.Body(str, pos:(s + sep).count)
+        return (s, rest)
     }
 
     static func HeadUntil(_ str: String, sep:String, options: ZStringCompareOptions = .literal) -> String {
@@ -171,12 +171,12 @@ struct ZStr {
         return str
     }
 
-    static func TailUntilWithRest(_ str: String, sep:String, options: ZStringCompareOptions = .literal) -> (String, String) {
+    static func TailUntilWithRest(_ str: String, sep:String, options: ZStringCompareOptions = .literal) -> (String, String) { // tail, then rest
         if let range = rangeOfWordAtEnd(str, sep:sep, options:options) {
             let tail = str[range]
             return (String(tail), Head(str, chars:range.lowerBound.encodedOffset))
         }
-        return (str, "")
+        return ("", str)
     }
     
     static func PopTailWord(_ str:inout String, sep:String = " ", options:ZStringCompareOptions = .literal) -> String {
@@ -199,22 +199,26 @@ struct ZStr {
         return str
     }
     
-    @discardableResult static func HasPrefix(_ str:String, prefix:String, rest:inout String) -> Bool {
+    @discardableResult static func HasPrefixWithRest(_ str:String, prefix:String) -> String? {
         if str.hasPrefix(prefix) {
-            rest = ZStr.Body(str, pos:prefix.count)
-            return true
+            let rest = ZStr.Body(str, pos:prefix.count)
+            return rest
         }
-        return false
+        return nil
     }
     
-    @discardableResult static func HasSuffix(_ str:String, suffix:String, rest:inout String) -> Bool {
+    @discardableResult static func HasSuffixWithRest(_ str:String, suffix:String) -> String? {
         if str.hasSuffix(suffix) {
-            rest = ZStr.Head(str, chars:str.count - suffix.count)
-            return true
+            let rest = ZStr.Head(str, chars:str.count - suffix.count)
+            return rest
         }
-        return false
+        return nil
     }
 
+    static func CommonPrefix(_ a: String, _ b: String) -> String {
+        return a.commonPrefix(with: b)
+    }
+    
     static func TruncatedEnd(_ str:String, chars:Int = 1) -> String {
         return String(str.dropLast(chars))
     }
@@ -363,6 +367,10 @@ struct ZStr {
         return (s == s.uppercased())
     }
     
+    static func TitleCase(_ str: String) -> String {
+        return str.prefix(1).capitalized + str.dropFirst()
+    }
+    
     static func SplitCamelCase(_ str:String) -> [String] {
         var out = [String]()
         var word = ""
@@ -484,14 +492,20 @@ struct ZStr {
         return sint + sfract
     }
     
-    static func ToDouble(str:String, def:Double = -1.0) -> Double {
+    static func ToDouble(_ str:String, def:Double? = nil) -> Double? {
         if let d = Double(str) {
             return d
         }
         return def
     }
     
-
+    static func ToInt(_ str:String, def:Int? = nil) -> Int? {
+        if let i = Int(str) {
+            return i
+        }
+        return def
+    }
+    
     static func GetStemAndExtension(fileName:String) -> (String, String) {
         return ZStr.TailUntilWithRest(fileName, sep:".")
     }

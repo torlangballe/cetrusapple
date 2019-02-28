@@ -37,6 +37,10 @@ class ZApp : ZObject {
         return ("", 0, 0)
     }
 
+    static var AppId : String {
+        return Bundle.main.bundleIdentifier ?? ""
+    }
+    
     func Quit() {
         exit(-1)
     }

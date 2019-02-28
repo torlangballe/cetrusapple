@@ -43,6 +43,9 @@ class ZUrl : Hashable  {
     }
 
     func IsDirectory() -> Bool {
+        if url == nil {
+            return false
+        }
         var o: AnyObject?
         do {
             try (url! as NSURL).getResourceValue(&o, forKey:URLResourceKey.isDirectoryKey)
@@ -87,6 +90,10 @@ class ZUrl : Hashable  {
     
     var Host : String {
         get { return url?.host ?? "" }
+    }
+    
+    var Port : Int {
+        get { return url?.port ?? -1 }
     }
     
     var AbsString : String {

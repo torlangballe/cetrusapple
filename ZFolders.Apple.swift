@@ -39,7 +39,9 @@ struct ZFolders {
                     nsUrl = URL(fileURLWithPath:stemp, isDirectory:true)
 
                 case .preferences:
-                    nsUrl = URL(fileURLWithPath:NSString(string:"~/Library/").expandingTildeInPath)
+                    let appId = Bundle.main.bundleIdentifier ?? ""
+                    nsUrl = URL(fileURLWithPath:NSString(string:"~/Library/Preferences/" + appId).expandingTildeInPath)
+                    ZFileUrl(nsUrl:nsUrl!).CreateFolder()
                 
                 default: break
             }
@@ -56,8 +58,7 @@ func ZGetResourceFileUrl(_ subPath:String) -> ZFileUrl {
     if subPath.isEmpty {
         return ZFileUrl(nsUrl:Bundle.main.bundleURL)
     }
-    var (base, _, stub, ext) = ZFileUrl.GetPathParts(subPath)
-    ext = ZStr.Body(ext, pos:1)
+    let (base, stub, ext) = ZFileUrl.GetPathParts(subPath)
     if let respath = Bundle.main.path(forResource: stub, ofType:ext, inDirectory:base) {
         return ZFileUrl(filePath:respath)
     }
