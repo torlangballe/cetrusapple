@@ -75,6 +75,11 @@ open class ZStackView: ZContainerView {
         return vr
     }
     
+    // Function for setting better focus on Android, due to bug with ScrollViews.
+    // Does nothing on Apple.
+    func ForceHorizontalFocusNavigation() {
+    }
+    
     override open func ArrangeChildren(onlyChild:ZView? = nil) {
         var incs = 0
         var decs = 0

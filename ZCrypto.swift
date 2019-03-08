@@ -14,7 +14,7 @@ extension ZCrypto {
     static func MD5ToHex(data:ZData) -> String {
         var str = ""
         for b in MD5(data:data) {
-            str += ZStr.Format("%x", b)
+            str += ZStr.Format("%02x", b)
         }
         return str
     }

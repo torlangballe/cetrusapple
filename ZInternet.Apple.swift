@@ -68,7 +68,6 @@ struct DataUsageInfo {
 }
 
 class DataUsage {
-    
     private static let wwanInterfacePrefix = "pdp_ip"
     private static let wifiInterfacePrefix = "en"
     
@@ -122,3 +121,4 @@ class DataUsage {
         return dataUsageInfo
     }
 }
+

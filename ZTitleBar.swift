@@ -19,7 +19,9 @@ class ZTitleBar : ZStackView {
     static var Color = ZColor(r:0.2, g:0.3, b:1.0)
     
     init(text:String = "", closeType:CloseButtons = CloseButtons.cross, closeAlignX:ZAlignment = ZAlignment.Left) {
-        closeButton = ZImageView(namedImage:closeType.rawValue + ".png")
+        if closeType != CloseButtons.none {
+            closeButton = ZImageView(namedImage:closeType.rawValue + ".png")
+        }
         title = ZLabel(text:text, maxWidth:ZScreen.Main.size.w, font:ZFont.Nice(25.0), align:ZAlignment.Left)
         title.Color = ZColor.White()
         title.adjustsFontSizeToFitWidth = true
@@ -35,7 +37,7 @@ class ZTitleBar : ZStackView {
             minSize.h += 45.0
         }
         closeButton?.accessibilityLabel = ZWords.GetClose()
-        closeButton!.HandlePressedInPosFunc = { [weak self] (pos) in
+        closeButton?.HandlePressedInPosFunc = { [weak self] (pos) in
             if self!.closeHandler != nil {
                 self!.closeHandler!.HandleClose(sender:self!)
             } else {

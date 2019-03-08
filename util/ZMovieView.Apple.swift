@@ -102,7 +102,7 @@ class ZMovieView : ZCustomView {
             if player != nil && player!.currentItem != nil {
                 return ZMath.NanCheck(CMTimeGetSeconds(player!.currentItem!.currentTime()), set:0)
             }
-            return 0.0
+            return -1
         }
         set {
             seeking = true
