@@ -545,5 +545,4 @@ class ZImageCache {
         }
         return 0
     }
-
 }

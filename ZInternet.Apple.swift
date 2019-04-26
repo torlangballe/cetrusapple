@@ -23,13 +23,25 @@ struct ZInternet {
         return ip
     }
     
-    static func GetNetworkTrafficBytes(processUid:Int? = nil) -> Int64 {
+    static func GetNetworkTrafficBytes() -> Int64 { // https://stackoverflow.com/questions/7946699/iphone-data-usage-tracking-monitoring
         let info = DataUsage.getDataUsage()
-        return Int64(info.wifiReceived)
+        return Int64(info.lanReceived) + Int64(info.lanSent) + Int64(info.wirelessWanDataReceived) + Int64(info.wirelessWanDataSent)
     }
     
     static func PingAddressForLatency(_ ipAddress:ZIPAddress) -> Double? {
         return ZMath.Random1() + 0.1
+    }
+    
+    static func GetHardwareAddressAsString(_ address:UInt64) -> String {
+        let str = ZStr.Format("%016lx", address)
+        var out = ""
+        for (i, c) in str.enumerated() {
+            if i%2 == 0 && i > 0 {
+                out += ":"
+            }
+            out += String(c)
+        }
+        return out
     }
 }
 
@@ -54,22 +66,22 @@ class ZRateLimiter {
 }
 
 struct DataUsageInfo {
-    var wifiReceived: UInt32 = 0
-    var wifiSent: UInt32 = 0
-    var wirelessWanDataReceived: UInt32 = 0
-    var wirelessWanDataSent: UInt32 = 0
+    var lanReceived: UInt64 = 0
+    var lanSent: UInt64 = 0
+    var wirelessWanDataReceived: UInt64 = 0
+    var wirelessWanDataSent: UInt64 = 0
     
     mutating func updateInfoByAdding(_ info: DataUsageInfo) {
-        wifiSent += info.wifiSent
-        wifiReceived += info.wifiReceived
-        wirelessWanDataSent += info.wirelessWanDataSent
-        wirelessWanDataReceived += info.wirelessWanDataReceived
+        lanSent += UInt64(info.lanSent)
+        lanReceived += UInt64(info.lanReceived)
+        wirelessWanDataSent += UInt64(info.wirelessWanDataSent)
+        wirelessWanDataReceived += UInt64(info.wirelessWanDataReceived)
     }
 }
 
 class DataUsage {
     private static let wwanInterfacePrefix = "pdp_ip"
-    private static let wifiInterfacePrefix = "en"
+    private static let lanInterfacePrefix = "en"
     
     class func getDataUsage() -> DataUsageInfo {
         var ifaddr: UnsafeMutablePointer<ifaddrs>?
@@ -103,18 +115,18 @@ class DataUsage {
         var networkData: UnsafeMutablePointer<if_data>?
         var dataUsageInfo = DataUsageInfo()
         
-        if name.hasPrefix(wifiInterfacePrefix) {
+        if name.hasPrefix(lanInterfacePrefix) {
             networkData = unsafeBitCast(pointer.pointee.ifa_data, to: UnsafeMutablePointer<if_data>.self)
             if let data = networkData {
-                dataUsageInfo.wifiSent += data.pointee.ifi_obytes
-                dataUsageInfo.wifiReceived += data.pointee.ifi_ibytes
+                dataUsageInfo.lanSent += UInt64(data.pointee.ifi_obytes)
+                dataUsageInfo.lanReceived += UInt64(data.pointee.ifi_ibytes)
             }
             
         } else if name.hasPrefix(wwanInterfacePrefix) {
             networkData = unsafeBitCast(pointer.pointee.ifa_data, to: UnsafeMutablePointer<if_data>.self)
             if let data = networkData {
-                dataUsageInfo.wirelessWanDataSent += data.pointee.ifi_obytes
-                dataUsageInfo.wirelessWanDataReceived += data.pointee.ifi_ibytes
+                dataUsageInfo.wirelessWanDataSent += UInt64(data.pointee.ifi_obytes)
+                dataUsageInfo.wirelessWanDataReceived += UInt64(data.pointee.ifi_ibytes)
             }
         }
         

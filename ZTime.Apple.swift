@@ -13,8 +13,20 @@ typealias ZCalendarUnit = NSCalendar.Unit
 let ZTimeNull = ZTime(date:Date.distantPast)
 let ZTimeDistantFuture = ZTime(date:Date.distantFuture)
 
-class ZTime {
+class ZTime : Codable {
     let date:Date
+
+    required init?(coder decoder: NSCoder)
+    {
+        let d = decoder.decodeData()
+        date = Date()
+    }
+    
+    func encode(with aCoder: NSCoder)
+    {
+        let d = ZData()
+        aCoder.encode(d)
+    }
 
     static func Now() -> ZTime {
         return ZTime(timeIntervalSinceNow:0)

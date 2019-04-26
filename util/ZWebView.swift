@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import WebKit
 
 protocol ZWebViewDelegate {
     func HandleFinishedDownload(_ view:ZWebView, url:String)
@@ -16,7 +17,7 @@ protocol ZWebViewDelegate {
     func HandleEnableForward(_ view:ZWebView, enabled:Bool)
 }
 
-class ZWebView : UIWebView, ZView, UIWebViewDelegate {
+class ZWebView : WKWebView, ZView, UIWebViewDelegate {
     var content = ""
     var currentUrl:String
     

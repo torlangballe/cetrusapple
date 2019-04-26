@@ -23,15 +23,15 @@ struct ZDevice {
         case beginSeekingForward
         case endSeekingForward
     }
-
+    
     static var IsIPad:Bool {
         return UIDevice.current.userInterfaceIdiom == UIUserInterfaceIdiom.pad
     }
-
+    
     static var IsIPhone:Bool {
         return UIDevice.current.userInterfaceIdiom == UIUserInterfaceIdiom.phone
     }
-
+    
     static var DeviceName: String {
         return UIDevice.current.name
         //mac:    nsstr = [(NSString *)SCDynamicStoreCopyComputerName(NULL, NULL) autorelease];  //  NSString *localHostname = [(NSString *)SCDynamicStoreCopyLocalHostName(NULL) autorelease];
@@ -57,7 +57,7 @@ struct ZDevice {
         case UIDevice.BatteryState.unplugged  : return 0
         case UIDevice.BatteryState.charging   : return 1
         case UIDevice.BatteryState.full       : return 1
-            default                              : return -1
+        default                              : return -1
         }
         #else
         return 0
@@ -75,20 +75,20 @@ struct ZDevice {
     static var TimeZone: ZTimeZone {
         return ZTimeZone.DeviceZone
     }
-
+    
     static var FingerPrint: String {
         return ""
     }
-
+    
     static var Manufacturer: String {
         return "Apple"
     }
-
+    
     static var DeviceType: String {
         let n = DeviceCodeNumbered
         return "\(n.0)\(n.1)\(n.2)"
     }
-
+    
     static var HardwareModel: String {
         return ""
     }
@@ -166,7 +166,7 @@ struct ZDevice {
     static func GetWifiLinkSpeed() -> String {
         return ""
     }
-
+    
     static var DeviceCodeNumbered: (String, Int, String, String) { // fullname, version(52), text-only-name, known-as
         var systemInfo = utsname()
         var knownAs = ""
@@ -209,7 +209,7 @@ struct ZDevice {
         
         return (mfree, mused)
     }
-
+    
     static func GetNetworkSSIDs() -> [String] {
         #if os(iOS)
         guard let interfaceNames = CNCopySupportedInterfaces() as? [String] else {
@@ -228,4 +228,67 @@ struct ZDevice {
         return []
         #endif
     }
+    
+    static func GetCpuUsage() -> [Double] {
+        var kr: kern_return_t
+        var task_info_count: mach_msg_type_number_t
+        var cpu = [Double]()
+        
+        task_info_count = mach_msg_type_number_t(TASK_INFO_MAX)
+        var tinfo = [integer_t](repeating: 0, count: Int(task_info_count))
+        
+        kr = task_info(mach_task_self_, task_flavor_t(TASK_BASIC_INFO), &tinfo, &task_info_count)
+        if kr != KERN_SUCCESS {
+            return []
+        }
+        
+        var thread_list: thread_act_array_t? = UnsafeMutablePointer(mutating: [thread_act_t]())
+        var thread_count: mach_msg_type_number_t = 0
+        defer {
+            if let thread_list = thread_list {
+                vm_deallocate(mach_task_self_, vm_address_t(UnsafePointer(thread_list).pointee), vm_size_t(thread_count))
+            }
+        }
+        
+        kr = task_threads(mach_task_self_, &thread_list, &thread_count)
+        
+        if kr != KERN_SUCCESS {
+            return []
+        }
+        
+        if let thread_list = thread_list {
+            
+            for j in 0 ..< Int(thread_count) {
+                var thread_info_count = mach_msg_type_number_t(THREAD_INFO_MAX)
+                var thinfo = [integer_t](repeating: 0, count: Int(thread_info_count))
+                kr = thread_info(thread_list[j], thread_flavor_t(THREAD_BASIC_INFO),
+                                 &thinfo, &thread_info_count)
+                if kr != KERN_SUCCESS {
+                    return []
+                }
+                
+                let threadBasicInfo = convertThreadInfoToThreadBasicInfo(thinfo)
+                
+                if threadBasicInfo.flags != TH_FLAGS_IDLE {
+                    cpu.append((Double(threadBasicInfo.cpu_usage) / Double(TH_USAGE_SCALE)) * 100.0)
+                }
+            } // for each thread
+        }
+        
+        return cpu
+    }
+    
+    static fileprivate func convertThreadInfoToThreadBasicInfo(_ threadInfo: [integer_t]) -> thread_basic_info {
+        var result = thread_basic_info()
+        result.user_time = time_value_t(seconds: threadInfo[0], microseconds: threadInfo[1])
+        result.system_time = time_value_t(seconds: threadInfo[2], microseconds: threadInfo[3])
+        result.cpu_usage = threadInfo[4]
+        result.policy = threadInfo[5]
+        result.run_state = threadInfo[6]
+        result.flags = threadInfo[7]
+        result.suspend_count = threadInfo[8]
+        result.sleep_time = threadInfo[9]
+        return result
+    }
 }
+

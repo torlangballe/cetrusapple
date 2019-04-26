@@ -26,7 +26,11 @@ extension ZTimeZone {
         //        if(snew.Size())
         //        return XTimeZone::FromName(snew);
     }
-    
+
+    var Name: String {
+        return identifier
+    }
+
     var NiceName: String {
         var last = ZStr.TailUntil(identifier, sep:"/")
         last = last.replacingOccurrences(of: "_", with:"")

@@ -20,14 +20,24 @@ extension ZData {
         }
     }
     
-    static func FromUrl(_ url:ZUrl) -> (ZData?, ZError?) {
-        do {
-            let d = try Data(contentsOf:url.url!)
-            return (d, nil)
-        } catch let error as NSError {
-            ZDebug.Print("ZData.FromUrl error:", error.localizedDescription)
-            return (nil, error)
+    static func FromUrl(_ url:ZUrl, got:@escaping (ZData?, ZError?)->Void) {
+        ZGetBackgroundQue().async {
+            do {
+                let d = try Data(contentsOf:url.url!)
+                ZMainQue.async {
+                    got(d, nil)
+                }
+            } catch let error as NSError {
+                ZDebug.Print("ZData.FromUrl error:", error.localizedDescription)
+                ZMainQue.async {
+                    got(nil, error)
+                }
+            }
         }
+    }
+    
+    var Length : Int {
+        return count
     }
     
     func GetString() -> String {
