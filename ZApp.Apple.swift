@@ -78,6 +78,11 @@ class ZApp : ZObject {
             break
         }
     }
+    
+    static func GetProcessId() -> Int64 {
+        let pinfo = NSProcessInfo.processIdentifier
+        return pfino
+    }
 
     func HandleAppNotification(_ notification:ZNotification, action:String) { }
     func HandlePushNotificationWithDictionary(_ dict:[String:ZAnyObject], fromStartup:Bool, whileActive:Bool) { }

@@ -11,7 +11,7 @@ import WebKit
 
 protocol ZWebViewDelegate {
     func HandleFinishedDownload(_ view:ZWebView, url:String)
-    func HandleFailedDownload(_ view:ZWebView, error:ZError)
+    func HandleError(_ view:ZWebView, error:ZError)
     func HandleShouldNotLoadUrl(_ view:ZWebView, url:String) -> Bool
     func HandleEnableBack(_ view:ZWebView, enabled:Bool)
     func HandleEnableForward(_ view:ZWebView, enabled:Bool)
@@ -38,7 +38,7 @@ class ZWebView : WKWebView, ZView, UIWebViewDelegate {
 //    var mobileizeURLs = true
     var makeUserAgentDesktopBrowser = ZDevice.IsIPad
 
-    init(url:String, minSize:ZSize, scale:Bool = true, content:String = "") {
+    init(url:String = "", minSize:ZSize, scale:Bool = true, content:String = "") {
         currentUrl = url
         self.minSize = minSize
         self.maxSize = minSize
@@ -81,7 +81,7 @@ class ZWebView : WKWebView, ZView, UIWebViewDelegate {
     }
 
     func webView(_ webView:UIWebView, didFailLoadWithError:Error) {
-        zdelegate?.HandleFailedDownload(self, error:didFailLoadWithError as Error)
+        zdelegate?.HandleError(self, error:didFailLoadWithError as Error)
     }
 
     func webView(_ webView:UIWebView, shouldStartLoadWith req:URLRequest, navigationType:UIWebView.NavigationType) -> Bool {
@@ -149,7 +149,8 @@ class ZWebView : WKWebView, ZView, UIWebViewDelegate {
         resourcecount = 0
         let nsRequest = NSMutableURLRequest(url:URL(string:url)!)
         if makeUserAgentDesktopBrowser {
-            nsRequest.setValue("%s Safari/528.16", forHTTPHeaderField:"User_Agent")
+            nsRequest.setValue("Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.137 Safari/537.36", forHTTPHeaderField:"User_Agent")
+//            nsRequest.setValue("%s Safari/528.16", forHTTPHeaderField:"User_Agent")
         }
         if useCookies {
             copyCookies(nsRequest)

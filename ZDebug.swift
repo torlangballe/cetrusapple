@@ -28,11 +28,13 @@ extension ZDebug {
             }
         }
         ZDebug.mutex.Lock()
-        if ZDebug.storePrintLines != 0 {
-            if ZDebug.storedLines.count > ZDebug.storePrintLines {
-                ZDebug.storedLines.removeFirst()
+        if !ZDebug.logAllOutput {
+            if ZDebug.storePrintLines != 0 {
+                if ZDebug.storedLines.count > ZDebug.storePrintLines {
+                    ZDebug.storedLines.removeFirst()
+                }
+                ZDebug.storedLines.append(str)
             }
-            ZDebug.storedLines.append(str)
         }
         for h in ZDebug.printHooks {
             h(str)

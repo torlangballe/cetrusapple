@@ -14,6 +14,7 @@ class ZDebug {
     static var storedLines = [String]()
     static var lastStampTime = ZTimeNull
     static var printHooks = [(String)->()]()
+    static var logAllOutput = false
     
     static func basePrint(_ str: String, separator: String = " ", terminator: String = "\n") {
         print(str, separator:separator, terminator:terminator)

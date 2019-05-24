@@ -23,3 +23,24 @@ class ZMutex {
         pthread_mutex_unlock(&lock)
     }
 }
+
+class ZCountDownLatch {
+    let dg = DispatchGroup()
+
+    init(count: Int = 1) {
+        for _ in 1 ... count {
+            dg.enter()
+        }
+    }
+    
+    @discardableResult func Wait() -> ZError? {
+        if dg.wait(timeout: ZDispatchTimeInSecs(timeoutSecs)) == .timedOut {
+            return ZNewError("timed out")
+        }
+        return nil
+    }
+
+    func Leave() {
+        dg.leave()
+    }
+}

@@ -151,6 +151,14 @@ struct ZDevice {
         return ""
     }
     
+    static func GetMainMAC() -> UInt64 {
+        #if os(tvOS)
+        return GetLanMAC()
+        #else
+        return GetWifiMAC()
+        #endif
+    }
+    
     static func GetWifiMAC() -> UInt64 {
         return 0x112233445567
     }

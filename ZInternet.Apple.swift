@@ -23,7 +23,7 @@ struct ZInternet {
         return ip
     }
     
-    static func GetNetworkTrafficBytes() -> Int64 { // https://stackoverflow.com/questions/7946699/iphone-data-usage-tracking-monitoring
+    static func GetNetworkTrafficBytes(processId: Int64) -> Int64 { // https://stackoverflow.com/questions/7946699/iphone-data-usage-tracking-monitoring
         let info = DataUsage.getDataUsage()
         return Int64(info.lanReceived) + Int64(info.lanSent) + Int64(info.wirelessWanDataReceived) + Int64(info.wirelessWanDataSent)
     }

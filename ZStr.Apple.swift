@@ -16,7 +16,7 @@ struct ZStr {
     static func Utf8(_ str:String) -> String.UTF8View {
         return str.utf8
     }
-
+    
     static func Format(_ format:String, _ args:CVarArg...) -> String {
         let vformat = format.replacingOccurrences(of:"%S", with:"%@") // need something better than this replacement %%S etc
         return NSString(format:vformat, arguments: getVaList(args)) as String
@@ -48,7 +48,7 @@ struct ZStr {
         }
         return -1
     }
-
+    
     static func FindLastOfChars(_ str:String, charset:String) -> Int {
         let set = CharacterSet(charactersIn:charset)
         let opts = NSString.CompareOptions(rawValue:NSString.CompareOptions.literal.rawValue | NSString.CompareOptions.backwards.rawValue)
@@ -57,11 +57,11 @@ struct ZStr {
         }
         return -1
     }
-
+    
     static func Join(_ strs:[String], sep:String) -> String {
         return NSArray(array: strs).componentsJoined(by: sep)
     }
-
+    
     static func Split(_ str:String, sep:String) -> [String] {
         if str.isEmpty {
             return []
@@ -94,6 +94,17 @@ struct ZStr {
         return ("", "")
     }
     
+    static func SplitIntoLengths(_ str: String, length: Int) -> [String] {
+        var startIndex = str.startIndex
+        var results = [Substring]()
+        while startIndex < str.endIndex {
+            let endIndex = str.index(startIndex, offsetBy: length, limitedBy: str.endIndex) ?? str.endIndex
+            results.append(str[startIndex..<endIndex])
+            startIndex = endIndex
+        }
+        return results.map { String($0) }
+    }
+    
     static func CountLines(_ str:String) -> Int {
         var count = 0
         str.enumerateLines { (line, quit) in count += 1 }
@@ -107,12 +118,12 @@ struct ZStr {
         }
         c = min(c, chars)
         let pos = str.index(str.startIndex, offsetBy: c)
-//        let head = str.substring(to: index)
-//        return head
-
+        //        let head = str.substring(to: index)
+        //        return head
+        
         let head = str[str.startIndex ..< pos]
         return String(head)
-}
+    }
     
     static func Tail(_ str: String, chars:Int = 1) -> String {
         if chars >= str.count {
@@ -124,7 +135,7 @@ struct ZStr {
         
         return String(tail)
     }
-
+    
     static func Body(_ str:String, pos:Int, size:Int = -1) -> String {
         if size == 0 {
             return ""
@@ -146,13 +157,13 @@ struct ZStr {
         let body = str[range]
         return String(body)
     }
-
+    
     @discardableResult static func HeadUntilWithRest(_ str: String, sep:String, options: ZStringCompareOptions = .literal) -> (String, String) { // head, rest
         let s = ZStr.HeadUntil(str, sep:sep, options:options)
         let rest = ZStr.Body(str, pos:(s + sep).count)
         return (s, rest)
     }
-
+    
     static func HeadUntil(_ str: String, sep:String, options: ZStringCompareOptions = .literal) -> String {
         let foundRange = str.range(of: sep, options:options)// range searchRange: Range<Index>? = default, locale: NSLocale? = default) -> Range<Index>?
         if foundRange != nil {
@@ -162,7 +173,7 @@ struct ZStr {
         }
         return str
     }
-
+    
     static func TailUntil(_ str: String, sep:String, options: ZStringCompareOptions = .literal) -> String {
         if let range = rangeOfWordAtEnd(str, sep:sep, options:options) {
             let tail = str[range]
@@ -170,7 +181,7 @@ struct ZStr {
         }
         return str
     }
-
+    
     static func TailUntilWithRest(_ str: String, sep:String, options: ZStringCompareOptions = .literal) -> (String, String) { // tail, then rest
         if let range = rangeOfWordAtEnd(str, sep:sep, options:options) {
             let tail = str[range]
@@ -188,7 +199,7 @@ struct ZStr {
         }
         return str
     }
-
+    
     static func PopHeadWord(_ str:inout String, sep:String = " ", options:ZStringCompareOptions = .literal) -> String {
         if let range = rangeOfWordAtStart(str, sep:sep, options:options) {
             let head = str[range]
@@ -214,7 +225,7 @@ struct ZStr {
         }
         return nil
     }
-
+    
     static func CommonPrefix(_ a: String, _ b: String) -> String {
         return a.commonPrefix(with: b)
     }
@@ -248,7 +259,7 @@ struct ZStr {
         }
         return str
     }
-
+    
     static func Compare(a:String, b:String, reverse:Bool = false, caseless:Bool = true, removeThe:Bool = false, sortAlphaFirst:Bool = false) -> Bool {
         var order = false
         var va = a
@@ -279,34 +290,34 @@ struct ZStr {
         }
         return reverse ? !order : order
     }
-
+    
     static func SortArray(_ strings:inout [String], reverse:Bool = false, caseless:Bool = true, removeThe:Bool = false) {
         strings.sort {
             return Compare(a:$0, b:$1, reverse:reverse, caseless:caseless, removeThe:removeThe)
         }
     }
-
+    
     static func Sorted(_ strings:[String], reverse:Bool = false, caseless:Bool = true, removeThe:Bool = false) -> [String] {
         return strings.sorted {
             return Compare(a:$0, b:$1, reverse:reverse, caseless:caseless, removeThe:removeThe)
         }
     }
-
+    
     static func ReplaceWhiteSpaces(_ str:String, to:String) -> String {
         var out = [Character]()
         let chars = Array(to)
         var white = false
         for c in str {
             switch c {
-                case "\n", "\r", "\t":
-                    white = true
+            case "\n", "\r", "\t":
+                white = true
                 
-                default:
-                    if(white) {
-                        out += chars
-                        white = false
-                    }
-                    out.append(c)
+            default:
+                if(white) {
+                    out += chars
+                    white = false
+                }
+                out.append(c)
             }
         }
         if white {
@@ -350,7 +361,7 @@ struct ZStr {
         }
         return String(filteredCharacters)
     }
-
+    
     static func FilterToNumeric(_ str:String) -> String {
         let filteredCharacters = str.filter {
             return String($0).rangeOfCharacter(from:CharacterSet.decimalDigits) != nil
@@ -397,7 +408,7 @@ struct ZStr {
         }
         return result
     }
-
+    
     static func MakeHashTagWord(_ str:String) -> String {
         let split = ZStr.SplitByChars(str, chars:" .-,/()_")
         var words = [String]()
@@ -415,7 +426,7 @@ struct ZStr {
         vstr = vstr.replacingOccurrences(of: "\\\"", with:"\"")
         vstr = vstr.replacingOccurrences(of: "\\'", with:"'")
         vstr = vstr.replacingOccurrences(of: "\\\\", with:"\\")
-
+        
         return vstr
     }
     
@@ -428,7 +439,7 @@ struct ZStr {
         }
     }
     static func Base64Encode(_ str:String) -> String {
-        let base64 = ZData(utfString:str)!.base64EncodedString(options: NSData.Base64EncodingOptions())        
+        let base64 = ZData(utfString:str)!.base64EncodedString(options: NSData.Base64EncodingOptions())
         return base64
     }
     
@@ -439,7 +450,7 @@ struct ZStr {
         }
         return nil
     }
-
+    
     static func UrlDecode(_ str:String) -> String? {
         return str.removingPercentEncoding
     }
@@ -454,14 +465,14 @@ struct ZStr {
         let c = str.utf8.count + 1
         _ = strlcpy(carray, str, c) // str is coerced to c-string amazingly enough
     }
-
+    
     static func StrFromCCharArray(_ carray:UnsafeMutablePointer<Int8>?) -> String { // this requires pointer to FIRST tuple using .0 if it's char[256] etc
         if carray == nil {
             return ""
         }
         return String(cString:carray!)
     }
-
+    
     static func CopyStrToAllocedCStr(_ str:String, len:Int) -> UnsafeMutablePointer<Int8> {
         let pointer = UnsafeMutablePointer<Int8>.allocate(capacity:len)
         strcpy(pointer, str)
@@ -469,27 +480,25 @@ struct ZStr {
     }
     
     static func NiceDouble(_ d:Double, maxSig:Int = 8, separator:String = ",") -> String {
-        let str = ZStr.Format("%lf", d)
-        var sfract = ZStr.TailUntil(str, sep: ".")
-        sfract = ZStr.Head(sfract, chars: maxSig)
-        var n = Int64(d)
-        var sint = ""
-        while true {
-            if n / 1000 > 0 {                
-                sint = ZStr.Format("%03ld", n % 1000) + sint
-            } else {
-                sint = "\(n % 1000)" + sint
+        let format = ZStr.Format("%%.%df", maxSig)
+        let s = ZStr.Format(format, f)
+        let parts = ZStr.Split(s, ".")
+        
+        var n = parts[0]
+        var f = ""
+        if len(parts > 1) {
+            f = parts[1]
+            while ZStr.Tail(f) == "0" {
+                f = f.removedLast()
             }
-            n /= 1000
-            if n == Int64(0) {
-                break
-            }
-            sint = separator + sint
         }
-        if !sfract.isEmpty {
-            sfract = "." + sfract
+        if separator != "" {
+            n = ZStr.SplitIntoLengths(n.reversed(), 3).reversed()
         }
-        return sint + sfract
+        if f != "" {
+            n += "." + f
+        }
+        return n
     }
     
     static func ToDouble(_ str:String, def:Double? = nil) -> Double? {
@@ -536,28 +545,28 @@ struct ZStr {
             
         case ia ... iz:
             return char - ia + 26
-        
+            
         case i0 ... i9:
             return char - i0 + 26 + 26
-        
+            
         case iPlus:
             return 62
-        
+            
         case iSlash:
             return 63
-
+            
         default:
             return -1
         }
     }
-
+    
     static func NumberToBase64String(_ num:Int) -> String {
         if let scalar = NumberToBase64Char(num) {
             return String(Character(UnicodeScalar(scalar)!))
         }
         return ""
     }
-
+    
     static func NumberToBase64Char(_ num:Int) -> Int? {
         let iA = Int(UnicodeScalar("A")!.value)
         let ia = Int(UnicodeScalar("a")!.value)
@@ -574,7 +583,7 @@ struct ZStr {
             
         case 52 ..< 62:
             return i0 + num - 26 - 26
-
+            
         case 62:
             return iPlus
             
@@ -585,7 +594,7 @@ struct ZStr {
             return nil
         }
     }
-
+    
 }
 
 private func rangeOfWordAtEnd(_ str: String, sep:String, options:ZStringCompareOptions) -> Range<String.Index>? {
@@ -604,3 +613,5 @@ private func rangeOfWordAtStart(_ str: String, sep:String, options:ZStringCompar
     }
     return nil
 }
+
+

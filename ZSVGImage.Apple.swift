@@ -16,7 +16,7 @@ class ZSVGImage {
         image = SVGKImage(data: data)
     }
     
-    func Draw(canvas: ZCanvas) {
+    func Draw(canvas: ZCanvas, rect: ZRect = ZRect.Null) {
         image?.render(to: canvas.context, antiAliased: true, curveFlatnessFactor:1.0, interpolationQuality:.medium, flipYaxis:false)
     }
 }
